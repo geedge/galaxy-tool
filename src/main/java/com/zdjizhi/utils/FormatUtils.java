@@ -13,7 +13,7 @@ public class FormatUtils {
 	 * 如{"BRH_ID":"1234","BRH_NAME":"机构"}改为{"brhId":"1234","brhName":"机构"}
 	 *
 	 * @param list
-	 * @return
+	 * @return List<HashMap<String, Object>>
 	 */
 	public static List<HashMap<String, Object>> formatHashMapKeyInList(
 			List<HashMap<String, Object>> list) {
@@ -33,7 +33,7 @@ public class FormatUtils {
 	 * "brhName":"机构"}
 	 *
 	 * @param hashMap
-	 * @return
+	 * @return HashMap<String, Object>
 	 */
 	public static HashMap<String, Object> formatHashMapKey(
 			HashMap<String, Object> hashMap) {
@@ -57,7 +57,7 @@ public class FormatUtils {
 	 * 规则为全部转化为单词，然后首字母小写
 	 *
 	 * @param DBName
-	 * @return
+	 * @return String
 	 */
 	public static String formatDBNameToVarName(String DBName) {
 		StringBuilder result = new StringBuilder("");

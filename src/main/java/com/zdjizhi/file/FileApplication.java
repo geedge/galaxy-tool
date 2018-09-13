@@ -94,7 +94,7 @@ public final class FileApplication  extends org.apache.commons.io.FileUtils {
 	 * TXT,HTML,HTM,EML,DOC,DOCX,XLS,XLSX,PPT,PPTX,PDF
 	 * </p>
 	 * @param filePath 文件路径
-	 * @return <code>string<code> 扩展名 ,<code>null</code> 无扩展名
+	 * @return <code>string</code> 扩展名 ,<code>null</code> 时无扩展名
 	 */
 	public static String getFileExtendName(String filePath) {
 		String extendName = null;

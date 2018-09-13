@@ -95,6 +95,11 @@ public class IpTest {
 
     }
 
+    @Test
+    public void testIpRange() {
+        logger.info(Arrays.toString(IPUtil.getIPRange("192.168.10.1", 25).toArray()));
+    }
+
    // @Test
     public void testCity() {
 

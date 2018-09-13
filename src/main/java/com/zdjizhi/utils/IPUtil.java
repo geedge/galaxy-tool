@@ -171,10 +171,9 @@ public class IPUtil {
     /**
      * 获得子网的所有IP地址；如：192.168.0.1/24。
      * 注意：本方法不做合法性检查！
-     *
-     * @param prefix
-     * @param prefixLen
-     * @return
+     * @param prefix 子网所属IP地址
+     * @param prefixLen 子网掩码
+     * @return List<String>
      */
     public static List<String> getIPRange(String prefix, int prefixLen) {
         String binPrefix = toBinaryString(prefix);
@@ -311,6 +310,7 @@ public class IPUtil {
 
     /**
      * 根据起始IP地址和子网掩码计算终止IP
+     * @return String 子网的结束IP
      */
     public static String getEndIP(String StartIP,int netmask)
     {
@@ -318,6 +318,7 @@ public class IPUtil {
     }
     /**
      * 根据起始IP地址和子网掩码计算终止IP
+     * @return String 子网的结束IP
      */
     public static String getEndIP(String StartIP, String netmask)
     {
@@ -360,11 +361,11 @@ public class IPUtil {
 
 
     /**
-     * 将整型的掩码转换成IPv4型(30 -> 255.255.255.252).
+     * <p>将整型的掩码转换成IPv4型(30 -> 255.255.255.252).</p>
      *
      * @param mask 整型掩码.
      * @return IPv4型掩码.
-     * @exception Exception 掩码错误.
+     * @exception RuntimeException 掩码错误.
      */
     public static String convertMask(int mask)  {
         if (mask > 32 || mask < 8) {
@@ -375,7 +376,7 @@ public class IPUtil {
 
 
     /**
-     * 将整型的掩码转换成反向IPv4型(30 -> 255.255.255.252).
+     * <p>将整型的掩码转换成反向IPv4型(30 -> 255.255.255.252).</p>
      *
      * @param mask 整型掩码.
      * @return IPv4型反向掩码.
@@ -467,7 +468,7 @@ public class IPUtil {
     }
 
     /**
-     * 将整型掩码转换成IPv4型的反码(30 -> 0.0.0.3).
+     * <p>将整型掩码转换成IPv4型的反码(30 -> 0.0.0.3).</p>
      *
      * @param mask 整型掩码.
      * @return IPv4型反码.

@@ -1,9 +1,3 @@
-/*
- *  @(#)StringUtil.java	1.0
- *
- * Copyright 2010 NIS, Inc. All rights reserved.
- * 
- */
 package com.zdjizhi.utils;
 
 
@@ -26,12 +20,14 @@ import org.apache.commons.lang3.StringUtils;
 import sun.misc.BASE64Encoder;
 
 /**
- *  
+ *
  * <p>字符串处理工具类</p>
- * @author 中科智源育成信息有限公司 E-mail: doufengh@software.ict.ac.cn
+ * @author 中电积至有限公司 E-mail: doufengh@software.ict.ac.cn
  * @version 1.0 创建时间：2010-11-8 下午04:50:39
  *
  */
+
+
 public final class StringUtil extends StringUtils {
 	
     private static int size = 0;
@@ -160,18 +156,18 @@ public final class StringUtil extends StringUtils {
 	
 	
 	/**
-	 * 
 	* <p>判断字符串是否为空.
-	* 为空条件:全角\半角\tab 等没有实际意义的字符.
-	* 具体参看{@link Character#isWhitespace(char)}对空格的定义.
+	*  为空条件:全角\半角\tab 等没有实际意义的字符.
+    *  具体参看{@link Character#isWhitespace(char)}对空格的定义.
 	* </p>
+     *
 	* <pre>
 	* StringUtils.isBlank("  ") = true 为半角空格
 	* StringUtils.isBlank("　　") = true 为全角空格
 	* StringUtils.isBlank("	") = true 为tab键
 	* </pre>   
 	* @param str 字符串
-	* @return <code>true<code> 字符串为空 ,<code>false</code> 不为空
+	* @return <code>true</code> 字符串为空 ,<code>false</code> 不为空
 	 */
 	public static boolean isBlank(String str) {
         int strLen;
@@ -187,7 +183,6 @@ public final class StringUtil extends StringUtils {
     }
 
 
-
     /**
      *
      * <p>判断字符串不为空.
@@ -200,7 +195,7 @@ public final class StringUtil extends StringUtils {
      * StringUtils.isBlank("	") = false 为tab键
      * </pre>
      * @param str 字符串
-     * @return <code>true<code> 字符串为空 ,<code>false</code> 不为空
+     * @return <code>true</code> 字符串为空 ,<code>false</code> 不为空
      */
     public static boolean isNotBlank(String str) {
 
@@ -216,7 +211,7 @@ public final class StringUtil extends StringUtils {
 	* TXT,HTML,HTM,EML,DOC,DOCX,XLS,XLSX,PPT,PPTX,PDF
 	* </p>
 	* @param filePath 文件路径
-	* @return <code>string<code> 扩展名 ,<code>null</code> 无扩展名
+	* @return <code>string</code> 扩展名 ,<code>null</code> 无扩展名
 	 */
 	public static String getFileExtendName(String filePath){
 		String extendName = null;
@@ -241,7 +236,7 @@ public final class StringUtil extends StringUtils {
 	* StringUtil.strip(" ").length() = 0 
 	* </pre>   
 	* @param str 字符
-	* @return <code>str</code> 两边去空后字符串,<code>""<code> 字符串为null时.
+	* @return <code>str</code> 两边去空后字符串,<code>""</code> 字符串为null时.
 	*/
 	public static String strip(String str){
 		
@@ -530,7 +525,7 @@ public final class StringUtil extends StringUtils {
     * @param text 需处理的字符串
     * @param searchString 查找的字符
     * @param replaceString 替换的字符
-    * @return 返回替换后的字符串,<null> 文本为空时.
+    * @return 返回替换后的字符串,文本为空时返回null.
      */
     public static String replace(String text, String searchString, String replaceString ){
     	
@@ -552,7 +547,7 @@ public final class StringUtil extends StringUtils {
     * @param searchString 查找的字符
     * @param replaceString 替换字符
     * @param count 替换的总次数,<code>-1</code> 替换所有满足条件的字符,<code>0</code> 不进行替换.
-    * @return  返回替换后的字符串,<null> 文本为空时.
+    * @return  返回替换后的字符串,文本为空时返回null.
      */
     public static String replace(String text, String searchString, String replaceString, int count) {
     	
@@ -726,15 +721,11 @@ public final class StringUtil extends StringUtils {
      *
      * @Title: getFromRegEx
      * @Description: 统一正则抽取字符方法
-     * @param @param str
-     * @param @param pattern
-     * @param @param index
-     * @param @return    入参
+     * @param  str
+     * @param  pattern
+     * @param  index
      * @return String    返回类型
-     * @author （darnell）
-     * @throws
-     * @date 2017年8月21日 下午4:25:31
-     * @version V1.0
+     * @author （darnell） 2017年8月21日 下午4:25:31
      */
     public static String getFromRegEx(String str, String pattern, int index) {
         String value = "";

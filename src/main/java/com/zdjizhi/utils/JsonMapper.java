@@ -1,6 +1,3 @@
-/**
- * Copyright &copy; 2012-2014 <a href="https://github.com/thinkgem/jeesite">JeeSite</a> All rights reserved.
- */
 package com.zdjizhi.utils;
 
 import java.io.IOException;
@@ -30,10 +27,9 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 
 /**
- * 简单封装Jackson，实现JSON String<->Java Object的Mapper.
+ * 简单封装Jackson，实现JSON String  to Java Object的Mapper.
  * 封装不同的输出风格, 使用不同的builder函数创建实例.
- * @author ThinkGem
- * @version 2013-11-15
+ * @author darnell
  */
 public class JsonMapper extends ObjectMapper {
 
@@ -92,6 +88,7 @@ public class JsonMapper extends ObjectMapper {
 
 	/**
 	 * 创建只输出非Null且非Empty(如List.isEmpty)的属性到Json字符串的Mapper,建议在外部接口中使用.
+	 * @return JsonMapper 生成实例
 	 */
 	public static JsonMapper getInstance() {
 		if (mapper == null){
@@ -102,6 +99,7 @@ public class JsonMapper extends ObjectMapper {
 
 	/**
 	 * 创建只输出初始值被改变的属性到Json字符串的Mapper, 最节约的存储方式，建议在内部接口中使用。
+     * @return JsonMapper 生成实例
 	 */
 	public static JsonMapper nonDefaultMapper() {
 		if (mapper == null){
@@ -114,6 +112,7 @@ public class JsonMapper extends ObjectMapper {
 	 * Object可以是POJO，也可以是Collection或数组。
 	 * 如果对象为Null, 返回"null".
 	 * 如果集合为空集合, 返回"[]".
+     * @return  String json字符格式
 	 */
 	public String toJson(Object object) {
 		try {
@@ -125,13 +124,13 @@ public class JsonMapper extends ObjectMapper {
 	}
 
 	/**
-	 * 反序列化POJO或简单Collection如List<String>.
-	 * 
+	 * 反序列化POJO或简单Collection如List<java.lang.String>.
 	 * 如果JSON字符串为Null或"null"字符串, 返回Null.
 	 * 如果JSON字符串为"[]", 返回空集合.
 	 * 
 	 * 如需反序列化复杂Collection如List<MyBean>, 请使用fromJson(String,JavaType)
 	 * @see #fromJson(String, JavaType)
+     * @return 反序列化后的对象
 	 */
 	public <T> T fromJson(String jsonString, Class<T> clazz) {
 		if (StringUtil.isEmpty(jsonString)) {
@@ -148,8 +147,8 @@ public class JsonMapper extends ObjectMapper {
 	/**
 	 * 反序列化复杂Collection如List<Bean>, 先使用函數createCollectionType构造类型,然后调用本函数.
 	 * @see #createCollectionType(Class, Class...)
+     *  @return 反序列化后的对象
 	 */
-	@SuppressWarnings("unchecked")
 	public <T> T fromJson(String jsonString, JavaType javaType) {
 		if (StringUtil.isEmpty(jsonString)) {
 			return null;
@@ -166,6 +165,7 @@ public class JsonMapper extends ObjectMapper {
 	 * 構造泛型的Collection Type如:
 	 * ArrayList<MyBean>, 则调用constructCollectionType(ArrayList.class,MyBean.class)
 	 * HashMap<String,MyBean>, 则调用(HashMap.class,String.class, MyBean.class)
+     *  @return 集合类型
 	 */
 	public JavaType createCollectionType(Class<?> collectionClass, Class<?>... elementClasses) {
 		return this.getTypeFactory().constructParametricType(collectionClass, elementClasses);
@@ -173,6 +173,7 @@ public class JsonMapper extends ObjectMapper {
 
 	/**
 	 * 當JSON裡只含有Bean的部分屬性時，更新一個已存在Bean，只覆蓋該部分的屬性.
+     *  @return 更新后集合
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T update(String jsonString, T object) {

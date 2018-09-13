@@ -49,7 +49,7 @@ public class IpLookup {
      *
      * <p>给定IP库文件路径，根据ip获取国家代码.</p>
      * @param ip  ip地址
-     * @return 国家代码
+     * @return String 国家代码
      */
     public static String countryLookup(String ip) {
 
@@ -88,7 +88,7 @@ public class IpLookup {
      * 默认路径为:dat/GeoLiteCity.dat
      * </p>
      * @param ip ip地址，点分十进制格式,ipv4
-     * @return 城市代码 省代码 国家代码
+     * @return String 城市代码 省代码 国家代码
      */
     public static String cityLookupDetail(String ip) {
 
@@ -144,7 +144,7 @@ public class IpLookup {
      * 默认路径为:dat/GeoLiteCity.dat
      * </p>
      * @param ip ip地址，点分十进制格式,ipv4
-     * @return 城市|省代码
+     * @return String 城市|省代码
      */
     public static String cityLookup(String ip) {
 
@@ -185,7 +185,7 @@ public class IpLookup {
      * 默认IP城市库文件路径，根据ip获取经纬度.
      * </p>
      * @param ip ip地址
-     * @return 省代码 纬度 经度
+     * @return String 省代码 纬度 经度
      */
     public static String cityLatLngLookup(String ip) {
         StringBuilder  result = new StringBuilder(64);
@@ -229,7 +229,7 @@ public class IpLookup {
      *
      * <p>给定IP组织库文件路径，根据ip获取AS号,带组织结构</p>
      * @param ip ip地址
-     * @return 组织名称
+     * @return String 组织名称
      */
     public static String asnLookupDeatil(String ip) {
 
@@ -258,7 +258,7 @@ public class IpLookup {
      *
      * <p>给定IP组织库文件路径，根据ip获取AS号</p>
      * @param ip ip地址
-     * @return 组织名称
+     * @return String 组织名称
      */
     public static String asnLookup(String ip) {
 
@@ -285,8 +285,6 @@ public class IpLookup {
         return result;
 
     }
-
-
 
 
     public static void flushAll() {
@@ -318,40 +316,6 @@ public class IpLookup {
         if (asnServicev6 != null) {
             asnServicev6.close();
         }
-
-
-    }
-
-
-    public static void main(String[] args){
-
-        long beginTime = System.currentTimeMillis();
-        // logger.info(cityLookup("14.223.89.138"));
-        //logger.info(cityService("185.103.186.12"));
-
-        //logger.info(IPUtil.getEndIP("176.98.192.0", 18));
-
-        //logger.info("" + IPUtil.getNetMask(IPUtil.getMask("176.98.192.0", "176.98.255.255")));
-
-        logger.info(IpLookup.asnLookup("202.106.10.20"));
-        logger.info(IpLookup.cityLatLngLookup("222.175.94.0"));
-        logger.info(IpLookup.countryLookup("2c0f:ff80:ffff:ffff:ffff:ffff:ffff:ffff"));
-        logger.info(IpLookup.countryLookup("202.106.10.20"));
-
-        logger.info(IpLookup.asnLookup("2c0f:fef0::ee"));
-
-
-        logger.info(IPUtil.isIPv6Address("2c0f:fff0:ffff:ffff:ffff:ffff:ffff:ffff") + "");
-
-
-        logger.info(IpLookup.asnLookup("2001:252:ffff:ffff:ffff:ffff:ffff:ffff"));
-
-
-
-        logger.info((System.currentTimeMillis()-beginTime) + "ms");
-
-
-
 
 
     }
