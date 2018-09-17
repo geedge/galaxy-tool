@@ -36,3 +36,5 @@ IP定位使用向导，[IpLookup](/releases/docs)
    <url>http://192.168.10.125:8099/content/groups/public</url>
 </repository>
 ```
+
+**打包方式**

@@ -154,7 +154,12 @@ public class IpLookup {
             Location location = null;
 
             if (IPUtil.isIP(ip)) {
+
+                if (IPUtil.internalIp(ip)){
+                    return "N/A";
+                }
                 location = cityService.getLocation(ip);
+
             } else if (IPUtil.isIPv6Address(ip)) {
                 location = cityServicev6.getLocation(ip);
             }

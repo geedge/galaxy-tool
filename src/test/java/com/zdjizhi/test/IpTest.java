@@ -310,7 +310,8 @@ public class IpTest {
 
     @Test
     public void ipTest() {
-        logger.info(IPUtil.getMask("192.168.100.1", "192.168.100.128"));
+        logger.info(IPUtil.internalIp("173.168.6.123") + "");
+        logger.info(IpLookup.cityLookup("10.0.3.123"));
 
         logger.info(IPUtil.convertMask(25));
 
