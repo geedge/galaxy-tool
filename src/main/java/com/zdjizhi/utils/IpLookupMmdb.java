@@ -1,62 +1,153 @@
 package com.zdjizhi.utils;
 
 import com.maxmind.db.CHMCache;
-import com.maxmind.geoip.regionName;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.model.AsnResponse;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
 import com.maxmind.geoip2.record.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.maxmind.geoip2.record.Country;
+import com.maxmind.geoip2.record.Location;
+
 
 import java.io.File;
 import java.net.InetAddress;
 
 /**
  *
- * <p>对IP定位查找工具类.</p>
+ * <p>maxmind 官网API结构，对IP定位查找工具类，加载mmdb数据格式文件</p>
  * @author 中电积至有限公司 darnell
  * @version 1.0 创建时间：2018-08-30
  *
  */
-public class IpLookupV2 {
+public class IpLookupMmdb extends AbstractIpLookup{
 
-    private static Logger logger = LoggerFactory.getLogger(IpLookup.class);
     public final static String DEFAULT_IP_DATABASE_PATH = "dat";
 
     private static DatabaseReader countryReader = null;
     private static DatabaseReader cityReader = null;
     private static DatabaseReader asnReader = null;
-    static {
+
+    synchronized void init(Builder builder) {
         try {
-            String datRootPath =  System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator;
-            countryReader = new DatabaseReader.Builder(new File(datRootPath + "GeoLite2-Country.mmdb"))
-                    .withCache(new CHMCache()).build();
 
-            cityReader = new DatabaseReader.Builder(new File(datRootPath + "GeoLite2-City.mmdb"))
-                    .withCache(new CHMCache()).build();
+            if (builder.isDefalultDB) {
+                String datRootPath =  System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator;
+                countryReader = new DatabaseReader.Builder(new File(datRootPath + "GeoLite2-Country.mmdb"))
+                        .withCache(new CHMCache()).build();
 
+                cityReader = new DatabaseReader.Builder(new File(datRootPath + "GeoLite2-City.mmdb"))
+                        .withCache(new CHMCache()).build();
 
-            asnReader = new DatabaseReader.Builder(new File(datRootPath + "GeoLite2-ASN.mmdb"))
-                    .withCache(new CHMCache()).build();
+                asnReader = new DatabaseReader.Builder(new File(datRootPath + "GeoLite2-ASN.mmdb"))
+                        .withCache(new CHMCache()).build();
+
+            } else {
+
+                if (builder.geoCountryFile != null) {
+                    countryReader = new DatabaseReader.Builder(new File(builder.geoCountryFile))
+                            .withCache(new CHMCache()).build();
+                }
+
+                if (builder.geoCityFile != null) {
+                    cityReader = new DatabaseReader.Builder(new File(builder.geoCityFile))
+                            .withCache(new CHMCache()).build();
+                }
+
+                if (builder.geoAsnFile != null) {
+                    asnReader = new DatabaseReader.Builder(new File(builder.geoAsnFile))
+                            .withCache(new CHMCache()).build();
+                }
+            }
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn("Unknow GeoIP dat file ,please check your dat path!");
+            logger.warn("Unknow　GeoIP mmdb dat file , please check your dat path!");
 
+        }
+
+
+    }
+
+    private IpLookupMmdb(Builder builder) {
+        init(builder);
+    }
+
+
+    /**
+     * 加载mmdb数据字典文件，内部生成mmdb动态库。
+     *
+     * 1.默认记载IP库，使用方式如下:
+     * IpLookupMmdb ipLookup = new IpLookupMmdb.Builder(true).build();
+     * 自动加载应用dat目录下的库文件，命名为:GeoLite2-Country.mmdb\GeoLite2-City.mmdb与GeoLite2-ASN.mmdb库。
+     *
+     * 2.手动加载IP库，使用方式如下：
+     * <p>
+     *   IpLookup IpLookupMmdb = new IpLookupMmdb.Builder(false).loadDataFileV4("D:\\galaxy-tool\\dat\\GeoLite2-Country.mmdb").
+     *   loadDataFileV6("D:\\galaxy-tool\\dat\\GeoLite2-City.mmdb").loadDataFileV6("D:\\galaxy-tool\\dat\\GeoLite2-ASN.mmdb").build();
+     *
+     * </p>
+     */
+    public static final class Builder {
+        String geoCountryFile;
+        String geoCityFile;
+        String geoAsnFile;
+        boolean isDefalultDB;
+
+        /**
+         *
+         * @param isDefalultDB <code>false</code> 手动指定IP库路径 <code>true</code> 使用默认路径
+         */
+        public Builder(boolean isDefalultDB) {
+            this.isDefalultDB = isDefalultDB;
+        }
+
+        /**
+         *
+         * @param geoCountryFile 加载GeoLite2-Country mmdb库文件
+         * @return
+         */
+        public Builder loadGeoCountryFile(String geoCountryFile) {
+            this.geoCountryFile = geoCountryFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param geoCityFile 加载GeoLite2-City mmdb库文件
+         * @return
+         */
+        public Builder loadGeoCityFile(String geoCityFile) {
+            this.geoCityFile = geoCityFile;
+            return this;
+        }
+
+
+        /**
+         *
+         * @param geoAsnFile 加载GeoLite2-ASN mmdb库文件
+         * @return
+         */
+        public Builder loadGeoAsnFile(String geoAsnFile) {
+            this.geoAsnFile = geoAsnFile;
+            return this;
+        }
+
+        /**
+         * 构建对象
+         * @return
+         */
+        public IpLookupMmdb build() {
+            return new IpLookupMmdb(this);
         }
 
     }
 
-    /**
-     *
-     * <p>给定IP库文件路径，根据ip获取国家代码.</p>
-     * @param ip  ip地址
-     * @return 国家代码
-     */
-    public static String countryLookup(String ip) {
+
+
+    @Override
+    public String countryLookup(String ip) {
 
         String result = null;
 
@@ -78,15 +169,8 @@ public class IpLookupV2 {
     }
 
 
-    /**
-     * <p>
-     * 默认IP城市库文件路径，根据ip获取城市代码.
-     * 默认路径为:dat/GeoLiteCity.dat
-     * </p>
-     * @param ip ip地址
-     * @return 城市代码 省代码 国家代码
-     */
-    public static String cityLookupDetail(String ip) {
+    @Override
+    public String cityLookupDetail(String ip) {
 
         String result = null;
 
@@ -110,14 +194,8 @@ public class IpLookupV2 {
         return result ;
     }
 
-    /**
-     * <p>
-     * 默认IP城市库文件路径，根据ip获取城市代码.
-     * </p>
-     * @param ip ip地址
-     * @return 省代码
-     */
-    public static String cityLookup(String ip) {
+    @Override
+    public String cityLookup(String ip) {
         String result = null;
         try {
 
@@ -141,14 +219,29 @@ public class IpLookupV2 {
         return result ;
     }
 
-    /**
-     * <p>
-     * 默认IP城市库文件路径，根据ip获取经纬度.
-     * </p>
-     * @param ip ip地址
-     * @return 省代码 纬度 经度
-     */
-    public static String cityLatLngLookup(String ip) {
+    @Override
+    public String latLngLookup(String ip) {
+        StringBuilder  result = new StringBuilder(64);
+        try {
+
+            InetAddress ipAddress = InetAddress.getByName(ip);
+            CityResponse response =  cityReader.city(ipAddress);
+            Location location = response.getLocation();
+            result.append(location.getLatitude()).append("\t").append(location.getLongitude());
+
+        } catch (AddressNotFoundException ae) {
+            logger.warn(ae.getMessage());
+        } catch (Exception e) {
+
+            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
+        }
+
+
+        return result.toString() ;
+    }
+
+    @Override
+    public String cityLatLngLookup(String ip) {
         StringBuilder  result = new StringBuilder(64);
         try {
 
@@ -176,13 +269,8 @@ public class IpLookupV2 {
 
 
 
-    /**
-     *
-     * <p>给定IP组织库文件路径，根据ip获取AS号详细，带组织.</p>
-     * @param ip ip地址
-     * @return 组织名称
-     */
-    public static String asnLookupDetail(String ip) {
+    @Override
+    public String asnLookupDetail(String ip) {
 
         String result = null;
         try {
@@ -202,13 +290,8 @@ public class IpLookupV2 {
     }
 
 
-    /**
-     *
-     * <p>给定IP组织库文件路径，根据ip获取AS号.</p>
-     * @param ip ip地址
-     * @return 组织名称
-     */
-    public static String asnLookup(String ip) {
+    @Override
+    public String asnLookup(String ip) {
 
         String result = null;
         try {
@@ -226,11 +309,8 @@ public class IpLookupV2 {
 
     }
 
-    public static void main(String[] args){
-        logger.info(countryLookup("202.106.10.20"));
-        logger.info(cityLatLngLookup("222.175.94.0"));
-        logger.info(asnLookup("202.106.10.20"));
-    }
+
+
 
 
 }

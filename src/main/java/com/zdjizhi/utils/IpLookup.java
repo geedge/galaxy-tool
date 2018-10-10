@@ -1,133 +1,169 @@
 package com.zdjizhi.utils;
 
-import com.maxmind.geoip.Country;
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
-import com.maxmind.geoip.regionName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.maxmind.db.CHMCache;
+import com.maxmind.geoip2.exception.AddressNotFoundException;
+import com.zdjizhi.domain.LocationResponse;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.InetAddress;
 
 /**
- *
- * <p>对IP定位查找工具类.</p>
- * @author 中电积至有限公司 darnell
- * @version 1.0 创建时间：2018-08-30
- *
- */
-public class IpLookup {
-    private static Logger logger = LoggerFactory.getLogger(IpLookup.class);
-    public final static String DEFAULT_IP_DATABASE_PATH = "dat";
-    private static final String ASN_PATTERN = "AS(.*?) ";
-    private static LookupService countyService;
-    private static LookupService cityService;
-    private static LookupService asnService;
-    private static LookupService countyServicev6;
-    private static LookupService cityServicev6;
-    private static LookupService asnServicev6;
+ * @ClassName IpLookup
+ * @Description  对IP定位查找工具类
+ * @Author 中电积至有限公司 darnell
+ * @Date 2018-10-8 16:48
+ * @Version 1.0
+ **/
+public final class IpLookup extends AbstractIpLookup{
 
-    static {
+    public final static String DEFAULT_IP_DATABASE_PATH = "dat";
+
+    private static GalaxyDataBaseReader locationReaderV4;
+    private static GalaxyDataBaseReader locationReaderV6;
+
+
+    synchronized void init(Builder builder) {
         try {
-            String datRootPath =  System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator;
-            countyService = new LookupService(datRootPath + "GeoIP.dat", LookupService.GEOIP_MEMORY_CACHE | LookupService.GEOIP_CHECK_CACHE);
-            cityService = new LookupService(datRootPath + "GeoLiteCity.dat", LookupService.GEOIP_MEMORY_CACHE | LookupService.GEOIP_CHECK_CACHE);
-            asnService = new LookupService(datRootPath + "GeoIPASNum.dat", LookupService.GEOIP_MEMORY_CACHE | LookupService.GEOIP_CHECK_CACHE);
-            countyServicev6 =  new LookupService(datRootPath + "GeoIPv6.dat", LookupService.GEOIP_MEMORY_CACHE | LookupService.GEOIP_CHECK_CACHE);
-            cityServicev6 =  new LookupService(datRootPath + "GeoLiteCityv6.dat", LookupService.GEOIP_MEMORY_CACHE | LookupService.GEOIP_CHECK_CACHE);
-            asnServicev6 = new LookupService(datRootPath + "GeoIPASNumv6.dat", LookupService.GEOIP_MEMORY_CACHE | LookupService.GEOIP_CHECK_CACHE);
+
+            if (builder.isDefalultDB) {
+                String datRootPath =  System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator;
+
+                locationReaderV4 = new GalaxyDataBaseReader.Builder(new File(datRootPath + "all_ip_info_v4.mmdb"))
+                        .withCache(new CHMCache()).build();
+                locationReaderV6 = new GalaxyDataBaseReader.Builder(new File(datRootPath + "all_ip_info_v6.mmdb"))
+                        .withCache(new CHMCache()).build();
+
+            } else {
+
+                if (builder.databaseFileV4 != null) {
+                    locationReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.databaseFileV4))
+                            .withCache(new CHMCache()).build();
+                }
+
+                if (builder.databaseFileV6 != null) {
+                    locationReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.databaseFileV6))
+                            .withCache(new CHMCache()).build();
+                }
+            }
+
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn("Unknow GeoIP dat file ,please check your dat path!");
+            logger.warn("Unknow mmdb dat file , please check your dat path!");
 
         }
+
 
     }
 
 
+    private IpLookup(Builder builder) {
+        init(builder);
+    }
+
+
+
     /**
+     * 加载mmdb数据字典文件，内部生成mmdb动态库。
      *
-     * <p>给定IP库文件路径，根据ip获取国家代码.</p>
-     * @param ip  ip地址
-     * @return String 国家代码
+     * 1.默认记载IP库，使用方式如下:
+     * IpLookup ipLookup = new IpLookup.Builder(true).build();
+     * 自动加载应用dat目录下的库文件，命名为:all_ip_info_v4.mmdb与all_ip_info_v6.mmdb库。
+     *
+     * 2.手动加载IP库，使用方式如下：
+     * <p>
+     *   IpLookup ipLookup = new IpLookup.Builder(false).loadDataFileV4("D:\\galaxy-tool\\dat\\all_ip_info_v4.mmdb").
+     *   loadDataFileV6("D:\\galaxy-tool\\dat\\all_ip_info_v6.mmdb").build();
+     *
+     * </p>
      */
-    public static String countryLookup(String ip) {
+    public static final class Builder {
+        String databaseFileV4;
+        String databaseFileV6;
+        boolean isDefalultDB;
 
-        String result = "";
-
-        try {
-            Country country = null;
-
-            if (IPUtil.isIP(ip)) {
-                country = countyService.getCountry(ip);
-            } else if (IPUtil.isIPv6Address(ip)){
-                country = countyServicev6.getCountry(ip);
-            }
-
-            if (StringUtil.isNotEmpty(country)) {
-
-                result = country.getName().equals("null") ? null :  country.getName();
-            }
-
-        } catch (Exception e) {
-
-            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
-
-        } finally {
-            return result;
+        /**
+         *
+         * @param isDefalultDB <code>false</code> 手动指定IP库路径 <code>true</code> 使用默认路径
+         */
+        public Builder(boolean isDefalultDB) {
+            this.isDefalultDB = isDefalultDB;
         }
 
+        /**
+         *
+         * @param databaseFileV4 加载IPv4 mmdb库文件
+         * @return
+         */
+        public Builder loadDataFileV4(String databaseFileV4) {
+            this.databaseFileV4 = databaseFileV4;
+            return this;
+        }
+
+        /**
+         *
+         * @param databaseFileV6 加载IPv6 mmdb库文件
+         * @return
+         */
+        public Builder loadDataFileV6(String databaseFileV6) {
+            this.databaseFileV6 = databaseFileV6;
+            return this;
+        }
+
+        /**
+         * 构建对象
+         * @return
+         * @throws IOException
+         */
+        public IpLookup build() {
+            return new IpLookup(this);
+        }
 
     }
 
+    @Override
+    public  String countryLookup(String ip) {
+        String result = UNKNOW;
 
+        LocationResponse response = getResponse(ip);
 
-    /**
-     * <p>
-     * 默认IP城市库文件路径，根据ip获取城市代码.
-     * 默认路径为:dat/GeoLiteCity.dat
-     * </p>
-     * @param ip ip地址，点分十进制格式,ipv4
-     * @return String 城市代码 省代码 国家代码
-     */
-    public static String cityLookupDetail(String ip) {
+        if (StringUtil.isNotEmpty(response)) {
+            result = StringUtil.setDefaultIfEmpty(response.getCountry(), "").toString() ;
+        }
+        return result;
+    }
+
+    @Override
+    public String cityLookupDetail(String ip) {
 
         StringBuffer result = new StringBuffer(64);
 
         try {
 
-            Location location = null;
+            LocationResponse response = getResponse(ip);
 
-            if (IPUtil.isIP(ip)) {
-                location = cityService.getLocation(ip);
-            } else if (IPUtil.isIPv6Address(ip)) {
-                location = cityServicev6.getLocation(ip);
-            }
+            if (StringUtil.isNotEmpty(response)) {
 
-            if (StringUtil.isNotEmpty(location)) {
-
-                if (StringUtil.isEmpty(location.city)) {
-                    result.append(" ").append("\t");
-
+                if (StringUtil.isBlank(response.getCity())) {
+                    result.append(UNKNOW).append("\t");
                 } else {
-                    result.append(location.city).append("\t");
+                    result.append(response.getCity()).append("\t");
                 }
 
 
-                if (StringUtil.isEmpty(location.countryCode)) {
-                    result.append(" ").append("\t");
+                if (StringUtil.isBlank(response.getProvince())) {
+                    result.append(UNKNOW).append("\t");
                 } else {
-                    result.append(regionName.regionNameByCode(location.countryCode, location.region)).append("\t");
+                    result.append(response.getProvince()).append("\t");
                 }
 
-
-
-                if (StringUtil.isEmpty(location.countryName)) {
-                    result.append(" ").append("\t");
+                if (StringUtil.isBlank(response.getCountry())) {
+                    result.append(UNKNOW);
                 } else {
-                    result.append(location.countryName).append("\t");
+                    result.append(response.getCountry());
                 }
-
+            } else {
+                result.append(UNKNOW).append("\t").append(UNKNOW).append("\t").append(UNKNOW);
             }
 
         } catch (Exception e) {
@@ -138,82 +174,72 @@ public class IpLookup {
         return result.toString();
     }
 
-    /**
-     * <p>
-     * 默认IP城市库文件路径，根据ip获取城市代码.
-     * 默认路径为:dat/GeoLiteCity.dat
-     * </p>
-     * @param ip ip地址，点分十进制格式,ipv4
-     * @return String 城市|省代码
-     */
-    public static String cityLookup(String ip) {
+    @Override
+    public String cityLookup(String ip) {
+        String result = UNKNOW;
+        LocationResponse response = getResponse(ip);
 
-        String result = "";
-        try {
-
-            Location location = null;
-
-            if (IPUtil.isIP(ip)) {
-
-                if (IPUtil.internalIp(ip)){
-                    return "N/A";
-                }
-                location = cityService.getLocation(ip);
-
-            } else if (IPUtil.isIPv6Address(ip)) {
-                location = cityServicev6.getLocation(ip);
-            }
-
-            if (StringUtil.isNotEmpty(location)) {
-
-                result = regionName.regionNameByCode(location.countryCode, location.region);
-                if (StringUtil.isBlank(result)
-                        || result.equals("null")) {
-                    result = location.city;
-                }
-
-            }
-
-        } catch (Exception e) {
-
-            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
+        if (StringUtil.isNotEmpty(response)) {
+            result = StringUtil.isNotBlank(response.getProvince()) ? response.getProvince() : response.getCity();
         }
-
 
         return result;
 
     }
 
-
-    /**
-     * <p>
-     * 默认IP城市库文件路径，根据ip获取经纬度.
-     * </p>
-     * @param ip ip地址
-     * @return String 省代码 纬度 经度
-     */
-    public static String cityLatLngLookup(String ip) {
+    @Override
+    public  String latLngLookup(String ip) {
         StringBuilder  result = new StringBuilder(64);
         try {
+            LocationResponse response = getResponse(ip);
+            if (StringUtil.isNotEmpty(response)) {
 
-            Location location = null;
-
-            if (IPUtil.isIP(ip)) {
-                location = cityService.getLocation(ip);
-            } else if (IPUtil.isIPv6Address(ip)) {
-                location = cityServicev6.getLocation(ip);
-            }
-
-            if (StringUtil.isNotEmpty(location)) {
-
-                result.append(regionName.regionNameByCode(location.countryCode, location.region));
-                if (StringUtil.isBlank(result.toString())
-                        || result.equals("null")) {
-                    result.append(location.city);
+                if (StringUtil.isBlank(response.getLatitude())) {
+                    result.append(UNKNOW).append("\t");
+                } else {
+                    result.append(response.getLatitude()).append("\t");
                 }
 
-                result.append("\t").append(location.latitude).append("\t") .append(location.longitude);
+                if (StringUtil.isBlank(response.getLongitude())) {
+                    result.append(UNKNOW);
+                } else {
+                    result.append(response.getLongitude());
+                }
+            } else {
+                result.append(UNKNOW).append("\t").append("N/A");
+            }
 
+        } catch (Exception e) {
+
+            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
+        }
+
+        return result.toString();
+
+    }
+
+
+    @Override
+    public  String cityLatLngLookup(String ip) {
+        StringBuilder  result = new StringBuilder(64);
+        try {
+            result.append(cityLookup(ip)).append("\t");
+            LocationResponse response = getResponse(ip);
+            if (StringUtil.isNotEmpty(response)) {
+
+                if (StringUtil.isBlank(response.getLatitude())) {
+                    result.append(UNKNOW).append("\t");
+                } else {
+                    result.append(response.getLatitude()).append("\t");
+                }
+
+                if (StringUtil.isBlank(response.getLongitude())) {
+                    result.append(UNKNOW);
+                } else {
+                    result.append(response.getLongitude());
+                }
+            } else {
+                result.append(UNKNOW).append("\t").append("N/A");
             }
 
         } catch (Exception e) {
@@ -226,65 +252,13 @@ public class IpLookup {
 
     }
 
+    @Override
+    public String asnLookup(String ip) {
+        String result = UNKNOW;
+        LocationResponse response = getResponse(ip);
 
-
-
-
-    /**
-     *
-     * <p>给定IP组织库文件路径，根据ip获取AS号,带组织结构</p>
-     * @param ip ip地址
-     * @return String 组织名称
-     */
-    public static String asnLookupDeatil(String ip) {
-
-        String result = null;
-        try {
-
-            if (IPUtil.isIP(ip)) {
-                result  = asnService.getOrg(ip);
-            } else if (IPUtil.isIPv6Address(ip)) {
-                result  = asnServicev6.getOrg(ip);
-            }
-
-            if (StringUtil.isNotBlank(result)) {
-                result = result.equals("null") ? null : result;
-            }
-
-        } catch (Exception e) {
-            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
-        }
-
-        return result;
-
-    }
-
-    /**
-     *
-     * <p>给定IP组织库文件路径，根据ip获取AS号</p>
-     * @param ip ip地址
-     * @return String 组织名称
-     */
-    public static String asnLookup(String ip) {
-
-        String result = null;
-        try {
-
-            if (IPUtil.isIP(ip)) {
-                result  = asnService.getOrg(ip);
-            } else if (IPUtil.isIPv6Address(ip)) {
-                result  = asnServicev6.getOrg(ip);
-            }
-
-            if (StringUtil.isNotBlank(result)) {
-
-                result = result.equals("null") ? "" : result;
-
-                result = StringUtil.getFromRegEx(result, ASN_PATTERN, 1);
-            }
-
-        } catch (Exception e) {
-            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
+        if (StringUtil.isNotEmpty(response)) {
+            result = StringUtil.isNotBlank(response.getAsn()) ? response.getAsn() : UNKNOW;
         }
 
         return result;
@@ -292,37 +266,59 @@ public class IpLookup {
     }
 
 
-    public static void flushAll() {
+    @Override
+    public String asnLookupDetail(String ip) {
+        String result = UNKNOW;
+        LocationResponse response = getResponse(ip);
 
-        if (countyService != null) {
-            countyService.close();
-        }
-
-        if (cityService != null) {
-            cityService.close();
-        }
-
-        if (asnService != null) {
-            asnService.close();
+        if (StringUtil.isNotEmpty(response)) {
+            result = StringUtil.setDefaultIfEmpty(response.getAsn(), UNKNOW) + "\t"  + StringUtil.setDefaultIfEmpty(response.getIsp(), UNKNOW);
         }
 
 
-        if (countyServicev6 != null) {
-            countyServicev6.close();
+        return result;
+
+    }
+
+
+
+
+    private LocationResponse getResponse(String ip) {
+        LocationResponse response = null;
+        if (!IPUtil.isIP(ip) && !IPUtil.isIPv6Address(ip)) {
+            throw new IllegalArgumentException("unknown ip format :" + ip );
         }
 
+        try {
 
-        if (cityServicev6 != null) {
+            InetAddress ipAddress = InetAddress.getByName(ip);
+            if (IPUtil.isIP(ip)) {
+                response = locationReaderV4.location(ipAddress);
+            } else if (IPUtil.isIPv6Address(ip)){
+                response = locationReaderV6.location(ipAddress);
+            }
 
-            cityServicev6.close();
+        } catch(AddressNotFoundException addressNotFoundException) {
+            response = null;
+        } catch (Exception e) {
+            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
         }
 
+        return response;
+    }
 
-        if (asnServicev6 != null) {
-            asnServicev6.close();
-        }
+
 
 
     }
 
-}
+
+
+
+
+
+
+
+
+
+

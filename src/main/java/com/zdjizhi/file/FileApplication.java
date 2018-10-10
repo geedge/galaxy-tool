@@ -1,7 +1,6 @@
 package com.zdjizhi.file;
 
 import com.zdjizhi.utils.DateUtil;
-import com.zdjizhi.utils.IpLookup;
 import com.zdjizhi.utils.StringUtil;
 import com.zdjizhi.utils.TimeConstants;
 import org.slf4j.Logger;
