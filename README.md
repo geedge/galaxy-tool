@@ -38,3 +38,6 @@ IP定位使用向导，[IpLookup](/releases/docs)
 ```
 
 **打包方式**
+
+mvn package
+

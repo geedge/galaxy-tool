@@ -1,13 +1,10 @@
 package com.zdjizhi.utils;
 
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import org.apache.commons.lang3.StringUtils;
+import sun.misc.BASE64Encoder;
+
 import java.io.UnsupportedEncodingException;
-import java.net.URL;
-import java.nio.charset.Charset;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Collection;
@@ -15,9 +12,6 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
-import sun.misc.BASE64Encoder;
 
 /**
  *
@@ -37,7 +31,10 @@ public final class StringUtil extends StringUtils {
 	
 	private static final String[] TRADITIONAL_CASE = { "零", "壹", "贰", "叁", "肆", "伍",
 		"陆", "柒", "捌", "玖", "拾" };
-	
+
+    private static final String PATTERN_EMPTY_FULL = "[\u4e00-\u9fa5]";
+    private static final String PATTERN_EMPTY_CHARACTER = "\\s*|\t|\r|\n";
+
 	/**
      * The empty String <code>""</code>.
      */
@@ -257,7 +254,40 @@ public final class StringUtil extends StringUtils {
 		return str.substring(start,end);
 	}
 
-   /**
+	/**
+	 *
+	 * <p>去掉字符串空格，如果为中文去掉所有空格，英文去两边空格。
+	 * 去掉空格规则:
+	 * 半角\全角\tab等无实际意义的字符.
+	 *
+	 * </p>
+	 * <pre>
+	 * StringUtil.strip("　	a a　　").length() = 2
+	 * StringUtil.strip(" ").length() = 0
+	 * </pre>
+	 * @param str 字符
+	 * @return <code>str</code> 去空后字符串,<code>""<code> 字符串为null时.
+	 */
+	public static String stripAll(String str){
+		String dest="";
+		Pattern p = Pattern.compile(PATTERN_EMPTY_FULL);
+		Matcher m = p.matcher(str);
+		if(m.find()){
+			if(str != null){
+				p = Pattern.compile(PATTERN_EMPTY_CHARACTER);
+				str = str.replace((char)12288,' ');
+				Matcher matcher = p.matcher(str);
+				dest = matcher.replaceAll("");
+			}
+		}else {
+			dest = str.trim();
+		}
+
+		return dest;
+	}
+
+
+	/**
 	* 
 	* <p>如果对象为空时,返回默认值.</p>
 	* @param object 要判断是否为空的对象
@@ -381,9 +411,9 @@ public final class StringUtil extends StringUtils {
 	* @param regex 分隔规则
 	* @return  返回字符串数组,如果分隔字符串为空返回<code>null</code>.
 	*/
-	public static String[] Split(String str,String regex) {
+	public static String[] split(String str,String regex) {
 		
-		if(str==null){
+		if(str == null){
 			return null;
 		}
 		
@@ -597,7 +627,7 @@ public final class StringUtil extends StringUtils {
     	if(isEmpty(numberString)){
     		return null;
     	}
-    	
+
 		
 		for (int i = 0; i < numberString.length(); i++) {
 			String tempNumberString = String.valueOf(numberString.charAt(i));

@@ -1,6 +1,6 @@
 package com.zdjizhi.file;
 
-import com.zdjizhi.utils.DateUtil;
+import com.zdjizhi.utils.DateUtils;
 import com.zdjizhi.utils.StringUtil;
 import com.zdjizhi.utils.TimeConstants;
 import org.slf4j.Logger;
@@ -74,12 +74,12 @@ public final class FileApplication  extends org.apache.commons.io.FileUtils {
 	public static String getOnlyFileName(String fileName){
 		
 		String extendName =  getFileExtendName(fileName);
-		if(fileName==null){
+		if(StringUtil.isBlank(fileName)){
 			extendName="";
-			fileName = fileName+"_"+ DateUtil.getCurrentDate(TimeConstants.YYYYMMDDHH24MMSS);
+			fileName = fileName+"_"+ DateUtils.getCurrentDate(TimeConstants.YYYYMMDDHH24MMSS);
 		}else {
 			extendName = extendName.toLowerCase();
-			fileName = fileName.substring(0,fileName.indexOf(extendName)-1)+"_"+DateUtil.getCurrentDate(TimeConstants.YYYYMMDDHH24MMSS)
+			fileName = fileName.substring(0,fileName.indexOf(extendName)-1)+"_"+DateUtils.getCurrentDate(TimeConstants.YYYYMMDDHH24MMSS)
 				+"."+extendName;
 		}
 		
@@ -583,7 +583,7 @@ public final class FileApplication  extends org.apache.commons.io.FileUtils {
      * @return
      */
     public static String getFileKey() {
-        String suffixName = DateUtil.getCurrentDate("hhmmss");
+        String suffixName = DateUtils.getCurrentDate("hhmmss");
         return StringUtil.createUUID() + suffixName;
 
     }

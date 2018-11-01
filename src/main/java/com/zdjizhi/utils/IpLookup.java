@@ -27,12 +27,23 @@ public final class IpLookup extends AbstractIpLookup{
         try {
 
             if (builder.isDefalultDB) {
-                String datRootPath =  System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator;
 
-                locationReaderV4 = new GalaxyDataBaseReader.Builder(new File(datRootPath + "all_ip_info_v4.mmdb"))
-                        .withCache(new CHMCache()).build();
-                locationReaderV6 = new GalaxyDataBaseReader.Builder(new File(datRootPath + "all_ip_info_v6.mmdb"))
-                        .withCache(new CHMCache()).build();
+                File dbV4File = new File(System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator
+                        + "all_ip_info_v4.mmdb");
+
+                if (!dbV4File.exists()) {
+                    dbV4File =  new File(IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v4.mmdb").getPath());
+                }
+
+                File dbV6File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator
+                        + "all_ip_info_v6.mmdb");
+                if (!dbV6File.exists()) {
+                    dbV6File =  new File(IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v6.mmdb").getPath());
+                }
+
+                locationReaderV4 = new GalaxyDataBaseReader.Builder(dbV4File).withCache(new CHMCache()).build();
+
+                locationReaderV6 = new GalaxyDataBaseReader.Builder(dbV6File) .withCache(new CHMCache()).build();
 
             } else {
 

@@ -1,7 +1,7 @@
 /**
  * Copyright (c) 2005-2012 springside.org.cn
  */
-package com.zdjizhi.utils;
+package com.zdjizhi.crypt;
 
 import java.io.IOException;
 import java.io.InputStream;

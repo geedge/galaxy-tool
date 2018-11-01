@@ -1,6 +1,7 @@
-package com.zdjizhi.utils;
+package com.zdjizhi.crypt;
 
 import com.zdjizhi.exception.Exceptions;
+import com.zdjizhi.utils.Encodes;
 
 import java.io.UnsupportedEncodingException;
 import java.security.GeneralSecurityException;

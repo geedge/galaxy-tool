@@ -4,8 +4,6 @@ import com.maxmind.geoip.Country;
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
 import com.maxmind.geoip.regionName;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -338,8 +336,8 @@ public class IpLookupDat extends AbstractIpLookup {
             if (StringUtil.isNotEmpty(location)) {
 
                 result.append(regionName.regionNameByCode(location.countryCode, location.region));
-                if (StringUtil.isBlank(result.toString())
-                        || result.equals("null")) {
+                if (StringUtil.isBlank(result.toString())) {
+
                     result.append(location.city);
                 }
 

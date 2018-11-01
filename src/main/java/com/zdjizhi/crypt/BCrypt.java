@@ -1,4 +1,4 @@
-package com.zdjizhi.utils;
+package com.zdjizhi.crypt;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
