@@ -104,12 +104,182 @@ public class DateUtils implements TimeConstants {
         return someDate.toString(pattern);
     }
 
+    /**
+     *
+     * <p>
+     * 得到距离指定时间<code>offset</code>天数的时间，通过 <code>offset</code> 的值（+/-）来确定增减计算.
+     * </p>
+     * <pre>
+     * 当天日期： 2010-11-05
+     * DateUtil.getSomeDate("yyyy-MM-dd", 2) = 2010-11-07
+     * DateUtil.getSomeDate("yyyy-MM-dd", -2) = 2010-11-03
+     * DateUtil.getSomeDate("yyyy-MM-dd", 0) = 2010-11-05
+     * </pre>
+     * @param  date 时间
+     * @param offset 描述增加\减少几日,为0时为当前日期.
+     * @return  返回日期格式的字符串
+     */
+
+    public static Date getSomeDate(Date date, int offset) {
+        DateTime dateTime = new DateTime(date);
+        return dateTime.plusDays(offset).toDate();
+    }
+
+
+
+    /**
+     *
+     * <p>
+     * 得到距离当前时间<code>offset</code>小时的时间，通过 <code>offset</code> 的值（+/-）来确定增减计算.
+     * </p>
+     * <pre>
+     * 当天时间： 2018-11-05 11:13:22
+     * DateUtil.getSomeHour(date, 2) =  2018-11-05 13:13:22
+     * DateUtil.getSomeHour(date, -2) = 2018-11-05 09:13:22
+     * DateUtil.getSomeHour(date, 0) = 2018-11-05 11:13:22
+     * </pre>
+     * @param date 时间
+     * @param offset 描述增加\减少小时数,为0时为当前日期.
+     * @return  返回距离当前时间小时数的时间
+     */
+    public static Date getSomeHour(Date date, int offset) {
+        DateTime dateTime = new DateTime(date);
+        return dateTime.plusHours(offset).toDate();
+    }
+
+
+
+    /**
+     *
+     * <p>
+     * 得到距离当前时间<code>offset</code>分钟数的时间，通过 <code>offset</code> 的值（+/-）来确定增减计算.
+     * </p>
+     * <pre>
+     * 当天时间： 2018-11-05 11:13:22
+     * DateUtil.getSomeMinute(date, 2) =  2018-11-05 11:15:22
+     * DateUtil.getSomeMinute(date, -2) = 2018-11-05 11:11:22
+     * DateUtil.getSomeMinute(date, 0) = 2018-11-05 11:13:22
+     * </pre>
+     * @param date 时间
+     * @param offset 描述增加\减少分钟数,为0时为当前日期.
+     * @return  返回距离当前时间分钟数的时间
+     */
+    public static Date getSomeMinute(Date date, int offset) {
+        DateTime dateTime = new DateTime(date);
+        return dateTime.plusMinutes(offset).toDate();
+    }
+
+
+    /**
+     *
+     * <p>
+     * 得到距离当前时间格式化分钟后的时间，5分钟倍数
+     * </p>
+     * <pre>
+     * 当天时间： 2018-11-05 11:13:22
+     * DateUtil.getFormatMinute(date) =  2018-11-05 11:10:00
+     * </pre>
+     * @param date 时间
+     * @return  返回距离当前时间5分钟倍数的时间
+     */
+    public static Date getFormatMinute(Date date) {
+        DateTime dateTime = new DateTime(date);
+        int minute = dateTime.getMinuteOfHour();
+        int formatMinute = minute % 5;
+        minute = minute - formatMinute;
+        dateTime = dateTime.withMinuteOfHour(minute).withSecondOfMinute(0).withMillisOfSecond(0);
+
+
+        return dateTime.toDate();
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     *
+     * <p>
+     * 得到距离当前时间<code>offset</code>秒数的时间，通过 <code>offset</code> 的值（+/-）来确定增减计算.
+     * </p>
+     * <pre>
+     * 当天时间： 2018-11-05 11:13:22
+     * DateUtil.getSomeSecond(date, 2) =  2018-11-05 11:13:24
+     * DateUtil.getSomeSecond(date, -2) = 2018-11-05 11:13:20
+     * DateUtil.getSomeSecond(date, 0) = 2018-11-05 11:13:22
+     * </pre>
+     * @param date 时间
+     * @param offset 描述增加\减少秒数,为0时为当前日期.
+     * @return  返回距离当前时间秒数的时间
+     */
+    public static Date getSomeSecond(Date date, int offset) {
+        DateTime dateTime = new DateTime(date);
+        return dateTime.plusMinutes(offset).toDate();
+    }
+
+
+
+    /**
+     *
+     * <p>获得指定日期当前周第一天</p>
+     * <pre>
+     *  当前时间 2018-12-26 11:47:00
+     * DateUtil.getFirstDayOfWeek(new Date(),TimeConstants.YYYY_MM_DD_HH24_MM_SS) = "2018-12-24 00:00:00"
+     * </pre>
+     * @param date 指定日期.
+     * @param pattern  描述日期和时间格式
+     * @return 返回日期格式的字符串
+     */
+    public static String getFirstDayOfWeek(Date date, String pattern) {
+
+        if (StringUtil.isEmpty(pattern) || StringUtil.isEmpty(date)) {
+            throw new NullPointerException("时间不能为空或解析格式不能为空");
+        }
+
+        DateTime firstDay = DateTime.parse(getFormatDate(date, TimeConstants.YYYY_MM_DD))
+                .dayOfWeek().setCopy(1).toDateTime();
+
+        return firstDay.toString(pattern);
+    }
+
+
+    /**
+     *
+     * <p>获得指定日期当前周最后一天</p>
+     * <pre>
+     *  当前时间 2018-12-26 11:47:00
+     * DateUtil.getFirstDayOfWeek(new Date(),TimeConstants.YYYY_MM_DD_HH24_MM_SS) = "2018-12-30 23:59:59"
+     * </pre>
+     * @param date 指定日期.
+     * @param pattern  描述日期和时间格式
+     * @return 返回日期格式的字符串
+     */
+    public static String getLastDayOfWeek(Date date, String pattern) {
+
+        if (StringUtil.isEmpty(pattern) || StringUtil.isEmpty(date)) {
+            throw new NullPointerException("时间不能为空或解析格式不能为空");
+        }
+
+        DateTime lastDay =  new DateTime(date)
+                .dayOfWeek().withMaximumValue().millisOfDay().withMaximumValue().toDateTime();
+
+        return lastDay.toString(pattern);
+    }
+
+
+
+
+
 
     /**
      *
      * <p>获得指定日期当月第一天</p>
      * <pre>
-     * DateUtil.getFirstDayOfMonth(TimeConstants.YYYY_MM_DD_HH24_MM_SS, new Date()) = "2010-11-01 00:00:00"
+     * DateUtil.getFirstDayOfMonth(new Date(), TimeConstants.YYYY_MM_DD_HH24_MM_SS) = "2010-11-01 00:00:00"
      * </pre>
      * @param date 指定日期.
      * @param pattern  描述日期和时间格式
@@ -121,7 +291,7 @@ public class DateUtils implements TimeConstants {
             throw new NullPointerException("时间不能为空或解析格式不能为空");
         }
 
-        DateTime firstDay = DateTime.parse(DateTime.now().toString(TimeConstants.YYYY_MM_DD))
+        DateTime firstDay = DateTime.parse(getFormatDate(date, TimeConstants.YYYY_MM_DD))
                         .dayOfMonth().setCopy(1).toDateTime();
 
         return firstDay.toString(pattern);
@@ -132,7 +302,7 @@ public class DateUtils implements TimeConstants {
      *
      * <p>获得指定日期当月最后一天</p>
      * <pre>
-     * DateUtil.getLastDayOfMonth(TimeConstants.YYYY_MM_DD_HH24_MM_SS, new Date()) = "2010-11-30 23:59:59"
+     * DateUtil.getLastDayOfMonth(new Date(), TimeConstants.YYYY_MM_DD_HH24_MM_SS) = "2010-11-30 23:59:59"
      * </pre>
      * @param date 指定日期
      * @param pattern  描述日期和时间格式
@@ -145,11 +315,14 @@ public class DateUtils implements TimeConstants {
             throw new NullPointerException("时间不能为空或解析格式不能为空");
         }
 
-        DateTime lastDay =   DateTime.now()
+        DateTime lastDay =  new DateTime(date)
                     .dayOfMonth().withMaximumValue().millisOfDay().withMaximumValue().toDateTime();
 
         return lastDay.toString(pattern);
     }
+
+
+
 
 
     /**
@@ -164,7 +337,7 @@ public class DateUtils implements TimeConstants {
             throw new NullPointerException("date 不能为空");
         }
 
-        return String.valueOf(DateTime.now().getDayOfMonth());
+        return String.valueOf(new DateTime(date).getDayOfMonth());
 
     }
 
@@ -181,7 +354,7 @@ public class DateUtils implements TimeConstants {
         if (StringUtil.isEmpty(date)) {
             throw new NullPointerException("date 不能为空");
         }
-        return String.valueOf(DateTime.now().getMonthOfYear());
+        return String.valueOf(new DateTime(date).getMonthOfYear());
 
     }
 
@@ -198,9 +371,12 @@ public class DateUtils implements TimeConstants {
         if (StringUtil.isEmpty(date)) {
             throw new NullPointerException("date 不能为空");
         }
-        return String.valueOf(DateTime.now().getYear());
+        return String.valueOf(new DateTime(date).getYear());
 
     }
+
+
+
 
 
     /**
