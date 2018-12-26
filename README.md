@@ -16,7 +16,7 @@ Galaxy 的 Maven group ID 是 `com.zdjizhi` 并且 artifactId 是 `galaxy`。增
 <dependency>
     <groupId>com.zdjizhi</groupId>
     <artifactId>galaxy</artifactId>
-    <version>1.0</version>
+    <version>1.0.1/version>
 </dependency>
 ```
 
@@ -36,8 +36,3 @@ IP定位使用向导，[IpLookup](/releases/docs)
    <url>http://192.168.10.125:8099/content/groups/public</url>
 </repository>
 ```
-
-**打包方式**
-
-mvn package
-
