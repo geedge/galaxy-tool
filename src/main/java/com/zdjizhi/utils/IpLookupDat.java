@@ -385,6 +385,11 @@ public class IpLookupDat extends AbstractIpLookup {
     }
 
     @Override
+    public String asnLookup(String ip, boolean isAsnDB) {
+        return null;
+    }
+
+    @Override
     public String asnLookupDetail(String ip) {
         String result = null;
         try {
@@ -404,6 +409,11 @@ public class IpLookupDat extends AbstractIpLookup {
         }
 
         return result;
+    }
+
+    @Override
+    public String asnLookupDetail(String ip, boolean isAsnDB) {
+        return null;
     }
 
 

@@ -289,6 +289,11 @@ public class IpLookupMmdb extends AbstractIpLookup{
 
     }
 
+    @Override
+    public String asnLookupDetail(String ip, boolean isAsnDB) {
+        return null;
+    }
+
 
     @Override
     public String asnLookup(String ip) {
@@ -309,8 +314,10 @@ public class IpLookupMmdb extends AbstractIpLookup{
 
     }
 
-
-
+    @Override
+    public String asnLookup(String ip, boolean isAsnDB) {
+        return null;
+    }
 
 
 }
