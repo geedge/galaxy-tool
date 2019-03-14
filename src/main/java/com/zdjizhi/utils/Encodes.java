@@ -3,14 +3,14 @@
  */
 package com.zdjizhi.utils;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.net.URLEncoder;
-
 import com.zdjizhi.exception.Exceptions;
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.codec.binary.Hex;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 
 /**
  * 封装各种格式的编码解码工具类.
@@ -18,7 +18,7 @@ import org.apache.commons.codec.binary.Hex;
  * 2.自制的base62 编码
  * 3.Commons-Lang的xml/html escape
  * 4.JDK提供的URLEncoder
- * @author calvin
+ * @author darnell
  * @version 2013-01-15
  */
 public class Encodes {

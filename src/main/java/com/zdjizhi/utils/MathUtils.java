@@ -1,11 +1,16 @@
 package com.zdjizhi.utils;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 public final class  MathUtils {
+
+    private static final  String[] byteUnits = new String[]{"B", "KB", "MB", "GB", "TB", "PB"};
+    private static final  String[] digitalUnits = new String[]{"", "K", "M"};
 
     /**
      *
@@ -222,12 +227,49 @@ public final class  MathUtils {
         return (sum / (arr.length - 1));
     }
 
+    /**\
+     * 格式化计算机字节为KB 、MB 、TB, 默认保留两位小数
+     * @param byteSize 字节大小单位为B
+     * @return 格式化后内容,byteSize <=0 ，将返回0值
+     */
+    public static String getFormatByteValue(long byteSize) {
+        if (byteSize <= 0) {
+            return "0";
+        }
+        int digitGroups = (int) (Math.log10(byteSize) / Math.log10(1024));
+        if (digitGroups >= byteUnits.length) {
+            digitGroups = byteUnits.length - 1;
+        }
+        return CommonUtil.round( byteSize / Math.pow(1024, digitGroups) ,2 ) + " " + byteUnits[digitGroups];
+    }
+
+
+
+
+    /**\
+     * 格式化数字为K 、M , 默认保留两位小数
+     * @param value 数字
+     * @return 格式化后内容,value <=0 ，将返回0值
+     */
+    public static String getFormatDigitalValue(long value) {
+        if (value <= 0) {
+            return "0";
+        }
+        int digitGroups = (int) (Math.log10(value) / Math.log10(1000));
+        if (digitGroups >= digitalUnits.length) {
+            digitGroups = digitalUnits.length - 1;
+        }
+        return  new DecimalFormat("#,##0.##").format( value / Math.pow(1000, digitGroups)) + " " + digitalUnits[digitGroups];
+    }
+
 
 
     //     138 541  643 988
     public static void main(String[] args){
-        double[] a = {15860, 15722};
-        System.out.println(getStandardDevition(a));
+
+        System.out.println(getFormatDigitalValue(100));
+
+
     }
 
 
