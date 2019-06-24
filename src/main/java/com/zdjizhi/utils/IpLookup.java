@@ -7,6 +7,7 @@ import com.zdjizhi.domain.LocationResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URL;
 
 /**
  * @ClassName IpLookup
@@ -35,35 +36,59 @@ public final class IpLookup extends AbstractIpLookup{
                         + "all_ip_info_v4.mmdb");
 
                 if (!dbV4File.exists()) {
-                    dbV4File =  new File(IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v4.mmdb").getPath());
+                    URL url = IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v4.mmdb");
+                    if (url != null) {
+                        dbV4File =  new File(url.getPath());
+                    }
                 }
 
                 File dbV6File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator
                         + "all_ip_info_v6.mmdb");
                 if (!dbV6File.exists()) {
-                    dbV6File =  new File(IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v6.mmdb").getPath());
+                    URL url = IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v6.mmdb");
+                    if (url != null) {
+                        dbV6File =  new File(url.getPath());
+                    }
                 }
 
                 File asnDbV4File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator
                         + "asn_v4.mmdb");
                 if (!asnDbV4File.exists()) {
-                    asnDbV4File =  new File(IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "asn_v4.mmdb").getPath());
+                    URL url = IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "asn_v4.mmdb");
+                    if (url != null) {
+                        asnDbV4File =  new File(url.getPath());
+                    }
+
                 }
 
 
                 File asnDbV6File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator
                         + "asn_v6.mmdb");
                 if (!asnDbV6File.exists()) {
-                    asnDbV6File =  new File(IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "asn_v6.mmdb").getPath());
+                    URL url = IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "asn_v6.mmdb");
+                    if (url != null) {
+                        asnDbV6File =  new File(url.getPath());
+                    }
                 }
 
-                ipLocationReaderV4 = new GalaxyDataBaseReader.Builder(dbV4File).withCache(new CHMCache()).build();
 
-                ipLocationReaderV6 = new GalaxyDataBaseReader.Builder(dbV6File) .withCache(new CHMCache()).build();
+                if (dbV4File.exists()) {
+                    ipLocationReaderV4 = new GalaxyDataBaseReader.Builder(dbV4File).withCache(new CHMCache()).build();
+                }
 
-                asnLocationReaderV4 = new GalaxyDataBaseReader.Builder(asnDbV4File) .withCache(new CHMCache()).build();
+                if (dbV6File.exists()) {
+                    ipLocationReaderV6 = new GalaxyDataBaseReader.Builder(dbV6File).withCache(new CHMCache()).build();
+                }
 
-                asnLocationReaderV6 = new GalaxyDataBaseReader.Builder(asnDbV6File) .withCache(new CHMCache()).build();
+
+                if (asnDbV4File.exists()) {
+                    asnLocationReaderV4 = new GalaxyDataBaseReader.Builder(asnDbV4File).withCache(new CHMCache()).build();
+                }
+
+                if (asnDbV6File.exists()) {
+                    asnLocationReaderV6 = new GalaxyDataBaseReader.Builder(asnDbV6File).withCache(new CHMCache()).build();
+                }
+
 
             } else {
 
@@ -210,26 +235,19 @@ public final class IpLookup extends AbstractIpLookup{
 
             if (StringUtil.isNotEmpty(response)) {
 
-                if (StringUtil.isBlank(response.getCity())) {
-                    result.append(UNKNOW).append("\t");
-                } else {
+                if (StringUtil.isNotBlank(response.getCity())) {
                     result.append(response.getCity()).append("\t");
                 }
 
-
-                if (StringUtil.isBlank(response.getProvince())) {
-                    result.append(UNKNOW).append("\t");
-                } else {
+                if (StringUtil.isNotBlank(response.getProvince())) {
                     result.append(response.getProvince()).append("\t");
                 }
 
-                if (StringUtil.isBlank(response.getCountry())) {
-                    result.append(UNKNOW);
-                } else {
+                if (StringUtil.isNotBlank(response.getCountry())) {
                     result.append(response.getCountry());
                 }
             } else {
-                result.append(UNKNOW).append("\t").append(UNKNOW).append("\t").append(UNKNOW);
+                result.append(UNKNOW).append("\t");
             }
 
         } catch (Exception e) {
@@ -245,7 +263,7 @@ public final class IpLookup extends AbstractIpLookup{
         String result = UNKNOW;
         LocationResponse response = getResponse(ip);
 
-        if (StringUtil.isNotEmpty(response)) {
+        if (StringUtil.isNotEmpty(response) && StringUtil.isNotBlank(response.getCity())) {
             result = StringUtil.isNotBlank(response.getProvince()) ? response.getProvince() : response.getCity();
         }
 
@@ -361,9 +379,21 @@ public final class IpLookup extends AbstractIpLookup{
     }
 
     private LocationResponse getResponse(String ip, boolean isAsnDB) {
+
         LocationResponse response = null;
+
         if (!IPUtil.isIP(ip) && !IPUtil.isIPv6Address(ip)) {
             throw new IllegalArgumentException("unknown ip format :" + ip );
+        }
+
+
+        //private ip
+        if (IPUtil.isIP(ip) && IPUtil.internalIp(ip)) {
+             response = new LocationResponse();
+             response.setCountry("Private IP");
+             response.setCity(" ");
+
+            return  response;
         }
 
         try {
