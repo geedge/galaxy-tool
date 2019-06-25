@@ -392,6 +392,7 @@ public final class IpLookup extends AbstractIpLookup{
              response = new LocationResponse();
              response.setCountry("Private IP");
              response.setCity(" ");
+             response.setProvince(" ");
 
             return  response;
         }
