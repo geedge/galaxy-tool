@@ -55,7 +55,7 @@
        <repository>
            <id>nexus</id>
            <name>Team Nexus Repository</name>
-           <url>http://192.168.40.125:8099/content/groups/public</url>
+           <url>http://192.168.40.125:8099/content/repositories/galaxy-tool</url>
        </repository>
 
     </repositories>
@@ -63,14 +63,14 @@
         <repository>
             <id>nexus</id>
             <name>releases</name>
-            <url>http://192.168.40.125:8099/content/repositories/releases/</url>
+            <url>http://192.168.40.125:8099/content/repositories/galaxy-tool</url>
             <uniqueVersion>true</uniqueVersion>
         </repository>
-        <snapshotRepository>
-            <id>nexus</id>
-            <name>snapshots</name>
-            <url>http://192.168.40.125:8099/content/repositories/snapshots/</url>
-        </snapshotRepository>
+<!--         <snapshotRepository> -->
+<!--             <id>nexus</id> -->
+<!--             <name>snapshots</name> -->
+<!--             <url>http://192.168.40.125:8099/content/repositories/snapshots/</url> -->
+<!--         </snapshotRepository> -->
     </distributionManagement>
     
 
