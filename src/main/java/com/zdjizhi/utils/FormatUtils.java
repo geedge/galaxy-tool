@@ -1,12 +1,21 @@
 package com.zdjizhi.utils;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.net.InternetDomainName;
+
 import java.util.Set;
 
 public class FormatUtils {
+	
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * 将List&lt;HashMap&lt;String,Object&gt;&gt;中HashMap的key全部转化为变量形式，<br>
@@ -76,5 +85,119 @@ public class FormatUtils {
 		result.setCharAt(0, c0);
 		return result.toString();
 	}
+	
+    private FormatUtils(Builder builder) {
+        init(builder);
+    }
 
+    private synchronized void init(Builder builder) {
+        try {
+
+            if (builder.isDefalult) {
+                logger.info("CompleteUtil begin with default PZ.");
+            } else {
+                logger.info("CompleteUtil begin with user-defined PZ.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static final class Builder {
+        boolean isDefalult;
+
+        public Builder(boolean isDefalult) {
+            this.isDefalult = isDefalult;
+        }
+
+        public FormatUtils build() {
+            return new FormatUtils(this);
+        }
+
+    }
+
+
+    /**
+     * 有sni通过sni获取域名，有host根据host获取域名
+     *
+     * @param sni  sni
+     * @param host host
+     * @return 顶级域名
+     */
+    public static String getTopDomain(String sni, String host) {
+        if (StringUtil.isNotBlank(host)) {
+            return getDomainName(host);
+        } else if (StringUtil.isNotBlank(sni)) {
+            return getDomainName(sni);
+        } else {
+            return "";
+        }
+    }
+
+
+    /**
+     * 根据url截取顶级域名
+     *
+     * @param host 网站url
+     * @return 顶级域名
+     */
+    public static String getDomainName(String host) {
+        String domain = "";
+        domain = InternetDomainName.from(host).topPrivateDomain().toString();
+        return domain;
+    }
+
+    /**
+     * 生成当前时间戳的操作
+     */
+    public static int getCurrentTime() {
+        return (int) (System.currentTimeMillis() / 1000);
+    }
+
+    /**
+     * 雪花模型生成id
+     *
+     * @return
+     */
+    public static long getSnowflakeId(String zookeeperIp, String kafkaTopic, long dataCenterIdNum) {
+
+        return SnowflakeId.generateId(zookeeperIp, kafkaTopic, dataCenterIdNum);
+    }
+
+    /**
+     * 根据ip去hbase中匹配对应的用户名
+     *
+     * @param clientIp
+     * @param hbaseZookeeper
+     * @param hbaseTable
+     * @return 用户名 subscriber_id
+     */
+    public static String radiusMatch(String clientIp, String hbaseZookeeper, String hbaseTable) {
+        return HBaseUtils.getAccount(clientIp, hbaseZookeeper, hbaseTable);
+    }
+
+
+    /**
+     * base64 解码
+     *
+     * @param encodedText    mail subject
+     * @param subjectCharset 编码格式
+     * @return 解码内容 / 空
+     */
+    public static String base64Str(String encodedText, String subjectCharset) {
+        Base64.Decoder decoder = Base64.getDecoder();
+        String sub;
+        try {
+            if (StringUtil.isNotBlank(subjectCharset)) {
+                sub = new String(decoder.decode(encodedText), subjectCharset);
+            } else {
+                sub = new String(decoder.decode(encodedText), "UTF-8");
+            }
+            return sub;
+        } catch (Exception e) {
+        	e.printStackTrace();
+            return "";
+        }
+    }
 }
