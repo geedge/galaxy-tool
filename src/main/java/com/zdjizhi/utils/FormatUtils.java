@@ -122,7 +122,7 @@ public class FormatUtils {
 	 * @param host host
 	 * @return 顶级域名
 	 */
-	public static String getTopDomain(String sni, String host) {
+	public String getTopDomain(String sni, String host) {
 		if (StringUtil.isNotBlank(host)) {
 			return getDomainName(host);
 		} else if (StringUtil.isNotBlank(sni)) {
@@ -138,7 +138,7 @@ public class FormatUtils {
 	 * @param host 网站url
 	 * @return 顶级域名
 	 */
-	public static String getDomainName(String host) {
+	public String getDomainName(String host) {
 		String domain = "";
 		domain = InternetDomainName.from(host).topPrivateDomain().toString();
 		return domain;
@@ -147,7 +147,7 @@ public class FormatUtils {
 	/**
 	 * 生成当前时间戳的操作
 	 */
-	public static int getCurrentTime() {
+	public int getCurrentTime() {
 		return (int) (System.currentTimeMillis() / 1000);
 	}
 
@@ -156,7 +156,7 @@ public class FormatUtils {
 	 *
 	 * @return
 	 */
-	public static long getSnowflakeId(String zookeeperIp, String kafkaTopic, long dataCenterIdNum) {
+	public long getSnowflakeId(String zookeeperIp, String kafkaTopic, long dataCenterIdNum) {
 
 		return SnowflakeId.generateId(zookeeperIp, kafkaTopic, dataCenterIdNum);
 	}
@@ -167,7 +167,7 @@ public class FormatUtils {
 	 * @param ipLibrary
 	 * @return ipLookup
 	 */
-	public static IpLookup getIpLookup(String ipLibrary) {
+	public IpLookup getIpLookup(String ipLibrary) {
 
 		IpLookup ipLookup = new IpLookup.Builder(false).loadDataFileV4(ipLibrary + "Kazakhstan.mmdb")
 				.loadDataFileV6(ipLibrary + "Kazakhstan.mmdb").loadAsnDataFileV4(ipLibrary + "asn_v4.mmdb")
@@ -182,7 +182,7 @@ public class FormatUtils {
 	 * @param ip
 	 * @return
 	 */
-	public static String getGeoIpDetail(String ip, IpLookup ipLookup) {
+	public String getGeoIpDetail(String ip, IpLookup ipLookup) {
 
 		return ipLookup.cityLookupDetail(ip);
 	}
@@ -193,7 +193,7 @@ public class FormatUtils {
 	 * @param ip
 	 * @return asn
 	 */
-	public static String getGeoAsn(String ip, IpLookup ipLookup) {
+	public String getGeoAsn(String ip, IpLookup ipLookup) {
 
 		return ipLookup.asnLookup(ip, true);
 	}
@@ -204,7 +204,7 @@ public class FormatUtils {
 	 * @param ip
 	 * @return country
 	 */
-	public static String getGeoIpCountry(String ip, IpLookup ipLookup) {
+	public String getGeoIpCountry(String ip, IpLookup ipLookup) {
 
 		return ipLookup.countryLookup(ip);
 	}
@@ -217,7 +217,7 @@ public class FormatUtils {
 	 * @param hbaseTable
 	 * @return 用户名 subscriber_id
 	 */
-	public static String radiusMatch(String clientIp, String hbaseZookeeper, String hbaseTable) {
+	public String radiusMatch(String clientIp, String hbaseZookeeper, String hbaseTable) {
 		return HBaseUtils.getAccount(clientIp, hbaseZookeeper, hbaseTable);
 	}
 
@@ -228,7 +228,7 @@ public class FormatUtils {
 	 * @param subjectCharset 编码格式
 	 * @return 解码内容 / 空
 	 */
-	public static String base64Str(String encodedText, String subjectCharset) {
+	public String base64Str(String encodedText, String subjectCharset) {
 		Base64.Decoder decoder = Base64.getDecoder();
 		String sub;
 		try {

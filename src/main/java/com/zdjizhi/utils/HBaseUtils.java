@@ -72,7 +72,16 @@ public class HBaseUtils {
         long nowTime = System.currentTimeMillis();
         timestampsFilter(time - 1000, nowTime + 500);
     }
-
+    /**
+     * 更新变量
+     */
+    public static void change(String hbaseZookeeper, String hbaseTable) {
+	    if (hBaseUtils == null) {
+            getHbaseInstance(hbaseZookeeper, hbaseTable);
+        }
+        long nowTime = System.currentTimeMillis();
+        timestampsFilter(time - 1000, nowTime + 500);
+    }
     /**
      * 获取变更内容
      *
