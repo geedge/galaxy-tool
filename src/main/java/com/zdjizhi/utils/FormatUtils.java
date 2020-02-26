@@ -5,13 +5,13 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Splitter;
 import com.google.common.net.InternetDomainName;
-
-import java.util.Set;
 
 public class FormatUtils {
 
@@ -116,109 +116,18 @@ public class FormatUtils {
 	}
 
 	/**
-	 * 有sni通过sni获取域名，有host根据host获取域名
+	 * 根据域名截取顶级域名
 	 *
-	 * @param sni  sni
-	 * @param host host
+	 * @param host 网站域名
 	 * @return 顶级域名
 	 */
-	public String getTopDomain(String sni, String host) {
-		if (StringUtil.isNotBlank(host)) {
-			return getDomainName(host);
-		} else if (StringUtil.isNotBlank(sni)) {
-			return getDomainName(sni);
-		} else {
-			return "";
+	public static String getTopDomain(String host) {
+		try {
+			return InternetDomainName.from(Splitter.on(":").splitToList(host).get(0)).topPrivateDomain().toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return host;
 		}
-	}
-
-	/**
-	 * 根据url截取顶级域名
-	 *
-	 * @param host 网站url
-	 * @return 顶级域名
-	 */
-	public String getDomainName(String host) {
-		String domain = "";
-		domain = InternetDomainName.from(host).topPrivateDomain().toString();
-		return domain;
-	}
-
-	/**
-	 * 生成当前时间戳的操作
-	 */
-	public int getCurrentTime() {
-		return (int) (System.currentTimeMillis() / 1000);
-	}
-
-	/**
-	 * 雪花模型生成id
-	 *
-	 * @return
-	 */
-	public long getSnowflakeId(String zookeeperIp, String kafkaTopic, long dataCenterIdNum) {
-
-		return SnowflakeId.generateId(zookeeperIp, kafkaTopic, dataCenterIdNum);
-	}
-
-	/**
-	 * 根据ip定位库的地址返回一个ipLookup工具类对象
-	 * 
-	 * @param ipLibrary
-	 * @return ipLookup
-	 */
-	public IpLookup getIpLookup(String ipLibrary) {
-
-		IpLookup ipLookup = new IpLookup.Builder(false).loadDataFileV4(ipLibrary + "Kazakhstan.mmdb")
-				.loadDataFileV6(ipLibrary + "Kazakhstan.mmdb").loadAsnDataFileV4(ipLibrary + "asn_v4.mmdb")
-				.loadAsnDataFileV6(ipLibrary + "asn_v6.mmdb").build();
-
-		return ipLookup;
-	}
-
-	/**
-	 * 根据clientIp获取location信息
-	 *
-	 * @param ip
-	 * @return
-	 */
-	public String getGeoIpDetail(String ip, IpLookup ipLookup) {
-
-		return ipLookup.cityLookupDetail(ip);
-	}
-
-	/**
-	 * 根据ip获取asn信息
-	 *
-	 * @param ip
-	 * @return asn
-	 */
-	public String getGeoAsn(String ip, IpLookup ipLookup) {
-
-		return ipLookup.asnLookup(ip, true);
-	}
-
-	/**
-	 * 根据ip获取country信息
-	 *
-	 * @param ip
-	 * @return country
-	 */
-	public String getGeoIpCountry(String ip, IpLookup ipLookup) {
-
-		return ipLookup.countryLookup(ip);
-	}
-
-	/**
-	 * 根据ip去hbase中匹配对应的用户名
-	 *
-	 * @param clientIp
-	 * @param hbaseZookeeper
-	 * @param hbaseTable
-	 * @return 用户名 subscriber_id
-	 */
-	public String radiusMatch(String clientIp, String hbaseZookeeper, String hbaseTable) {
-		return HBaseUtils.getAccount(clientIp, hbaseZookeeper, hbaseTable);
 	}
 
 	/**
@@ -228,20 +137,34 @@ public class FormatUtils {
 	 * @param subjectCharset 编码格式
 	 * @return 解码内容 / 空
 	 */
-	public String base64Str(String encodedText, String subjectCharset) {
+	public static String base64Str(String encodedText, String subjectCharset) {
 		Base64.Decoder decoder = Base64.getDecoder();
-		String sub;
+		String sub = null;
 		try {
-			if (StringUtil.isNotBlank(subjectCharset)) {
-				sub = new String(decoder.decode(encodedText), subjectCharset);
-			} else {
-				sub = new String(decoder.decode(encodedText), "UTF-8");
-			}
-			return sub;
+			sub = new String(decoder.decode(encodedText), StringUtil.isBlank(subjectCharset)? "UTF-8" : subjectCharset);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return "";
 		}
+		return sub;
 	}
-	
+	/**
+	 * 雪花模型生成id
+	 * @param workerId
+	 * @param dataCenterId
+	 * @return
+	 */
+	public long getSnowflakeId(long workerId, long dataCenterId) {
+		return SnowflakeId.generateId(workerId, dataCenterId);
+	}
+	/**
+	 * 雪花模型生成id
+	 *
+	 * @return
+	 */
+	public long getSnowflakeId(String zookeeperIp, String kafkaTopic, long dataCenterId) {
+
+		return SnowflakeId.generateId(zookeeperIp, kafkaTopic, dataCenterId);
+	}
+
 }

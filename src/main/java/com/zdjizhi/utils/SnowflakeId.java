@@ -81,14 +81,43 @@ public class SnowflakeId {
     private static SnowflakeId idWorker;
 
     private static ZookeeperUtils zookeeperUtils = new ZookeeperUtils();
+    /**
+     * 设置允许时间回拨的最大限制10s
+     */
+    private static final long rollBackTime = 10000L;
 
-    private static void getSnowflakeldInstance(String zookeeperIp, String kafkaTopic, long dataCenterIdNum) {
-        idWorker = new SnowflakeId(zookeeperIp, kafkaTopic, dataCenterIdNum);
+    /**
+     * @param workerId
+     * @param dataCenterId
+     */
+    private static void getSnowflakeldInstance(long workerId, long dataCenterId) {
+        idWorker = new SnowflakeId(workerId, dataCenterId);
+    }
+    /**
+     * 依赖于zookeeper
+     * @param zookeeperIp
+     * @param kafkaTopic
+     * @param dataCenterId
+     */
+    private static void getSnowflakeldInstance(String zookeeperIp,String kafkaTopic, long dataCenterId) {
+    	idWorker = new SnowflakeId(zookeeperIp,kafkaTopic, dataCenterId);
     }
 
     /**
-     * 构造函数
+               * 构造函数
      */
+    private SnowflakeId(long tmpWorkerId, long dataCenterIdNum) {
+            if (tmpWorkerId > maxWorkerId || tmpWorkerId < 0) {
+                throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
+            }
+            if (dataCenterIdNum > maxDataCenterId || dataCenterIdNum < 0) {
+                throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than ", maxDataCenterId));
+            }
+            this.workerId = tmpWorkerId;
+            this.dataCenterId = dataCenterIdNum;
+            
+    }
+
     private SnowflakeId(String zookeeperIp, String kafkaTopic, long dataCenterIdNum) {
         ZooKeeperLock lock = new ZooKeeperLock(zookeeperIp, "/locks", "disLocks1");
         if (lock.lock()) {
@@ -111,7 +140,6 @@ public class SnowflakeId {
             }
         }
     }
-
     /**
      * 获得下一个ID (该方法是线程安全的)
      *
@@ -119,7 +147,10 @@ public class SnowflakeId {
      */
     private synchronized long nextId() {
         long timestamp = timeGen();
-
+        //设置一个允许回拨限制时间，系统时间回拨范围在rollBackTime内可以等待校准
+        if (lastTimestamp - timestamp > 0 && lastTimestamp - timestamp < rollBackTime) {
+        	timestamp = tilNextMillis(lastTimestamp);
+        }
         //如果当前时间小于上一次ID生成的时间戳，说明系统时钟回退过这个时候应当抛出异常
         if (timestamp < lastTimestamp) {
             throw new RuntimeException(
@@ -172,7 +203,13 @@ public class SnowflakeId {
     protected long timeGen() {
         return System.currentTimeMillis();
     }
-
+    
+    public static Long generateId(long workerId, long dataCenterIdNum) {
+    	if (idWorker == null) {
+    		getSnowflakeldInstance(workerId, dataCenterIdNum);
+    	}
+    	return idWorker.nextId();
+    }
 
     /**
      * 静态工具类
@@ -185,4 +222,5 @@ public class SnowflakeId {
         }
         return idWorker.nextId();
     }
+
 }
