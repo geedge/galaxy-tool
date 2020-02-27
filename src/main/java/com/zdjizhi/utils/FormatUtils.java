@@ -1,5 +1,8 @@
 package com.zdjizhi.utils;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
@@ -116,40 +119,80 @@ public class FormatUtils {
 	}
 
 	/**
-	 * 根据域名截取顶级域名
-	 *
-	 * @param host 网站域名
-	 * @return 顶级域名
+	 * 获取域名的顶级私有域名
+	 * 例如：getTopPrivateDomain('www.google.com.hk') ,返回 google.com.hk
+	 * @param domain 网站域名
+	 * @return 顶级私有域名
 	 */
-	public static String getTopDomain(String host) {
-		try {
-			if(host.indexOf(":")!=-1) {
-				host = new StringTokenizer(host,":").nextToken();
-			}
-			return InternetDomainName.from(host).topPrivateDomain().toString();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return host;
+	public static String getTopPrivateDomain(String domain) {
+
+		domain = getDomain(domain);
+
+		if (StringUtil.isBlank(domain) || !InternetDomainName.isValid(domain)) {
+			return StringUtil.EMPTY;
 		}
+
+		InternetDomainName internetDomainName = InternetDomainName.from(domain);
+
+		if (internetDomainName.isUnderPublicSuffix()) {
+			return internetDomainName.topPrivateDomain().toString();
+		} else {
+			return StringUtil.EMPTY;
+
+		}
+
+
+
 	}
+
 	/**
-	 * base64 解码
 	 *
-	 * @param encodedText    mail subject
-	 * @param subjectCharset 编码格式
-	 * @return 解码内容 / 空
+	 * <p>通过给定url获取域名地址.</p>
+	 * <p>
+	 * 获得域名信息需去除 http/https/ftp 与 www 一些头信息,获取有效地址.
+	 * </p>
+	 * <pre>
+	 * StringUtil.getDomain("http://www.baidu.com") = "baidu.com"
+	 * </pre>
+	 * @param  url 地址
+	 * @return  返回截取后的域名地址
 	 */
-	public static String base64Str(String encodedText, String subjectCharset) {
-		Base64.Decoder decoder = Base64.getDecoder();
-		String sub = null;
-		try {
-			sub = new String(decoder.decode(encodedText), StringUtil.isBlank(subjectCharset)? "UTF-8" : subjectCharset);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "";
+	public static String getDomain(String url) {
+
+		if(StringUtil.isBlank(url)){
+			return StringUtil.EMPTY;
 		}
-		return sub;
+
+		if (url.indexOf("http://") >= 0) {
+			url = url.substring("http://".length(), url.length());
+		} else if (url.indexOf("https://", 0) >= 0) {
+			url = url.substring("https://".length(), url.length());
+		} else if (url.indexOf("ftp://", 0) >= 0) {
+			url = url.substring("ftp://".length(), url.length());
+		} else {
+			url = url;
+		}
+
+		if (url.indexOf("www.") == 0) {
+			url = url.substring(url.indexOf(".") + 1, url.length());
+		}
+
+		if (url.indexOf(":") >= 0) {
+			url = url.substring(0, url.indexOf(":"));
+		}
+
+		if (url.indexOf("/", 0) >= 0) {
+			url = url.substring(0, url.indexOf("/", 1));
+		}
+
+		if (url.indexOf("?") >= 0) {
+			url = url.substring(0, url.indexOf("?"));
+		}
+
+
+		return url;
 	}
+
 	/**
 	 * 雪花模型生成id
 	 * @param workerId

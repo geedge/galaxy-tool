@@ -62,6 +62,15 @@ public class Encodes {
 		}
 	}
 
+
+	public static String encodeBase64(String input, String charset) {
+		try {
+			return new String(Base64.encodeBase64(input.getBytes(charset)));
+		} catch (UnsupportedEncodingException e) {
+			return "";
+		}
+	}
+
 //	/**
 //	 * Base64编码, URL安全(将Base64中的URL非法字符'+'和'/'转为'-'和'_', 见RFC3548).
 //	 */
@@ -82,6 +91,17 @@ public class Encodes {
 	public static String decodeBase64String(String input) {
 		try {
 			return new String(Base64.decodeBase64(input.getBytes()), DEFAULT_URL_ENCODING);
+		} catch (UnsupportedEncodingException e) {
+			return "";
+		}
+	}
+
+	/**
+	 * Base64解码.
+	 */
+	public static String decodeBase64String(String input, String charset) {
+		try {
+			return new String(Base64.decodeBase64(input.getBytes()), charset);
 		} catch (UnsupportedEncodingException e) {
 			return "";
 		}

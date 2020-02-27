@@ -354,47 +354,7 @@ public final class StringUtil extends StringUtils {
 	}
 	
 	
-   /**
-	* 
-	* <p>通过给定url获取域名地址.</p>
-	* <p>
-	* 获得域名信息需去除 http/https/ftp 与 www 一些头信息,获取有效地址. 
-	* </p>
-	* <pre>
-	* StringUtil.getDomain("http://www.baidu.com") = "baidu.com"
-	* </pre>   
-	* @param webSiteUrl url 地址
-	* @return  返回截取后的域名地址
-	*/
-	public static String getDomain(String webSiteUrl) {
-		String url ;
-		
-		if(isEmpty(webSiteUrl)){
-			return EMPTY;
-		}
 
-		if (webSiteUrl.indexOf("http://") >= 0) {
-			url = webSiteUrl.substring("http://".length(), webSiteUrl.length());
-		} else if (webSiteUrl.indexOf("https://", 0) >= 0) {
-			url = webSiteUrl.substring("https://".length(), webSiteUrl.length());
-		} else if (webSiteUrl.indexOf("ftp://", 0) >= 0) {
-			url = webSiteUrl.substring("ftp://".length(), webSiteUrl.length());
-		} else {
-			url = webSiteUrl;
-		}
-
-		if (url.indexOf("/", 0) >= 0) {
-			url = url.substring(0, url.indexOf("/", 1));
-		}
-		if (url.indexOf("www.") == 0) {
-			url = url.substring(url.indexOf(".") + 1, url.length());
-		}
-		if (url.indexOf("?") >= 0) {
-			url = url.substring(0, url.indexOf("?"));
-		}
-		
-		return url;
-	}
 
    /**
 	* 
