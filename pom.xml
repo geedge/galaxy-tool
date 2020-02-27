@@ -7,7 +7,7 @@
     <artifactId>galaxy</artifactId>
     <packaging>jar</packaging>
     <name>galaxy</name>
-    <version>1.0.1</version>
+    <version>1.0.2</version>
     <description>galaxy tools for common</description>
     <url>http://www.zdjizhi.com/galaxy-tool</url>
 
@@ -55,16 +55,30 @@
        <repository>
            <id>nexus</id>
            <name>Team Nexus Repository</name>
-           <url>http://192.168.10.125:8099/content/groups/public</url>
+           <url>http://192.168.40.125:8099/content/repositories/galaxy-tool</url>
        </repository>
 
-
-
     </repositories>
+  <distributionManagement>
+        <repository>
+            <id>nexus</id>
+            <name>releases</name>
+            <url>http://192.168.40.125:8099/content/repositories/galaxy-tool</url>
+            <uniqueVersion>true</uniqueVersion>
+        </repository>
+<!--         <snapshotRepository> -->
+<!--             <id>nexus</id> -->
+<!--             <name>snapshots</name> -->
+<!--             <url>http://192.168.40.125:8099/content/repositories/snapshots/</url> -->
+<!--         </snapshotRepository> -->
+    </distributionManagement>
+    
 
     <properties>
         <java.version>1.8</java.version>
         <slf4j.version>1.7.7</slf4j.version>
+        <hbase.version>1.4.9</hbase.version>
+        <hadoop.version>2.7.1</hadoop.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
     </properties>
@@ -220,14 +234,29 @@
             <version>2.5</version>
             <scope>provided</scope>
         </dependency>
+		<!-- 2.0  引入数据预处理工具依赖 -->
+            <dependency>
+                <groupId>org.apache.zookeeper</groupId>
+                <artifactId>zookeeper</artifactId>
+                <version>3.4.9</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>slf4j-log4j12</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>log4j-over-slf4j</artifactId>
+                        <groupId>org.slf4j</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
 
-
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>23.0</version>
+             </dependency>
     </dependencies>
-
-
-
-
-
 
 
 </project>

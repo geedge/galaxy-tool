@@ -1,12 +1,21 @@
 package com.zdjizhi.utils;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.StringTokenizer;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.common.net.InternetDomainName;
 
 public class FormatUtils {
+
+	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	/**
 	 * 将List&lt;HashMap&lt;String,Object&gt;&gt;中HashMap的key全部转化为变量形式，<br>
@@ -15,19 +24,18 @@ public class FormatUtils {
 	 * @param list
 	 * @return List<HashMap<String, Object>>
 	 */
-	public static List<HashMap<String, Object>> formatHashMapKeyInList(
-			List<HashMap<String, Object>> list) {
+	public static List<HashMap<String, Object>> formatHashMapKeyInList(List<HashMap<String, Object>> list) {
 		List result = new ArrayList();
 		// 遍历list后进行格式化列表元素
-		if (list!=null){
+		if (list != null) {
 			for (HashMap<String, Object> h : list) {
-				//  将hashMap的key转化为驼峰格式，如{"BRH_ID":"1234"}改为{"brhId":"1234"}
+				// 将hashMap的key转化为驼峰格式，如{"BRH_ID":"1234"}改为{"brhId":"1234"}
 				result.add(formatHashMapKey(h));
 			}
 		}
 		return result;
 	}
-		
+
 	/**
 	 * 将hashMap的key转化为驼峰格式，如{"BRH_ID":"1234","BRH_NAME":"机构"}改为{"brhId":"1234",
 	 * "brhName":"机构"}
@@ -35,8 +43,7 @@ public class FormatUtils {
 	 * @param hashMap
 	 * @return HashMap<String, Object>
 	 */
-	public static HashMap<String, Object> formatHashMapKey(
-			HashMap<String, Object> hashMap) {
+	public static HashMap<String, Object> formatHashMapKey(HashMap<String, Object> hashMap) {
 		HashMap result = new HashMap();
 		String key = null;
 		// 遍历map
@@ -75,6 +82,91 @@ public class FormatUtils {
 		}
 		result.setCharAt(0, c0);
 		return result.toString();
+	}
+
+	private FormatUtils(Builder builder) {
+		init(builder);
+	}
+
+	private synchronized void init(Builder builder) {
+		try {
+
+			if (builder.isDefalult) {
+				logger.info("FormatUtils begin with default PZ.");
+			} else {
+				logger.info("FormatUtils begin with user-defined PZ.");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static final class Builder {
+		boolean isDefalult;
+
+		public Builder(boolean isDefalult) {
+			this.isDefalult = isDefalult;
+		}
+
+		public FormatUtils build() {
+			return new FormatUtils(this);
+		}
+
+	}
+
+	/**
+	 * 根据域名截取顶级域名
+	 *
+	 * @param host 网站域名
+	 * @return 顶级域名
+	 */
+	public static String getTopDomain(String host) {
+		try {
+			if(host.indexOf(":")!=-1) {
+				host = new StringTokenizer(host,":").nextToken();
+			}
+			return InternetDomainName.from(host).topPrivateDomain().toString();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return host;
+		}
+	}
+	/**
+	 * base64 解码
+	 *
+	 * @param encodedText    mail subject
+	 * @param subjectCharset 编码格式
+	 * @return 解码内容 / 空
+	 */
+	public static String base64Str(String encodedText, String subjectCharset) {
+		Base64.Decoder decoder = Base64.getDecoder();
+		String sub = null;
+		try {
+			sub = new String(decoder.decode(encodedText), StringUtil.isBlank(subjectCharset)? "UTF-8" : subjectCharset);
+		} catch (Exception e) {
+			e.printStackTrace();
+			return "";
+		}
+		return sub;
+	}
+	/**
+	 * 雪花模型生成id
+	 * @param workerId
+	 * @param dataCenterId
+	 * @return
+	 */
+	public long getSnowflakeId(long workerId, long dataCenterId) {
+		return SnowflakeId.generateId(workerId, dataCenterId);
+	}
+	/**
+	 * 雪花模型生成id
+	 *
+	 * @return
+	 */
+	public long getSnowflakeId(String zookeeperIp, String kafkaTopic, long dataCenterId) {
+
+		return SnowflakeId.generateId(zookeeperIp, kafkaTopic, dataCenterId);
 	}
 
 }

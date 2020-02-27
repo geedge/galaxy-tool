@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 /**
  *
  * <p>字符串处理工具类</p>
- * @author 中电积至有限公司 E-mail: doufengh@software.ict.ac.cn
+ * @author 中电积至有限公司
  * @version 1.0 创建时间：2010-11-8 下午04:50:39
  *
  */
@@ -172,7 +172,7 @@ public final class StringUtil extends StringUtils {
             return true;
         }
         for (int i = 0; i < strLen; i++) {
-            if ((Character.isWhitespace(str.charAt(i)) == false)) {
+            if (!Character.isWhitespace(str.charAt(i))) {
                 return false;
             }
         }
@@ -195,7 +195,6 @@ public final class StringUtil extends StringUtils {
      * @return <code>true</code> 字符串为空 ,<code>false</code> 不为空
      */
     public static boolean isNotBlank(String str) {
-
         return !isBlank(str);
     }
 	

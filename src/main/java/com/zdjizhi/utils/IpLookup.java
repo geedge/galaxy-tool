@@ -7,6 +7,7 @@ import com.zdjizhi.domain.LocationResponse;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.URL;
 
 /**
  * @ClassName IpLookup
@@ -17,10 +18,13 @@ import java.net.InetAddress;
  **/
 public final class IpLookup extends AbstractIpLookup{
 
+
     public final static String DEFAULT_IP_DATABASE_PATH = "dat";
 
-    private static GalaxyDataBaseReader locationReaderV4;
-    private static GalaxyDataBaseReader locationReaderV6;
+    private static GalaxyDataBaseReader ipLocationReaderV4;
+    private static GalaxyDataBaseReader ipLocationReaderV6;
+    private static GalaxyDataBaseReader asnLocationReaderV4;
+    private static GalaxyDataBaseReader asnLocationReaderV6;
 
 
     synchronized void init(Builder builder) {
@@ -32,28 +36,79 @@ public final class IpLookup extends AbstractIpLookup{
                         + "all_ip_info_v4.mmdb");
 
                 if (!dbV4File.exists()) {
-                    dbV4File =  new File(IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v4.mmdb").getPath());
+                    URL url = IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v4.mmdb");
+                    if (url != null) {
+                        dbV4File =  new File(url.getPath());
+                    }
                 }
 
                 File dbV6File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator
                         + "all_ip_info_v6.mmdb");
                 if (!dbV6File.exists()) {
-                    dbV6File =  new File(IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v6.mmdb").getPath());
+                    URL url = IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "all_ip_info_v6.mmdb");
+                    if (url != null) {
+                        dbV6File =  new File(url.getPath());
+                    }
                 }
 
-                locationReaderV4 = new GalaxyDataBaseReader.Builder(dbV4File).withCache(new CHMCache()).build();
+                File asnDbV4File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator
+                        + "asn_v4.mmdb");
+                if (!asnDbV4File.exists()) {
+                    URL url = IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "asn_v4.mmdb");
+                    if (url != null) {
+                        asnDbV4File =  new File(url.getPath());
+                    }
 
-                locationReaderV6 = new GalaxyDataBaseReader.Builder(dbV6File) .withCache(new CHMCache()).build();
+                }
+
+
+                File asnDbV6File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_IP_DATABASE_PATH + File.separator
+                        + "asn_v6.mmdb");
+                if (!asnDbV6File.exists()) {
+                    URL url = IpLookup.class.getResource("/"+ DEFAULT_IP_DATABASE_PATH + "/" + "asn_v6.mmdb");
+                    if (url != null) {
+                        asnDbV6File =  new File(url.getPath());
+                    }
+                }
+
+
+                if (dbV4File.exists()) {
+                    ipLocationReaderV4 = new GalaxyDataBaseReader.Builder(dbV4File).withCache(new CHMCache()).build();
+                }
+
+                if (dbV6File.exists()) {
+                    ipLocationReaderV6 = new GalaxyDataBaseReader.Builder(dbV6File).withCache(new CHMCache()).build();
+                }
+
+
+                if (asnDbV4File.exists()) {
+                    asnLocationReaderV4 = new GalaxyDataBaseReader.Builder(asnDbV4File).withCache(new CHMCache()).build();
+                }
+
+                if (asnDbV6File.exists()) {
+                    asnLocationReaderV6 = new GalaxyDataBaseReader.Builder(asnDbV6File).withCache(new CHMCache()).build();
+                }
+
 
             } else {
 
-                if (builder.databaseFileV4 != null) {
-                    locationReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.databaseFileV4))
+                if (builder.ipDatabaseFileV4 != null) {
+                    ipLocationReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabaseFileV4))
                             .withCache(new CHMCache()).build();
                 }
 
-                if (builder.databaseFileV6 != null) {
-                    locationReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.databaseFileV6))
+                if (builder.ipDatabaseFileV6 != null) {
+                    ipLocationReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabaseFileV6))
+                            .withCache(new CHMCache()).build();
+                }
+
+                if (builder.asnDatabaseFileV4 != null) {
+                    asnLocationReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabaseFileV4))
+                            .withCache(new CHMCache()).build();
+                }
+
+                if (builder.asnDatabaseFileV6 != null) {
+                    asnLocationReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabaseFileV6))
                             .withCache(new CHMCache()).build();
                 }
             }
@@ -89,8 +144,10 @@ public final class IpLookup extends AbstractIpLookup{
      * </p>
      */
     public static final class Builder {
-        String databaseFileV4;
-        String databaseFileV6;
+        String ipDatabaseFileV4;
+        String ipDatabaseFileV6;
+        String asnDatabaseFileV4;
+        String asnDatabaseFileV6;
         boolean isDefalultDB;
 
         /**
@@ -103,21 +160,44 @@ public final class IpLookup extends AbstractIpLookup{
 
         /**
          *
-         * @param databaseFileV4 加载IPv4 mmdb库文件
+         * @param ipDatabaseFileV4 加载IPv4 mmdb库文件
          * @return
          */
-        public Builder loadDataFileV4(String databaseFileV4) {
-            this.databaseFileV4 = databaseFileV4;
+        public Builder loadDataFileV4(String ipDatabaseFileV4) {
+            this.ipDatabaseFileV4 = ipDatabaseFileV4;
             return this;
         }
 
         /**
          *
-         * @param databaseFileV6 加载IPv6 mmdb库文件
+         * @param ipDatabaseFileV6 加载IPv6 mmdb库文件
          * @return
          */
-        public Builder loadDataFileV6(String databaseFileV6) {
-            this.databaseFileV6 = databaseFileV6;
+        public Builder loadDataFileV6(String ipDatabaseFileV6) {
+            this.ipDatabaseFileV6 = ipDatabaseFileV6;
+            return this;
+        }
+
+
+        /**
+         *
+         * @param asnDatabaseFileV4 加载asn IPv4 mmdb库文件
+         * @return
+         */
+        public Builder loadAsnDataFileV4(String asnDatabaseFileV4) {
+            this.asnDatabaseFileV4 = asnDatabaseFileV4;
+            return this;
+        }
+
+
+
+        /**
+         *
+         * @param asnDatabaseFileV6 加载asn IPv6 mmdb库文件
+         * @return
+         */
+        public Builder loadAsnDataFileV6(String asnDatabaseFileV6) {
+            this.asnDatabaseFileV6 = asnDatabaseFileV6;
             return this;
         }
 
@@ -155,26 +235,19 @@ public final class IpLookup extends AbstractIpLookup{
 
             if (StringUtil.isNotEmpty(response)) {
 
-                if (StringUtil.isBlank(response.getCity())) {
-                    result.append(UNKNOW).append("\t");
-                } else {
+                if (StringUtil.isNotBlank(response.getCity())) {
                     result.append(response.getCity()).append("\t");
                 }
 
-
-                if (StringUtil.isBlank(response.getProvince())) {
-                    result.append(UNKNOW).append("\t");
-                } else {
+                if (StringUtil.isNotBlank(response.getProvince())) {
                     result.append(response.getProvince()).append("\t");
                 }
 
-                if (StringUtil.isBlank(response.getCountry())) {
-                    result.append(UNKNOW);
-                } else {
+                if (StringUtil.isNotBlank(response.getCountry())) {
                     result.append(response.getCountry());
                 }
             } else {
-                result.append(UNKNOW).append("\t").append(UNKNOW).append("\t").append(UNKNOW);
+                result.append(UNKNOW).append("\t");
             }
 
         } catch (Exception e) {
@@ -190,7 +263,7 @@ public final class IpLookup extends AbstractIpLookup{
         String result = UNKNOW;
         LocationResponse response = getResponse(ip);
 
-        if (StringUtil.isNotEmpty(response)) {
+        if (StringUtil.isNotEmpty(response) && StringUtil.isNotBlank(response.getCity())) {
             result = StringUtil.isNotBlank(response.getProvince()) ? response.getProvince() : response.getCity();
         }
 
@@ -265,22 +338,37 @@ public final class IpLookup extends AbstractIpLookup{
 
     @Override
     public String asnLookup(String ip) {
+       return asnLookup(ip, false);
+
+    }
+
+    @Override
+    public String asnLookup(String ip, boolean isAsnDB) {
         String result = UNKNOW;
-        LocationResponse response = getResponse(ip);
+
+        LocationResponse response = getResponse(ip,isAsnDB);
 
         if (StringUtil.isNotEmpty(response)) {
+
             result = StringUtil.isNotBlank(response.getAsn()) ? response.getAsn() : UNKNOW;
         }
 
         return result;
-
     }
 
 
     @Override
     public String asnLookupDetail(String ip) {
+
+        return asnLookupDetail(ip, false);
+
+
+    }
+
+    @Override
+    public String asnLookupDetail(String ip, boolean isAsnDB) {
         String result = UNKNOW;
-        LocationResponse response = getResponse(ip);
+        LocationResponse response = getResponse(ip, isAsnDB);
 
         if (StringUtil.isNotEmpty(response)) {
             result = StringUtil.setDefaultIfEmpty(response.getAsn(), UNKNOW) + "\t"  + StringUtil.setDefaultIfEmpty(response.getIsp(), UNKNOW);
@@ -288,26 +376,46 @@ public final class IpLookup extends AbstractIpLookup{
 
 
         return result;
-
     }
 
+    private LocationResponse getResponse(String ip, boolean isAsnDB) {
 
-
-
-    private LocationResponse getResponse(String ip) {
         LocationResponse response = null;
+
         if (!IPUtil.isIP(ip) && !IPUtil.isIPv6Address(ip)) {
             throw new IllegalArgumentException("unknown ip format :" + ip );
+        }
+
+
+        //private ip
+        if (IPUtil.isIP(ip) && IPUtil.internalIp(ip)) {
+             response = new LocationResponse();
+             response.setCountry("Private IP");
+             response.setCity(" ");
+             response.setProvince(" ");
+
+            return  response;
         }
 
         try {
 
             InetAddress ipAddress = InetAddress.getByName(ip);
-            if (IPUtil.isIP(ip)) {
-                response = locationReaderV4.location(ipAddress);
-            } else if (IPUtil.isIPv6Address(ip)){
-                response = locationReaderV6.location(ipAddress);
+
+            if (isAsnDB) {
+                if (IPUtil.isIP(ip)) {
+                    response = asnLocationReaderV4.location(ipAddress);
+                } else if (IPUtil.isIPv6Address(ip)){
+                    response = asnLocationReaderV6.location(ipAddress);
+                }
+            } else {
+
+                if (IPUtil.isIP(ip)) {
+                    response = ipLocationReaderV4.location(ipAddress);
+                } else if (IPUtil.isIPv6Address(ip)){
+                    response = ipLocationReaderV6.location(ipAddress);
+                }
             }
+
 
         } catch(AddressNotFoundException addressNotFoundException) {
             response = null;
@@ -316,6 +424,12 @@ public final class IpLookup extends AbstractIpLookup{
         }
 
         return response;
+    }
+
+
+
+    private LocationResponse getResponse(String ip) {
+        return getResponse(ip, false);
     }
 
 

@@ -105,16 +105,48 @@ public final class CommonUtil {
 	* @throws IllegalArgumentException
 	*/
 	public static double round(double value, int scale) {
-		
+		return round(value, scale, BigDecimal.ROUND_HALF_UP);
+	}
+
+
+	/**
+	 *
+	 * <p>精确小数位数，对一个浮点数按照给定的精度取值，不进行四舍五入.</p>
+	 * <pre>
+	 * double a1 = 1.789812302;
+	 * CommonUtil.roundPrecision(a1, 2) = 1.78
+	 * CommonUtil.roundPrecision(a1, 5) = 1.78981
+	 *
+	 * float a2 = 1.239f;
+	 * CommonUtil.roundPrecision(a1, 2) = 1.23
+	 * CommonUtil.roundPrecision(a1, 5) = 1.239
+	 * </pre>
+	 * @param value 处理值
+	 * @param scale 精度(小数点后位数)
+	 * @return double    返回指定精度的数值
+	 * @throws IllegalArgumentException
+	 */
+	public static double roundPrecision(double value, int scale) {
+		return round(value, scale, BigDecimal.ROUND_FLOOR);
+	}
+
+	/**
+	 *
+	 * <p>精确小数位数，对一个浮点数按照给定的精度取值，不进行四舍五入.</p>
+	 * @param value 处理值
+	 * @param scale 精度(小数点后位数)
+	 *  @param mode 参见 {@link BigDecimal#ROUND_HALF_UP } 和 {@link BigDecimal#ROUND_FLOOR }用法
+	 * @return double    返回指定精度的数值
+	 * @throws IllegalArgumentException
+	 */
+	public static double round(double value, int scale, int mode) {
 		if (scale < 0) {
 			throw new IllegalArgumentException(
 					"The scale must be a positive integer or zero");
 		}
-		
 		BigDecimal b = new BigDecimal(Double.toString(value));
 		BigDecimal one = new BigDecimal("1");
-		
-		return b.divide(one, scale, BigDecimal.ROUND_HALF_UP).doubleValue();
+		return b.divide(one, scale, mode).doubleValue();
 	}
 	
   /**

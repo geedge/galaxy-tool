@@ -63,20 +63,39 @@ public abstract class AbstractIpLookup {
 
     /**
      *
-     * 获取AS号
+     * 获取AS号，默认通过IP定位库获取ASN号
      * @param ip ip地址
-     * @return String 组织名称
+     * @return String asn号
      */
     public abstract String asnLookup(String ip);
 
 
     /**
      *
+     * 获取AS号,使用独立ASN库
+     * @param ip ip地址
+     * @param isAsnDB true-需要加载ASN库 false -使用IP定位库
+     * @return String asn号
+     */
+    public abstract String asnLookup(String ip, boolean isAsnDB);
+
+
+    /**
+     *
      * 获取AS号与组织信息
      * @param ip ip地址
-     * @return 组织名称
+     * @return asn号 组织名称
      */
     public abstract String asnLookupDetail(String ip);
+
+    /**
+     *
+     * 获取AS号与组织信息
+     * @param ip ip地址
+     * @param isAsnDB true-需要加载ASN库 false -使用IP定位库
+     * @return asn号 组织名称
+     */
+    public abstract String asnLookupDetail(String ip, boolean isAsnDB);
 
 
 

@@ -9,7 +9,7 @@ import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.*;
 import com.zdjizhi.domain.LocationResponse;
-import com.zdjizhi.domain.JsonInjector;;
+import com.zdjizhi.domain.JsonInjector;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

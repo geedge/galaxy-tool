@@ -351,6 +351,9 @@ public class IPUtil {
     }
 
 
+
+
+
     /**
      * 根据起始IP地址和子网掩码计算终止IP
      * @return String 子网的结束IP
@@ -696,6 +699,37 @@ public class IPUtil {
         }
 
         return ip10;
+    }
+
+
+
+    /**
+     *
+     * <p>获取IP/mask 包含IP数量，适合完整IPw网段</p>
+     * <p>
+     *
+     *
+     * </p>
+     * <pre>
+     *
+     *
+     * </pre>
+     * @param ip 符合IP规则的字符串
+     * @param mask 掩码格式
+     * @return   <code>-1</code> 验证ip不合法,<code>ip</code> 计算ip返回长整型.
+     */
+    public static long getIpNum(String ip, int mask) {
+        long num = 0;
+
+        if (isIP(ip)) {
+            String endIp = getEndIP(ip, mask);
+            num = getIpHostDesimal(endIp) -  getIpHostDesimal(ip) +1;
+
+        } else {
+            throw new IllegalArgumentException("所传入的IP地址不符合IPV4规范");
+        }
+
+        return num;
     }
 
 
