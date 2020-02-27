@@ -6,11 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.StringTokenizer;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Splitter;
 import com.google.common.net.InternetDomainName;
 
 public class FormatUtils {
@@ -92,9 +92,9 @@ public class FormatUtils {
 		try {
 
 			if (builder.isDefalult) {
-				logger.info("CompleteUtil begin with default PZ.");
+				logger.info("FormatUtils begin with default PZ.");
 			} else {
-				logger.info("CompleteUtil begin with user-defined PZ.");
+				logger.info("FormatUtils begin with user-defined PZ.");
 			}
 
 		} catch (Exception e) {
@@ -123,13 +123,15 @@ public class FormatUtils {
 	 */
 	public static String getTopDomain(String host) {
 		try {
-			return InternetDomainName.from(Splitter.on(":").splitToList(host).get(0)).topPrivateDomain().toString();
+			if(host.indexOf(":")!=-1) {
+				host = new StringTokenizer(host,":").nextToken();
+			}
+			return InternetDomainName.from(host).topPrivateDomain().toString();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return host;
 		}
 	}
-
 	/**
 	 * base64 解码
 	 *
