@@ -7,9 +7,9 @@ public class SnowflakeId {
     private static Logger logger = Logger.getLogger(SnowflakeId.class);
 
     /**
-     * 开始时间截 (2018-08-01 00:00:00) max 17years
+     * 开始时间截 (2020-02-28 00:00:00) max 17years
      */
-    private final long twepoch = 1564588800000L;
+    private final long twepoch = 1582819200000L;
 
     /**
      * 机器id所占的位数
@@ -19,7 +19,7 @@ public class SnowflakeId {
     /**
      * 数据标识id所占的位数
      */
-    private final long dataCenterIdBits = 4L;
+    private final long dataCenterIdBits = 8L;
 
     /**
      * 支持的最大机器id，结果是63 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数)
@@ -99,12 +99,12 @@ public class SnowflakeId {
      * @param kafkaTopic
      * @param dataCenterId
      */
-    private static void getSnowflakeldInstance(String zookeeperIp,String kafkaTopic, long dataCenterId) {
-    	idWorker = new SnowflakeId(zookeeperIp,kafkaTopic, dataCenterId);
+    private static void getSnowflakeldInstance(String zookeeperIp, long dataCenterId) {
+    	idWorker = new SnowflakeId(zookeeperIp, dataCenterId);
     }
 
     /**
-               * 构造函数
+     * 构造函数
      */
     private SnowflakeId(long tmpWorkerId, long dataCenterIdNum) {
             if (tmpWorkerId > maxWorkerId || tmpWorkerId < 0) {
@@ -118,10 +118,10 @@ public class SnowflakeId {
             
     }
 
-    private SnowflakeId(String zookeeperIp, String kafkaTopic, long dataCenterIdNum) {
+    private SnowflakeId(String zookeeperIp, long dataCenterIdNum) {
         ZooKeeperLock lock = new ZooKeeperLock(zookeeperIp, "/locks", "disLocks1");
         if (lock.lock()) {
-            int tmpWorkerId = zookeeperUtils.modifyNode("/Snowflake/" + kafkaTopic, zookeeperIp);
+            int tmpWorkerId = zookeeperUtils.modifyNode("/Snowflake/" + "worker" + dataCenterIdNum, zookeeperIp);
             if (tmpWorkerId > maxWorkerId || tmpWorkerId < 0) {
                 throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
             }
@@ -216,9 +216,9 @@ public class SnowflakeId {
      *
      * @return
      */
-    public static Long generateId(String zookeeperIp, String kafkaTopic, long dataCenterIdNum) {
+    public static Long generateId(String zookeeperIp, long dataCenterIdNum) {
         if (idWorker == null) {
-            getSnowflakeldInstance(zookeeperIp, kafkaTopic, dataCenterIdNum);
+            getSnowflakeldInstance(zookeeperIp, dataCenterIdNum);
         }
         return idWorker.nextId();
     }

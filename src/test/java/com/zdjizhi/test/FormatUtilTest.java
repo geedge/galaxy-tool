@@ -4,11 +4,19 @@ import com.google.common.net.InternetDomainName;
 import com.zdjizhi.utils.Encodes;
 import com.zdjizhi.utils.FormatUtils;
 import com.zdjizhi.utils.StringUtil;
+
+import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class FormatUtilTest {
 
@@ -56,4 +64,47 @@ public class FormatUtilTest {
         Assert.assertEquals(Encodes.decodeBase64String( Encodes.encodeBase64("我是UTF-8")), "我是UTF-8");
 
     }
+//    @Test
+	public void snowFlakeIdWriteTest() throws IOException {
+		FormatUtils build = new FormatUtils.Builder(false).build();
+		File file = new File("D:\\123\\test.txt");
+		List list = new ArrayList<Long>();
+		for (int i = 1; i <= 500000; i++) {
+			try {
+			//单机
+			long snowflakeId = build.getSnowflakeId(1, 128);
+			//集群模式
+//			long snowflakeId = build.getSnowflakeId("192.168.40.224:2181", 12);
+//				set.add(snowflakeId);
+				list.add(snowflakeId);
+				if(i%10000==0) {
+					FileUtils.writeLines(file, list);
+				}
+				System.err.println(snowflakeId);
+//				Thread.sleep(1000L);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+		System.err.println("=====完成=======");
+	}
+
+//    @Test
+	public void snowFlakeIdRepeatTest() throws IOException {
+		Set set = new HashSet<Long>();
+		File file = new File("D:\\123\\test.txt");
+		File file2 = new File("D:\\123\\test2.txt");
+		List<String> readLines = FileUtils.readLines(file);
+		System.out.println(readLines.size());
+		for (String object : readLines) {
+			set.add(object);
+		}
+		List<String> readLines2 = FileUtils.readLines(file2);
+		System.out.println(readLines2.size());
+		for (String object : readLines2) {
+			set.add(object);
+		}
+		System.err.println(readLines.size()+readLines2.size()+"合计："+set.size());
+	}
 }

@@ -194,22 +194,25 @@ public class FormatUtils {
 	}
 
 	/**
-	 * 雪花模型生成id
+	 * 雪花模型生成id 
 	 * @param workerId
 	 * @param dataCenterId
-	 * @return
+	 * @return 全局唯一id
 	 */
 	public long getSnowflakeId(long workerId, long dataCenterId) {
 		return SnowflakeId.generateId(workerId, dataCenterId);
 	}
+	
 	/**
-	 * 雪花模型生成id
-	 *
-	 * @return
+	 * 雪花模型生成id 
+	 * 依赖于zookeeper
+	 * @param zookeeperIp
+	 * @param dataCenterId
+	 * @return 全局唯一id
 	 */
-	public long getSnowflakeId(String zookeeperIp, String kafkaTopic, long dataCenterId) {
+	public long getSnowflakeId(String zookeeperIp, long dataCenterId) {
 
-		return SnowflakeId.generateId(zookeeperIp, kafkaTopic, dataCenterId);
+		return SnowflakeId.generateId(zookeeperIp, dataCenterId);
 	}
 
 }
