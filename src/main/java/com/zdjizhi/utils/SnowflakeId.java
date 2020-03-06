@@ -6,6 +6,14 @@ import org.apache.log4j.Logger;
 public class SnowflakeId {
     private static Logger logger = Logger.getLogger(SnowflakeId.class);
 
+   /**
+        * 共64位 第一位为符号位 默认0
+        * 时间戳 39位(17 year), centerId:(关联每个环境或任务数) :7位(0-127),
+    * workerId(关联进程):6(0-63) ,序列号：11位(2047/ms) 
+    * 
+         * 序列号 /ms = (-1L ^ (-1L << 11))
+	* 最大使用年 = (1L << 39) / (1000L * 60 * 60 * 24 * 365)
+    */
     /**
      * 开始时间截 (2020-02-28 00:00:00) max 17years
      */
@@ -19,7 +27,7 @@ public class SnowflakeId {
     /**
      * 数据标识id所占的位数
      */
-    private final long dataCenterIdBits = 8L;
+    private final long dataCenterIdBits = 7L;
 
     /**
      * 支持的最大机器id，结果是63 (这个移位算法可以很快的计算出几位二进制数所能表示的最大十进制数)
@@ -28,14 +36,14 @@ public class SnowflakeId {
     private final long maxWorkerId = -1L ^ (-1L << workerIdBits);
 
     /**
-     * 支持的最大数据标识id，结果是15
+     * 支持的最大数据标识id，结果是127
      */
     private final long maxDataCenterId = -1L ^ (-1L << dataCenterIdBits);
 
     /**
      * 序列在id中占的位数
      */
-    private final long sequenceBits = 14L;
+    private final long sequenceBits = 11L;
 
     /**
      * 机器ID向左移12位
@@ -53,7 +61,7 @@ public class SnowflakeId {
     private final long timestampLeftShift = sequenceBits + workerIdBits + dataCenterIdBits;
 
     /**
-     * 生成序列的掩码，这里为16383
+     * 生成序列的掩码，这里为2047
      */
     private final long sequenceMask = -1L ^ (-1L << sequenceBits);
 
@@ -63,12 +71,12 @@ public class SnowflakeId {
     private long workerId;
 
     /**
-     * 数据中心ID(0~15)
+     * 数据中心ID(0~127)
      */
     private long dataCenterId;
 
     /**
-     * 毫秒内序列(0~16383)
+     * 毫秒内序列(0~2047)
      */
     private long sequence = 0L;
 
