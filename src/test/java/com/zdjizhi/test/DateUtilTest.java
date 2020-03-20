@@ -1,12 +1,19 @@
 package com.zdjizhi.test;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
+import com.google.common.base.Stopwatch;
 import com.zdjizhi.utils.DateUtil;
 import com.zdjizhi.utils.DateUtils;
 import com.zdjizhi.utils.TimeConstants;
 import org.apache.log4j.Logger;
+import org.joda.time.DurationFieldType;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -94,7 +101,7 @@ public class DateUtilTest {
 			}
 
 
-            List<Date> lists = DateUtils.getDateList(DateUtil.convertStringToDate("2018-09-01",
+            List<Date> lists = DateUtils.getEveryDay(DateUtil.convertStringToDate("2018-09-01",
                     DateUtil.YYYY_MM_DD),new Date());
 
             for(Date date:lists){
@@ -197,7 +204,14 @@ public class DateUtilTest {
 		
 		
 	}
-	
+
+	@Test
+	public void testGetDateRange() {
+
+		List<Date>lists = DateUtils.getDateRange(DateUtils.convertStringToDate("2020-01-22 12:11:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),
+				DateUtils.convertStringToDate("2020-01-23 11:11:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),"PT1H");
+		Assert.assertEquals(lists.size(), 24);
+	}
 	
 	
 

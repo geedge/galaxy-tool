@@ -1,5 +1,7 @@
 package com.zdjizhi.utils;
 
+import com.google.common.base.Stopwatch;
+import com.google.common.collect.Lists;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -182,22 +184,9 @@ public class DateUtils implements TimeConstants {
      * @param date 时间
      * @return  返回距离当前时间5分钟倍数的时间
      */
-    public static Date getFormatMinute(Date date) {
-        DateTime dateTime = new DateTime(date);
-        int minute = dateTime.getMinuteOfHour();
-        int formatMinute = minute % 5;
-        minute = minute - formatMinute;
-        dateTime = dateTime.withMinuteOfHour(minute).withSecondOfMinute(0).withMillisOfSecond(0);
-
-
-        return dateTime.toDate();
+    public static Date getGranularityFiveMinute(Date date) {
+        return getTimeFloor(date, "PT5M");
     }
-
-
-
-
-
-
 
 
 
@@ -218,7 +207,7 @@ public class DateUtils implements TimeConstants {
      */
     public static Date getSomeSecond(Date date, int offset) {
         DateTime dateTime = new DateTime(date);
-        return dateTime.plusMinutes(offset).toDate();
+        return dateTime.plusSeconds(offset).toDate();
     }
 
 
@@ -391,12 +380,11 @@ public class DateUtils implements TimeConstants {
      * @return 返回两个日期相隔时间集合
      * @throws NullPointerException
      */
-    public static List<Date> getDateList(Date begin, Date end) {
+    public static List<Date> getEveryDay(Date begin, Date end) {
 
         if (StringUtil.isEmpty(begin) || StringUtil.isEmpty(end)) {
             throw new NullPointerException("date 不能为空");
         }
-
         List<Date> result = new ArrayList<Date>();
         DateTime beginDate = new DateTime(begin);
         DateTime endDate = new DateTime(end);
@@ -412,6 +400,44 @@ public class DateUtils implements TimeConstants {
         return result;
 
     }
+
+    /**
+     * 按照时间粒度，获取指定时间范围内的所有时间点。
+     * 例如：2019-10-11 10:00:00/2019-10-11 10:20:00,时间周期每5分钟（PT5M)，
+     * 则获取结果为[2019-10-11 10:00:00,2019-10-11 10:05:00,2019-10-11 10:10:00,2019-10-11 10:15:00,2019-10-11 10:20:00]
+     * @param startDate 起始时间
+     * @param endDate 终止时间
+     * @param period 时间粒度 参见ISO8601 对durations定义，例如PT5M,P1W; 约束不可为复合周期(P1YT5M)
+     * @return
+     */
+    public static List<Date> getDateRange(Date startDate, Date endDate, String period) {
+
+        if (StringUtil.isEmpty(startDate) || StringUtil.isEmpty(endDate)) {
+            throw new NullPointerException("startDate and endDate is not null.");
+        }
+
+
+        List<Date> dateList = Lists.newArrayList();
+
+        Period granularityPeriod = Period.parse(period);
+
+        DateTime floorStartDate = new DateTime(getTimeFloor(startDate, period));
+
+        DateTime endDateTime = new DateTime(endDate);
+
+
+        while(floorStartDate.compareTo(endDateTime) <= 0) {
+            dateList.add(floorStartDate.toDate());
+            floorStartDate = floorStartDate.plus(granularityPeriod);
+        }
+
+
+        return dateList;
+    }
+
+
+
+
 
 
     /**
@@ -431,7 +457,7 @@ public class DateUtils implements TimeConstants {
         if (null == begin || null == end ) {
             throw new NullPointerException();
         }
-        List<Date> list = getDateList(begin, end);
+        List<Date> list = getEveryDay(begin, end);
         List<Date> result = new ArrayList<Date>();
         for (int i = 0; i < list.size(); i++) {
 
@@ -602,7 +628,130 @@ public class DateUtils implements TimeConstants {
         return DateTime.parse(date, format).toDate();
     }
 
+    /**
+     * 对当前时间根据粒度往下舍入时间,返回一个新的时间
+     * 例如 getTimeFloor("2019-12-12 12:32:12", "PT5M") = "2019-12-12 12:30:00"
+     * @param date
+     * @param periodGranularity
+     * @return
+     */
+    public static Date getTimeFloor(Date date, String periodGranularity) {
 
+        Period period = Period.parse(periodGranularity);
+        if (isCompoundPeriod(period)) {
+            throw  new IllegalArgumentException("periodGranularity is not supported:"+ period.toString());
+        }
+
+        DateTime dateTime = new DateTime(date);
+
+        final int years = period.getYears();
+        if (years > 0) {
+            int y = dateTime.getYear();
+            y -= y % years;
+            dateTime = dateTime.withYear(y).withMonthOfYear(1).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+
+            return dateTime.toDate();
+        }
+
+        final int months = period.getMonths();
+        if (months > 0) {
+            int m = dateTime.getMonthOfYear();
+            m -= m % months;
+            dateTime = dateTime.withMonthOfYear(m).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+
+            return dateTime.toDate();
+        }
+
+
+        final int weeks = period.getWeeks();
+        if (weeks > 0) {
+            int w = dateTime.getWeekOfWeekyear();
+            w -= w % weeks;
+            dateTime = dateTime.withWeekOfWeekyear(w).withDayOfWeek(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+
+            return dateTime.toDate();
+        }
+
+
+
+        final int days = period.getDays();
+        if (days > 0) {
+            int d = dateTime.getDayOfMonth();
+            d -= d % days;
+            dateTime = dateTime.withDayOfMonth(d).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            return dateTime.toDate();
+        }
+
+
+        final int hours = period.getHours();
+        if (hours > 0) {
+            int h = dateTime.getHourOfDay();
+             h -= h % hours;
+            dateTime = dateTime.withHourOfDay(h).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+            return dateTime.toDate();
+        }
+
+
+
+        final int minutes = period.getMinutes();
+        if (minutes > 0) {
+
+            int m = dateTime.getMinuteOfHour();
+            m -= m % minutes;
+
+            dateTime = dateTime.withMinuteOfHour(m).withSecondOfMinute(0).withMillisOfSecond(0);
+
+            return dateTime.toDate();
+
+        }
+
+        final int seconds = period.getSeconds();
+        if (seconds > 0) {
+
+            int s = dateTime.getSecondOfMinute();
+            s -= s % seconds;
+
+            dateTime = dateTime.withSecondOfMinute(s).withMillisOfSecond(0);
+
+            return dateTime.toDate();
+
+        }
+
+
+        return null;
+
+
+
+
+    }
+
+
+
+
+
+
+    /**
+     * 判定周期是否为复合周期，用于时序数据粒度的判定
+     * 例如:按照ISO_8601 规定Durations定义, P1DT12H 为复合周期，P1D 为单个周期
+     * @param period
+     * @return
+     */
+    private static boolean isCompoundPeriod(Period period) {
+        int[] values = period.getValues();
+        boolean single =  false;
+        for (int value : values) {
+            if (value > 0) {
+                if(single) {
+                    return true;
+                }
+
+                single = true;
+
+            }
+        }
+
+        return false;
+    }
 
 
 
