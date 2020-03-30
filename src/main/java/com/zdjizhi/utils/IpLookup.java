@@ -1,5 +1,6 @@
 package com.zdjizhi.utils;
 
+import com.google.common.base.Joiner;
 import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.zdjizhi.domain.LocationResponse;
@@ -8,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
+import java.util.StringJoiner;
 
 /**
  * @ClassName IpLookup
@@ -20,11 +22,13 @@ public final class IpLookup extends AbstractIpLookup{
 
 
     public final static String DEFAULT_IP_DATABASE_PATH = "dat";
+    private final static String SEPRATOR = ",";
 
     private static GalaxyDataBaseReader ipLocationReaderV4;
     private static GalaxyDataBaseReader ipLocationReaderV6;
     private static GalaxyDataBaseReader asnLocationReaderV4;
     private static GalaxyDataBaseReader asnLocationReaderV6;
+
 
 
     synchronized void init(Builder builder) {
@@ -227,7 +231,7 @@ public final class IpLookup extends AbstractIpLookup{
     @Override
     public String cityLookupDetail(String ip) {
 
-        StringBuffer result = new StringBuffer(64);
+       String result;
 
         try {
 
@@ -235,19 +239,10 @@ public final class IpLookup extends AbstractIpLookup{
 
             if (StringUtil.isNotEmpty(response)) {
 
-                if (StringUtil.isNotBlank(response.getCity())) {
-                    result.append(response.getCity()).append("\t");
-                }
+                result = Joiner.on(SEPRATOR).skipNulls().join(response.getCity(), response.getProvince(), response.getCountry());
 
-                if (StringUtil.isNotBlank(response.getProvince())) {
-                    result.append(response.getProvince()).append("\t");
-                }
-
-                if (StringUtil.isNotBlank(response.getCountry())) {
-                    result.append(response.getCountry());
-                }
             } else {
-                result.append(UNKNOW).append("\t");
+                result = UNKNOW;
             }
 
         } catch (Exception e) {
@@ -255,7 +250,7 @@ public final class IpLookup extends AbstractIpLookup{
             throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
         }
 
-        return result.toString();
+        return result;
     }
 
     @Override
@@ -263,8 +258,15 @@ public final class IpLookup extends AbstractIpLookup{
         String result = UNKNOW;
         LocationResponse response = getResponse(ip);
 
-        if (StringUtil.isNotEmpty(response) && StringUtil.isNotBlank(response.getCity())) {
-            result = StringUtil.isNotBlank(response.getProvince()) ? response.getProvince() : response.getCity();
+        if (StringUtil.isNotEmpty(response)) {
+            if (StringUtil.isNotBlank(response.getProvince())) {
+                result = response.getProvince();
+            } else if(StringUtil.isNotBlank(response.getCity())) {
+                result = response.getCity();
+            } else {
+                result = response.getCountry();
+            }
+
         }
 
         return result;
@@ -273,24 +275,19 @@ public final class IpLookup extends AbstractIpLookup{
 
     @Override
     public  String latLngLookup(String ip) {
-        StringBuilder  result = new StringBuilder(64);
+
+        String result;
         try {
             LocationResponse response = getResponse(ip);
-            if (StringUtil.isNotEmpty(response)) {
+            if (StringUtil.isNotEmpty(response)
+                && StringUtil.isNotBlank(response.getLatitude())
+                && StringUtil.isNotBlank(response.getLongitude())) {
 
-                if (StringUtil.isBlank(response.getLatitude())) {
-                    result.append(UNKNOW).append("\t");
-                } else {
-                    result.append(response.getLatitude()).append("\t");
-                }
 
-                if (StringUtil.isBlank(response.getLongitude())) {
-                    result.append(UNKNOW);
-                } else {
-                    result.append(response.getLongitude());
-                }
+                result = Joiner.on(SEPRATOR).skipNulls().join(response.getLatitude(), response.getLongitude());
+
             } else {
-                result.append(UNKNOW).append("\t").append("N/A");
+                result = Joiner.on(SEPRATOR).join(UNKNOW, UNKNOW);
             }
 
         } catch (Exception e) {
@@ -298,33 +295,17 @@ public final class IpLookup extends AbstractIpLookup{
             throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
         }
 
-        return result.toString();
+        return result;
 
     }
 
 
     @Override
     public  String cityLatLngLookup(String ip) {
-        StringBuilder  result = new StringBuilder(64);
+        String result;
         try {
-            result.append(cityLookup(ip)).append("\t");
-            LocationResponse response = getResponse(ip);
-            if (StringUtil.isNotEmpty(response)) {
 
-                if (StringUtil.isBlank(response.getLatitude())) {
-                    result.append(UNKNOW).append("\t");
-                } else {
-                    result.append(response.getLatitude()).append("\t");
-                }
-
-                if (StringUtil.isBlank(response.getLongitude())) {
-                    result.append(UNKNOW);
-                } else {
-                    result.append(response.getLongitude());
-                }
-            } else {
-                result.append(UNKNOW).append("\t").append("N/A");
-            }
+            result = Joiner.on(SEPRATOR).skipNulls().join(cityLookup(ip), latLngLookup(ip));
 
         } catch (Exception e) {
 
@@ -332,7 +313,7 @@ public final class IpLookup extends AbstractIpLookup{
         }
 
 
-        return result.toString();
+        return result;
 
     }
 
@@ -365,6 +346,8 @@ public final class IpLookup extends AbstractIpLookup{
 
     }
 
+
+
     @Override
     public String asnLookupDetail(String ip, boolean isAsnDB) {
         String result = UNKNOW;
@@ -391,8 +374,13 @@ public final class IpLookup extends AbstractIpLookup{
         if (IPUtil.isIP(ip) && IPUtil.internalIp(ip)) {
              response = new LocationResponse();
              response.setCountry("Private IP");
-             response.setCity(" ");
-             response.setProvince(" ");
+             response.setCity(null);
+             response.setProvince(null);
+             response.setAsn(null);
+             response.setIsp(null);
+             response.setLatitude(null);
+             response.setLongitude(null);
+             response.setAreaCode(null);
 
             return  response;
         }
