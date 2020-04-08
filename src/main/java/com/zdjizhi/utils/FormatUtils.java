@@ -141,9 +141,27 @@ public class FormatUtils {
 
 		}
 
-
-
 	}
+
+	/**
+	 * 根据邮箱发件人或收件人地址获取域名信息
+	 * @param email 发件人或收件人地址
+	 * @return
+	 */
+	public static String getEmailDomain(String email) {
+		if (StringUtil.isBlank(email)) {
+			return StringUtil.EMPTY;
+		}
+
+		if (email.indexOf("@") < 0) {
+			return StringUtil.EMPTY;
+		}
+
+
+		return email.substring(email.indexOf("@") + 1);
+	}
+
+
 
 	/**
 	 *

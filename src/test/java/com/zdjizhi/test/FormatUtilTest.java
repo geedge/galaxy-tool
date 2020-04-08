@@ -33,7 +33,7 @@ public class FormatUtilTest {
 
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("&&&&Dddddsdd"), "");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("com.cn"), "");
-        Assert.assertEquals(FormatUtils.getTopPrivateDomain("comcn"), "");
+        Assert.assertEquals(FormatUtils.getTopPrivateDomain("z1343921421z@163.com"), "163.com");
 
         Assert.assertNotEquals(FormatUtils.getTopPrivateDomain("com.io"), "com.io");
 
@@ -64,6 +64,18 @@ public class FormatUtilTest {
         Assert.assertEquals(Encodes.decodeBase64String( Encodes.encodeBase64("我是UTF-8")), "我是UTF-8");
 
     }
+
+
+	@Test
+	public void testGetEmailDomain() {
+
+		Assert.assertEquals(FormatUtils.getEmailDomain("zhansan@gmail.com"), "gmail.com");
+		Assert.assertEquals(FormatUtils.getEmailDomain("zhansan"), "");
+		Assert.assertEquals(FormatUtils.getEmailDomain("@gmail.com"), "gmail.com");
+
+
+	}
+
 //    @Test
 	public void snowFlakeIdWriteTest() throws IOException {
 		FormatUtils build = new FormatUtils.Builder(false).build();
