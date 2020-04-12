@@ -33,8 +33,6 @@ public class FormatUtilTest {
 
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("&&&&Dddddsdd"), "");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("com.cn"), "");
-        Assert.assertEquals(FormatUtils.getTopPrivateDomain("z1343921421z@163.com"), "163.com");
-
         Assert.assertNotEquals(FormatUtils.getTopPrivateDomain("com.io"), "com.io");
 
     }
