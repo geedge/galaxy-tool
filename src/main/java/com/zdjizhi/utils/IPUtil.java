@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.StringWriter;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -14,7 +15,7 @@ import java.util.regex.Pattern;
 
 /**
  *
- * <p>对IPV4进行处理工具类.</p>
+ * <p>对IP进行处理工具类</p>
  * @author 中电积至有限公司 darnell
  * @version 1.0 创建时间：2018-08-30
  *
@@ -131,7 +132,6 @@ public class IPUtil {
         if (binPrefix.length() > prefixLen) {
             binPrefix = binPrefix.substring(0,prefixLen);
         }
-
         String binIP = toBinaryString(ip);
         binIP = binIP.substring(0,prefixLen);
         if (binIP.equals(binPrefix)) {
@@ -140,6 +140,15 @@ public class IPUtil {
             return false;
         }
     }
+
+
+
+
+
+
+
+
+
 
 
     /**
