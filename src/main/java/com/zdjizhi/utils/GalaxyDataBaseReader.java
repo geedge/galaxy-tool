@@ -178,7 +178,7 @@ public class GalaxyDataBaseReader  {
 
 
     public LocationResponse location(InetAddress ipAddress) throws IOException, GeoIp2Exception {
-        return this.get(ipAddress, LocationResponse.class, "IPLOCATOR");
+        return this.get(ipAddress, LocationResponse.class, "");
 
     }
 
