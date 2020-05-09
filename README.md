@@ -23,7 +23,7 @@ Galaxy 的 Maven group ID 是 `com.zdjizhi` 并且 artifactId 是 `galaxy`。增
 **关于Galaxy 应用**
 ***
 
-IP定位使用向导，[IpLookup](/releases/docs)
+IP映射使用向导，[IPGEO](help/IPGEO.md)
 
 格式转换Formatutils向导[FormatUtils](https://git.mesalab.cn/doufenghu/galaxy-tool/wikis/FormatUtils)
 
