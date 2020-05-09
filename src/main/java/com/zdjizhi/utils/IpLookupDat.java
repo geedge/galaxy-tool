@@ -384,10 +384,7 @@ public class IpLookupDat extends AbstractIpLookup {
 
     }
 
-    @Override
-    public String asnLookup(String ip, boolean isAsnDB) {
-        return null;
-    }
+
 
     @Override
     public String asnLookupDetail(String ip) {
@@ -411,10 +408,7 @@ public class IpLookupDat extends AbstractIpLookup {
         return result;
     }
 
-    @Override
-    public String asnLookupDetail(String ip, boolean isAsnDB) {
-        return null;
-    }
+
 
 
     public synchronized  void close() {

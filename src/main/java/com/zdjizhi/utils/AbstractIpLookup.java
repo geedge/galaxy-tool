@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @ClassName AbstractIpLookup
  * @Description 对IP定位查找抽象类，规定可执行方法
- * @Author dell
+ * @Author darnell
  * @Date 2018-10-9 19:20
  * @Version 1.0
  **/
@@ -70,15 +70,6 @@ public abstract class AbstractIpLookup {
     public abstract String asnLookup(String ip);
 
 
-    /**
-     *
-     * 获取AS号,使用独立ASN库
-     * @param ip ip地址
-     * @param isAsnDB true-需要加载ASN库 false -使用IP定位库
-     * @return String asn号
-     */
-    public abstract String asnLookup(String ip, boolean isAsnDB);
-
 
     /**
      *
@@ -88,14 +79,6 @@ public abstract class AbstractIpLookup {
      */
     public abstract String asnLookupDetail(String ip);
 
-    /**
-     *
-     * 获取AS号与组织信息
-     * @param ip ip地址
-     * @param isAsnDB true-需要加载ASN库 false -使用IP定位库
-     * @return asn号 组织名称
-     */
-    public abstract String asnLookupDetail(String ip, boolean isAsnDB);
 
 
 

@@ -22,7 +22,6 @@ import java.util.regex.Pattern;
  */
 public class IPUtil {
 
-
     private static Logger logger = LoggerFactory.getLogger(IPUtil.class);
     private static byte pos []= new byte []{(byte)128,64,32,16,8,4,2,1};
     private static final Pattern IPV4Pattern = Pattern.
