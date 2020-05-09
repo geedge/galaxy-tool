@@ -1,24 +1,20 @@
 package com.zdjizhi.test;
 
 import com.zdjizhi.utils.IpLookup;
-import jdk.internal.org.objectweb.asm.tree.TryCatchBlockNode;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 
-import java.math.BigInteger;
-import java.net.InetAddress;
-
-public class IpLookupTestUtils {
-    Logger logger  = Logger.getLogger(IpLookupTestUtils.class);
+public class IpLookupTest {
+    Logger logger  = Logger.getLogger(IpLookupTest.class);
     @Test
     public void testIpCoutry() {
 
-       IpLookup ipLookup =  new IpLookup.Builder(false)
-               .loadDataFile("dat/ip.mmdb")
-               .loadDataFilePrivateV4("dat/ip_private_v4.mmdb")
-               .loadDataFilePrivateV6("dat/ip_v6.mmdb")
-               .loadAsnDataFile("dat/asn_v4.mmdb")
-               .loadAsnDataFileV6("dat/asn_v6.mmdb")
+       IpLookup ipLookup =  new IpLookup.Builder(true)
+               //.loadDataFile("dat/ip.mmdb")
+               //.loadDataFilePrivateV4("dat/ip_private_v4.mmdb")
+              // .loadDataFilePrivateV6("dat/ip_v6.mmdb")
+              // .loadAsnDataFile("dat/asn_v4.mmdb")
+              // .loadAsnDataFileV6("dat/asn_v6.mmdb")
                .build();
 
         logger.info(ipLookup.countryLookup("192.168.50.231"));
