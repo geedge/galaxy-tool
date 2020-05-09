@@ -46,13 +46,44 @@ Galaxy IPGEO 即数据平台下的galaxy-tool支持的IP定位功能。最终的
 
 **IpLookup** 
 
-| Name                                                      | Type             | Description                |
-| --------------------------------------------------------- | ---------------- | -------------------------- |
-| IpLookup.Builder(boolean isDefaultDB)                     | IpLookup.Builder |                            |
-| Builder.loadDataFile(String ipDatabasePublicFile)         | IpLookup.Builder | 加载公共IP定位库文件       |
-| Builder.loadDataFilePrivate(String ipDatabasePrivateFile) | IpLookup.Builder | 加载用户自定义IP定位库文件 |
-|                                                           |                  |                            |
-|                                                           |                  |                            |
+| Name                                                         | Type             | Description                                        |
+| ------------------------------------------------------------ | ---------------- | -------------------------------------------------- |
+| IpLookup.Builder(boolean isDefaultDB)                        | IpLookup.Builder |                                                    |
+| Builder.loadDataFile(String ipDatabasePublicFile)            | IpLookup.Builder | 加载公共IP定位库                                   |
+| Builder.loadDataFileV4(String ipDatabasePublicFileV4)        | IpLookup.Builder | 加载公共IPv4定位库                                 |
+| Builder.loadDataFileV6(String ipDatabasePublicFileV6)        | IpLookup.Builder | 加载公共IPv6定位库                                 |
+| Builder.loadDataFilePrivate(String ipDatabasePrivateFile)    | IpLookup.Builder | 加载用户自定义IP定位库                             |
+| Builder.loadDataFilePrivateV4(String ipDatabasePrivateFileV4) | IpLookup.Builder | 加载用户自定义IPv4定位库                           |
+| Builder.loadDataFilePrivateV6(String ipDatabasePrivateFileV6) | IpLookup.Builder | 加载用户自定义IPv6定位库                           |
+| Builder.loadAsnDataFile(String asnDatabasePublicFile)        | IpLookup.Builder | 加载公共ASN定位库                                  |
+| Builder.loadAsnDataFileV4(String asnDatabasePublicFileV4)    | IpLookup.Builder | 加载公共ASN IPv4定位库                             |
+| Builder.loadAsnDataFileV6(String asnDatabasePublicFileV6)    | IpLookup.Builder | 加载公共ASN IPv6定位库                             |
+| Builder.loadAsnDataFilePrivate(String asnDatabasePrivateFile) | IpLookup.Builder | 加载用户自定义ASN定位库                            |
+| Builder.loadAsnDataFilePrivateV4(String asnDatabasePrivateFileV4) | IpLookup.Builder | 加载用户自定义ASN IPv4定位库                       |
+| Builder.loadAsnDataFilePrivateV6(String asnDatabasePrivateFileV6) | IpLookup.Builder | 加载用户自定义ASN IPv6定位库                       |
+| Builder.build()                                              | IpLookup         | 构建IPGEO对象                                      |
+| countryLookup(String ip)                                     | String           | 返回国家                                           |
+| cityLookupDetail(String ip)                                  | String           | 返回详情，包含城市,省(州),国家;分隔符为英文逗号"," |
+| cityLookup(String ip)                                        | String           | 返回所属城市，若不存在可返回国家信息；             |
+| latLngLookup(String ip)                                      | String           | 返回经纬度，格式：维度,经度 ；分隔符为英文逗号","  |
+| cityLatLngLookup(String ip)                                  | String           | 返回 cityLookup+latLngLookup信息；                 |
+| asnLookup(String ip)                                         | String           | 返回ASN号，调用AsnLookup工具类                     |
+| asnLookupDetail(String ip)                                   | String           | 返回ASN号及ISP信息，调用AsnLookup工具类            |
+
+**AsnLookup** 
+
+| Name                                                         | Type              | Description                  |
+| ------------------------------------------------------------ | ----------------- | ---------------------------- |
+| AsnLookup.Builder(boolean isDefaultDB)                       | AsnLookup.Builder |                              |
+| Builder.loadDataFile(String asnDatabasePublicFile)           | AsnLookup.Builder | 加载公共IP定位库             |
+| Builder.loadDataFileV4(String asnDatabasePublicFileV4)       | AsnLookup.Builder | 加载公共ASN IPv4定位库       |
+| Builder.loadDataFileV6(String asnDatabasePublicFileV6)       | AsnLookup.Builder | 加载公共ASN IPv6定位库       |
+| Builder.loadDataFilePrivate(String asnDatabasePrivateFile)   | AsnLookup.Builder | 加载用户自定义ASN 定位库     |
+| Builder.loadDataFilePrivateV4(String asnDatabasePrivateFileV4) | AsnLookup.Builder | 加载用户自定义ASN IPv4定位库 |
+| Builder.loadDataFilePrivateV6(String asnDatabasePrivateFileV6) | AsnLookup.Builder | 加载用户自定义ASN IPv6定位库 |
+| Builder.build()                                              | AsnLookup         | 构建IPGEO对象                |
+| asnLookup(String ip)                                         | String            | 返回ASN号                    |
+| asnLookupDetail(String ip)                                   | String            | 返回ASN号及ISP信息           |
 
 ## 实现举例
 
