@@ -49,7 +49,7 @@ public final class IpLookup extends AbstractIpLookup{
     synchronized void init(Builder builder) {
         try {
 
-            if (builder.isDefalultDB) {
+            if (builder.isDefaultDB) {
 
                 File dbPublicFile = new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
                         + DEFAULT_DB_IP_PUBLIC);
@@ -229,14 +229,14 @@ public final class IpLookup extends AbstractIpLookup{
         String asnDatabasePrivateFileV4;
         String asnDatabasePrivateFileV6;
 
-        boolean isDefalultDB;
+        boolean isDefaultDB;
 
         /**
          *
-         * @param isDefalultDB <code>false</code> 手动指定IP库路径 <code>true</code> 使用默认路径
+         * @param isDefaultDB <code>false</code> 手动指定IP库路径 <code>true</code> 使用默认路径
          */
-        public Builder(boolean isDefalultDB) {
-            this.isDefalultDB = isDefalultDB;
+        public Builder(boolean isDefaultDB) {
+            this.isDefaultDB = isDefaultDB;
         }
 
         /**
