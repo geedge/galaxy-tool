@@ -30,7 +30,8 @@ Galaxy IPGEO 即数据平台下的galaxy-tool支持的IP定位功能。最终的
 
 如上所述，若同时加载多个相同类型库，系统根据IP特点会优先获取V4或V6库.
 
-![Image text](./ip_load_priortiy.png)
+
+![默认加载顺序](help/images/ip_load_priortiy.png)
 
 
 
@@ -38,7 +39,8 @@ Galaxy IPGEO 即数据平台下的galaxy-tool支持的IP定位功能。最终的
 
 当同时指定公共与用户自定义库时，系统优先通过自定义库进行映射匹配。执行顺序如下：
 
-![](/Users/darnell/docs/ip_map.png)
+![映射优先级](help/images/ip_map.png)
+
 
 ## 功能说明
 
