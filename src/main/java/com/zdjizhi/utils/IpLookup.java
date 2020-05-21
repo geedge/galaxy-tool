@@ -379,65 +379,62 @@ public final class IpLookup extends AbstractIpLookup{
 
     @Override
     public  String countryLookup(String ip) {
-        String result = UNKNOW;
+        String result = "";
 
         LocationResponse response = getResponse(ip);
 
         if (StringUtil.isNotEmpty(response)) {
             result = StringUtil.setDefaultIfEmpty(response.getCountry(), "").toString() ;
         }
-        return result;
+
+        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
     }
 
     @Override
     public String cityLookupDetail(String ip) {
 
-       String result;
-
-        try {
-
-            LocationResponse response = getResponse(ip);
-
-            if (StringUtil.isNotEmpty(response)) {
-
-                result = Joiner.on(SEPRATOR).skipNulls().join(response.getCity(), response.getProvince(), response.getCountry());
-
-            } else {
-                result = UNKNOW;
-            }
-
-        } catch (Exception e) {
-
-            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
+        String result = "";
+        LocationResponse response = getResponse(ip);
+        if (StringUtil.isNotEmpty(response)) {
+            result = Joiner.on(SEPRATOR).skipNulls().join(response.getCity(), response.getProvince(), response.getCountry());
         }
 
-        return result;
+        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
     }
 
     @Override
     public String cityLookup(String ip) {
-        String result = UNKNOW;
+        String result = "";
         LocationResponse response = getResponse(ip);
 
         if (StringUtil.isNotEmpty(response)) {
-            if (StringUtil.isNotBlank(response.getProvince())) {
-                result = response.getProvince();
-            } else if(StringUtil.isNotBlank(response.getCity())) {
+            if(StringUtil.isNotBlank(response.getCity())) {
                 result = response.getCity();
-            } else {
-                result = response.getCountry();
             }
-
         }
 
-        return result;
+        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
 
     }
 
     @Override
+    public String provinceLookup(String ip) {
+        String result = "";
+        LocationResponse response = getResponse(ip);
+        if (StringUtil.isNotEmpty(response)) {
+            if (StringUtil.isNotBlank(response.getProvince())) {
+                result = response.getProvince();
+            }
+        }
+
+        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
+    }
+
+
+    @Override
     public  String latLngLookup(String ip) {
 
-        String result;
+        String result = "";
         try {
             LocationResponse response = getResponse(ip);
             if (StringUtil.isNotEmpty(response)
@@ -463,7 +460,7 @@ public final class IpLookup extends AbstractIpLookup{
 
     @Override
     public  String cityLatLngLookup(String ip) {
-        String result;
+        String result = "";
         try {
 
             result = Joiner.on(SEPRATOR).skipNulls().join(cityLookup(ip), latLngLookup(ip));
@@ -474,7 +471,7 @@ public final class IpLookup extends AbstractIpLookup{
         }
 
 
-        return result;
+        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
 
     }
 

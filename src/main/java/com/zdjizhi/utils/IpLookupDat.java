@@ -14,6 +14,7 @@ import java.io.File;
  * @version 1.0 创建时间：2018-08-30
  *
  */
+@Deprecated
 public class IpLookupDat extends AbstractIpLookup {
     public final static String DEFAULT_IP_DATABASE_PATH = "dat";
     private static final String ASN_PATTERN = "AS(.*?) ";
@@ -291,6 +292,43 @@ public class IpLookupDat extends AbstractIpLookup {
 
         return result;
 
+    }
+
+    @Override
+    public String provinceLookup(String ip) {
+        String result = UNKNOW;
+        try {
+
+            Location location = null;
+
+            if (IPUtil.isIP(ip)) {
+
+                if (IPUtil.internalIp(ip)){
+                    return "N/A";
+                }
+                location = cityService.getLocation(ip);
+
+            } else if (IPUtil.isIPv6Address(ip)) {
+                location = cityServicev6.getLocation(ip);
+            }
+
+            if (StringUtil.isNotEmpty(location)) {
+
+                result = regionName.regionNameByCode(location.countryCode, location.region);
+                if (StringUtil.isBlank(result)
+                        || result.equals("null")) {
+                    result = location.city;
+                }
+
+            }
+
+        } catch (Exception e) {
+
+            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
+        }
+
+
+        return result;
     }
 
     @Override

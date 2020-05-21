@@ -21,6 +21,7 @@ import java.net.InetAddress;
  * @version 1.0 创建时间：2018-08-30
  *
  */
+@Deprecated
 public class IpLookupMmdb extends AbstractIpLookup{
 
     public final static String DEFAULT_IP_DATABASE_PATH = "dat";
@@ -196,6 +197,31 @@ public class IpLookupMmdb extends AbstractIpLookup{
 
     @Override
     public String cityLookup(String ip) {
+        String result = null;
+        try {
+
+            InetAddress ipAddress = InetAddress.getByName(ip);
+            CityResponse response =  cityReader.city(ipAddress);
+            City city = response.getCity();
+            result = StringUtil.setDefaultIfEmpty(city.getName(), "").toString();
+            if (StringUtil.isBlank(result)) {
+                Subdivision subdivision = response.getMostSpecificSubdivision();
+                result = StringUtil.setDefaultIfEmpty(subdivision.getName(), "").toString();
+            }
+
+        } catch (AddressNotFoundException ae) {
+            logger.warn(ae.getMessage());
+        } catch (Exception e) {
+
+            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
+        }
+
+
+        return result ;
+    }
+
+    @Override
+    public String provinceLookup(String ip) {
         String result = null;
         try {
 

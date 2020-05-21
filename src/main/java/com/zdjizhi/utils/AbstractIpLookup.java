@@ -25,19 +25,28 @@ public abstract class AbstractIpLookup {
      * 获取详细定位信息
      *
      * @param ip ip地址，点分十进制格式,ipv4
-     * @return String 城市代码 省代码 国家代码
+     * @return String 城市代码,省代码,国家代码
      */
     public abstract String cityLookupDetail(String ip);
 
 
     /**
      *
-     *  获取所属省或市信息
+     *  获取城市信息
      *
      * @param ip ip地址
-     * @return String 城市|省代码
+     * @return String 城市代码
      */
     public abstract String cityLookup(String ip);
+
+    /**
+     *
+     *  获取所属省信息
+     *
+     * @param ip ip地址
+     * @return String 州/省代码
+     */
+    public abstract String provinceLookup(String ip);
 
 
     /**
