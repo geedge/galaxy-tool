@@ -655,10 +655,12 @@ public class DateUtils implements TimeConstants {
 
         final int months = period.getMonths();
         if (months > 0) {
-            int m = dateTime.getMonthOfYear();
-            m -= m % months;
-            dateTime = dateTime.withMonthOfYear(m).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
 
+            int m = dateTime.getMonthOfYear();
+            if (m % months != m) {
+                m -= m % months;
+            }
+            dateTime = dateTime.withMonthOfYear(m).withDayOfMonth(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
             return dateTime.toDate();
         }
 
@@ -666,7 +668,10 @@ public class DateUtils implements TimeConstants {
         final int weeks = period.getWeeks();
         if (weeks > 0) {
             int w = dateTime.getWeekOfWeekyear();
-            w -= w % weeks;
+
+            if (w % weeks != w) {
+                w -= w % weeks;
+            }
             dateTime = dateTime.withWeekOfWeekyear(w).withDayOfWeek(1).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
 
             return dateTime.toDate();
@@ -677,7 +682,10 @@ public class DateUtils implements TimeConstants {
         final int days = period.getDays();
         if (days > 0) {
             int d = dateTime.getDayOfMonth();
-            d -= d % days;
+            if (d % days != d) {
+                d -= d % days;
+            }
+
             dateTime = dateTime.withDayOfMonth(d).withHourOfDay(0).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
             return dateTime.toDate();
         }
@@ -686,7 +694,7 @@ public class DateUtils implements TimeConstants {
         final int hours = period.getHours();
         if (hours > 0) {
             int h = dateTime.getHourOfDay();
-             h -= h % hours;
+            h -= h % hours;
             dateTime = dateTime.withHourOfDay(h).withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
             return dateTime.toDate();
         }
