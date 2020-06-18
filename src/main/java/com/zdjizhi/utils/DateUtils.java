@@ -401,6 +401,61 @@ public class DateUtils implements TimeConstants {
 
     }
 
+
+    /**
+     * 以基准日期为起点向左获取所有时间点列表。
+     * @param benchmarkDate 基准时间
+     * @param endDate  终止时间，用于定义时间数据范围
+     * @param period 参见ISO8601 对durations定义，例如PT5M,P1W; 约束不可为复合周期(P1YT5M)
+     * @return
+     */
+    public static List<Date> getLeftDateRange(Date benchmarkDate, Date endDate, String period) {
+
+        if (StringUtil.isEmpty(endDate) || StringUtil.isEmpty(benchmarkDate)) {
+            throw new NullPointerException("benchmarkDate and endDate is not null.");
+        }
+
+        List<Date> dateList = Lists.newArrayList();
+
+        Period granularityPeriod = Period.parse(period);
+        DateTime benchmarkTime =  new DateTime (benchmarkDate);
+        DateTime endTime = new DateTime((endDate));
+        while(benchmarkTime.compareTo(endTime) > 0) {
+            benchmarkTime = benchmarkTime.minus(granularityPeriod);
+            dateList.add(benchmarkTime.toDate());
+        }
+
+        return dateList;
+
+    }
+
+    /**
+     * 以基准日期为起点向右获取所有时间点列表。
+     * @param benchmarkDate 基准时间
+     * @param endDate  终止时间，用于定义时间数据范围
+     * @param period 参见ISO8601 对durations定义，例如PT5M,P1W; 约束不可为复合周期(P1YT5M)
+     * @return
+     */
+    public static List<Date> getRightDateRange(Date benchmarkDate, Date endDate, String period) {
+
+        if (StringUtil.isEmpty(endDate) || StringUtil.isEmpty(benchmarkDate)) {
+            throw new NullPointerException("benchmarkDate and endDate is not null.");
+        }
+
+        List<Date> dateList = Lists.newArrayList();
+
+        Period granularityPeriod = Period.parse(period);
+        DateTime benchmarkTime =  new DateTime (benchmarkDate);
+        DateTime endTime = new DateTime((endDate));
+        while(benchmarkTime.compareTo(endTime) <= 0) {
+            dateList.add(benchmarkTime.toDate());
+            benchmarkTime = benchmarkTime.plus(granularityPeriod);
+        }
+
+        return dateList;
+
+    }
+
     /**
      * 按照时间粒度，获取指定时间范围内的所有时间点。
      * 例如：2019-10-11 10:00:00/2019-10-11 10:20:00,时间周期每5分钟（PT5M)，

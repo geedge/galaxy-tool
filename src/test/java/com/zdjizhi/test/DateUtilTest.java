@@ -1,11 +1,15 @@
 package com.zdjizhi.test;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import com.zdjizhi.utils.DateUtil;
 import com.zdjizhi.utils.DateUtils;
 import com.zdjizhi.utils.TimeConstants;
@@ -208,10 +212,54 @@ public class DateUtilTest {
 	@Test
 	public void testGetDateRange() {
 
-		List<Date>lists = DateUtils.getDateRange(DateUtils.convertStringToDate("2020-01-22 12:11:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),
-				DateUtils.convertStringToDate("2020-01-23 11:11:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),"PT1H");
+		List<Date>lists = DateUtils.getDateRange(DateUtils.convertStringToDate("2020-06-01 01:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),
+				DateUtils.convertStringToDate("2020-06-02 00:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),"PT3H");
 		Assert.assertEquals(lists.size(), 24);
 	}
+
+	@Test
+	public void testGetLeftDateRange() {
+
+		List<Date>lists = DateUtils.getLeftDateRange(DateUtils.convertStringToDate("2020-06-02 00:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),
+				DateUtils.convertStringToDate("2020-06-01 00:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),"PT3H");
+		Assert.assertEquals(lists.size(), 8);
+	}
+
+
+	@Test
+	public void testGetRightDateRange() {
+
+		List<Date>lists = DateUtils.getRightDateRange(DateUtils.convertStringToDate("2020-06-02 00:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),
+				DateUtils.convertStringToDate("2020-06-03 00:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),"PT3H");
+		Assert.assertEquals(lists.size(), 9);
+	}
+
+
+
+	@Test
+	public void testGetLeftAndRightDateRange() {
+		List leftLists = DateUtils.getLeftDateRange(DateUtils.convertStringToDate("2020-06-01 00:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),
+				DateUtils.convertStringToDate("2020-06-01 00:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),"PT3H");
+
+		Collections.sort(leftLists);
+
+		List rightLists = DateUtils.getRightDateRange(DateUtils.convertStringToDate("2020-06-02 00:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),
+				DateUtils.convertStringToDate("2020-06-02 23:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),"PT3H");
+
+
+		List<Date> lists = Lists.newArrayList(Iterables.concat(leftLists, rightLists));
+
+		Assert.assertEquals(lists.size(), 8);
+
+
+
+
+
+
+
+	}
+
+
 	
 	
 
