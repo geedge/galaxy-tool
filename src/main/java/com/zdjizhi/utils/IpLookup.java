@@ -1,6 +1,5 @@
 package com.zdjizhi.utils;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.google.common.base.Joiner;
 import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
