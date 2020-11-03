@@ -30,15 +30,20 @@ public class LocationResponse {
 
     private String province;
 
+    private String organization;
+
+    private String countryCode;
+
     public LocationResponse() {
 
-        this("", "", "", "", "", "", "", "");
+        this("", "", "", "", "", "", "", "", "", "");
     }
 
     public LocationResponse(@JsonProperty("AREA_CODE") String areaCode, @JsonProperty("ASN") String asn,
                             @JsonProperty("CITY") String city, @JsonProperty("COUNTRY") String country,
                             @JsonProperty("ISP") String isp, @JsonProperty("LATITUDE") String latitude,
-                            @JsonProperty("LONGITUDE") String longitude, @JsonProperty("PROVINCE") String province ) {
+                            @JsonProperty("LONGITUDE") String longitude, @JsonProperty("PROVINCE") String province,
+                            @JsonProperty("ORGANIZATION") String organization, @JsonProperty("COUNTRY_CODE") String countryCode) {
         this.areaCode = areaCode;
         this.asn = asn;
         this.city = city;
@@ -47,6 +52,8 @@ public class LocationResponse {
         this.longitude = longitude;
         this.province = province;
         this.country = country;
+        this.organization = organization;
+        this.countryCode = countryCode;
 
     }
 
@@ -114,6 +121,22 @@ public class LocationResponse {
 
     public void setProvince(String province) {
         this.province = province;
+    }
+
+    public String getOrganization() {
+        return organization;
+    }
+
+    public void setOrganization(String organization) {
+        this.organization = organization;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
     }
 }
 

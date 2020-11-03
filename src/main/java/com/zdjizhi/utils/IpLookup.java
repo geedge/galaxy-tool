@@ -480,6 +480,12 @@ public final class IpLookup extends AbstractIpLookup{
 
     }
 
+
+    @Override
+    public String asnLookupInfo(String ip) {
+        return asnLookup.asnLookupInfo(ip);
+    }
+
     @Override
     public String asnLookupDetail(String ip) {
 

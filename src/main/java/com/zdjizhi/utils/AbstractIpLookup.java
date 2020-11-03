@@ -78,6 +78,14 @@ public abstract class AbstractIpLookup {
      */
     public abstract String asnLookup(String ip);
 
+    /**
+     *
+     * 获取IP 所属AS的组织+国家代码
+     * @param ip ip地址
+     * @return String asn号
+     */
+    public abstract String asnLookupInfo(String ip);
+
 
 
     /**

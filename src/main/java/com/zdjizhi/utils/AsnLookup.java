@@ -26,8 +26,8 @@ public class AsnLookup {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     public final static String DEFAULT_DATABASE_PATH = "dat";
     private final static String DEFAULT_DB_ASN_PUBLIC = "asn.mmdb";
-    private final static String DEFAULT_DB_ASN_PUBLIC_V4 = "asn_v4.mmdb";
-    private final static String DEFAULT_DB_ASN_PUBLIC_V6 = "asn_v6.mmdb";
+    private final static String DEFAULT_DB_ASN_PUBLIC_V4 = "asn_v4_201901.mmdb";
+    private final static String DEFAULT_DB_ASN_PUBLIC_V6 = "asn_v6_201901.mmdb";
     private final static String DEFAULT_DB_ASN_PRIVATE = "asn_private.mmdb";
     private final static String DEFAULT_DB_ASN_PRIVATE_V4 = "asn_private_v4.mmdb";
     private final static String DEFAULT_DB_ASN_PRIVATE_V6 = "asn_private_v6.mmdb";
@@ -186,8 +186,8 @@ public class AsnLookup {
      *
      * 2.手动加载IP库，使用方式如下：
      * <p>
-     *   AsnLookup asnLookup = new AsnLookup.Builder(false).loadDataFileV4("D:\\galaxy-tool\\dat\\asn_v4.mmdb").
-     *   loadDataFileV6("D:\\galaxy-tool\\dat\\asn_v6.mmdb").build();
+     *   AsnLookup asnLookup = new AsnLookup.Builder(false).loadDataFileV4("D:\\galaxy-tool\\dat\\asn_v4_201901.mmdb").
+     *   loadDataFileV6("D:\\galaxy-tool\\dat\\asn_v6_201901.mmdb").build();
      *
      * </p>
      */
@@ -290,6 +290,7 @@ public class AsnLookup {
         String result = UNKNOW;
         LocationResponse response = getResponse(ip);
 
+
         if (StringUtil.isNotEmpty(response)) {
             result = StringUtil.isNotBlank(response.getAsn()) ? response.getAsn() : UNKNOW;
         }
@@ -298,13 +299,30 @@ public class AsnLookup {
 
     }
 
+    public String asnLookupInfo(String ip) {
+        String result = UNKNOW;
+        LocationResponse response = getResponse(ip);
+
+
+        if (StringUtil.isNotEmpty(response)) {
+            result = StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOW)
+                    +"," + StringUtil.setDefaultIfEmpty(response.getCountryCode(), UNKNOW);
+        }
+
+        return result;
+
+    }
+
+
 
     public String asnLookupDetail(String ip) {
         String result = UNKNOW;
         LocationResponse response = getResponse(ip);
 
         if (StringUtil.isNotEmpty(response)) {
-            result = StringUtil.setDefaultIfEmpty(response.getAsn(), UNKNOW) + "\t"  + StringUtil.setDefaultIfEmpty(response.getIsp(), UNKNOW);
+            result = StringUtil.setDefaultIfEmpty(response.getAsn(), UNKNOW) + "\t"
+                    + StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOW)
+                    +"," + StringUtil.setDefaultIfEmpty(response.getCountryCode(), UNKNOW);
         }
 
 
