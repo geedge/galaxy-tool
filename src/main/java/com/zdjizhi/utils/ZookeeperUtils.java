@@ -1,14 +1,18 @@
 package com.zdjizhi.utils;
 
-import org.apache.commons.lang3.RandomUtils;
-import org.apache.log4j.Logger;
-import org.apache.zookeeper.*;
-import org.apache.zookeeper.data.ACL;
-import org.apache.zookeeper.data.Stat;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
+
+import org.apache.log4j.Logger;
+import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
+import org.apache.zookeeper.WatchedEvent;
+import org.apache.zookeeper.Watcher;
+import org.apache.zookeeper.ZooDefs;
+import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.data.ACL;
+import org.apache.zookeeper.data.Stat;
 
 
 public class ZookeeperUtils implements Watcher {
@@ -40,7 +44,7 @@ public class ZookeeperUtils implements Watcher {
             connectZookeeper(zookeeperIp);
             Stat stat = zookeeper.exists(path, true);
             workerId = Integer.parseInt(getNodeDate(path));
-            if (workerId > 55) {
+            if (workerId > 63) {
                 workerId = 0;
                 zookeeper.setData(path, "1".getBytes(), stat.getVersion());
             } else {
@@ -52,8 +56,7 @@ public class ZookeeperUtils implements Watcher {
                 }
             }
         } catch (KeeperException | InterruptedException e) {
-            e.printStackTrace();
-            workerId = RandomUtils.nextInt(56, 63);
+            logger.error("modify error Can't modify,"+e.getMessage());
         }
         finally {
             closeConn();
