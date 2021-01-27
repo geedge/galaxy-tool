@@ -21,8 +21,14 @@ import java.util.regex.Pattern;
  *
  */
 public class IPUtil {
-
     private static Logger logger = LoggerFactory.getLogger(IPUtil.class);
+    private static final String UNKNOWN = "unknown";
+    private static final String DEFAULT_SEPARATOR = ",";
+    private static final int DEFAULT_IP_LENGTH = 15;
+    private static final String UNKNOWN_IPV4_ADDRESS = "0.0.0.0";
+    private static final String LOCAL_IPV6_ADDRESS = "0:0:0:0:0:0:0:1";
+    private static final String LOCALHOST_IPV4_ADDRESS = "127.0.0.1";
+    private static final String LOCALHOST_NAME = "localhost";
     private static byte pos []= new byte []{(byte)128,64,32,16,8,4,2,1};
     private static final Pattern IPV4Pattern = Pattern.
             compile("\\b((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\.((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\.((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\.((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\b");
@@ -597,21 +603,46 @@ public class IPUtil {
      * @return  返回字符串IP地址
      */
     public static String getIpAddr(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+
+        String ip = request.getHeader("x-forwarded-for");
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("Proxy-Client-IP");
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            // 代理IP
             ip = request.getHeader("WL-Proxy-Client-IP");
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            // 网宿cdn的真实ip
+            ip = request.getHeader("Cdn-Src-Ip");
+        }
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            // 蓝讯cdn的真实ip
             ip = request.getHeader("HTTP_CLIENT_IP");
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
             ip = request.getHeader("HTTP_X_FORWARDED_FOR");
         }
-        if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
+        if (ip == null || ip.length() == 0 || UNKNOWN.equalsIgnoreCase(ip)) {
+            // 真实IP
             ip = request.getRemoteAddr();
+        }
+        // 如果是多级代理，那么取第一个ip为客户端ip
+        if (ip != null && ip.length() > DEFAULT_IP_LENGTH && ip.contains(DEFAULT_SEPARATOR)) {
+            String[] ips = ip.split(DEFAULT_SEPARATOR);
+            for (String strIp : ips) {
+                if (!UNKNOWN.equalsIgnoreCase(strIp)) {
+                    ip = strIp;
+                    break;
+                }
+            }
+        }
+
+        if(UNKNOWN_IPV4_ADDRESS.equals(ip)
+                || LOCAL_IPV6_ADDRESS.equals(ip)
+                || LOCALHOST_NAME.equals(ip)
+                || LOCALHOST_IPV4_ADDRESS.equals(ip)){
+            ip = "127.0.0.1";
         }
         return ip;
     }
