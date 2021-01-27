@@ -224,7 +224,7 @@ public class SnowflakeId {
      *
      * @return
      */
-    public static Long generateId(String zookeeperIp, long dataCenterIdNum) {
+    public synchronized static Long generateId(String zookeeperIp, long dataCenterIdNum) {
         if (idWorker == null) {
             getSnowflakeldInstance(zookeeperIp, dataCenterIdNum);
         }
