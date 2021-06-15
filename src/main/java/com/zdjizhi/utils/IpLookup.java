@@ -23,7 +23,6 @@ public final class IpLookup extends AbstractIpLookup{
         PRIVATE, PUBLIC
     }
     public final static String DEFAULT_DATABASE_PATH = "dat";
-    private final static String SEPRATOR = ",";
     private final static String DEFAULT_DB_IP_PUBLIC = "ip.mmdb";
     private final static String DEFAULT_DB_IP_PUBLIC_V4 = "ip_v4.mmdb";
     private final static String DEFAULT_DB_IP_PUBLIC_V6 = "ip_v6.mmdb";
@@ -33,16 +32,13 @@ public final class IpLookup extends AbstractIpLookup{
 
     private AsnLookup asnLookup;
 
-
     private static GalaxyDataBaseReader ipLocationPublicReader;
     private static GalaxyDataBaseReader ipLocationPublicReaderV4;
     private static GalaxyDataBaseReader ipLocationPublicReaderV6;
 
-
     private static GalaxyDataBaseReader ipLocationPrivateReader;
     private static GalaxyDataBaseReader ipLocationPrivateReaderV4;
     private static GalaxyDataBaseReader ipLocationPrivateReaderV6;
-
 
 
     synchronized void init(Builder builder) {
@@ -183,7 +179,7 @@ public final class IpLookup extends AbstractIpLookup{
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn("Unknow mmdb dat file , please check your dat path!");
+            logger.warn("Unknown mmdb dat file , please check your dat path!");
 
         }
 
@@ -378,100 +374,78 @@ public final class IpLookup extends AbstractIpLookup{
 
     @Override
     public  String countryLookup(String ip) {
-        String result = "";
 
         LocationResponse response = getResponse(ip);
-
-        if (StringUtil.isNotEmpty(response)) {
-            result = StringUtil.setDefaultIfEmpty(response.getCountry(), "").toString() ;
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        if (response.isPrivateIP()) {
+            return PRIVATE_IP;
         }
 
-        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
+        return StringUtil.setDefaultIfEmpty(response.getCountry(), UNKNOWN).toString() ;
     }
 
     @Override
     public String cityLookupDetail(String ip) {
 
-        String result = "";
         LocationResponse response = getResponse(ip);
-        if (StringUtil.isNotEmpty(response)) {
-            result = Joiner.on(SEPRATOR).skipNulls().join(response.getCity(), response.getProvince(), response.getCountry());
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        if (response.isPrivateIP()) {
+            return PRIVATE_IP;
         }
 
-        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
+        return Joiner.on(SEPARATOR).useForNull("").join(response.getCity(), response.getProvince(), response.getCountry());
+
     }
 
     @Override
     public String cityLookup(String ip) {
-        String result = "";
         LocationResponse response = getResponse(ip);
 
-        if (StringUtil.isNotEmpty(response)) {
-            if(StringUtil.isNotBlank(response.getCity())) {
-                result = response.getCity();
-            }
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        if (response.isPrivateIP()) {
+            return PRIVATE_IP;
         }
 
-        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
+        return StringUtil.setDefaultIfEmpty(response.getCity(), UNKNOWN).toString() ;
 
     }
 
     @Override
     public String provinceLookup(String ip) {
-        String result = "";
         LocationResponse response = getResponse(ip);
-        if (StringUtil.isNotEmpty(response)) {
-            if (StringUtil.isNotBlank(response.getProvince())) {
-                result = response.getProvince();
-            }
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        if (response.isPrivateIP()) {
+            return PRIVATE_IP;
         }
 
-        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
+        return StringUtil.setDefaultIfEmpty(response.getProvince(), UNKNOWN).toString() ;
     }
 
 
     @Override
     public  String latLngLookup(String ip) {
 
-        String result = "";
-        try {
-            LocationResponse response = getResponse(ip);
-            if (StringUtil.isNotEmpty(response)
-                && StringUtil.isNotBlank(response.getLatitude())
-                && StringUtil.isNotBlank(response.getLongitude())) {
-
-
-                result = Joiner.on(SEPRATOR).skipNulls().join(response.getLatitude(), response.getLongitude());
-
-            } else {
-                result = Joiner.on(SEPRATOR).join(UNKNOW, UNKNOW);
-            }
-
-        } catch (Exception e) {
-
-            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
+        LocationResponse response = getResponse(ip);
+        if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
+            return  UNKNOWN;
         }
 
-        return result;
+        return Joiner.on(SEPARATOR).skipNulls().join(response.getLatitude(), response.getLongitude());
 
     }
 
 
     @Override
     public  String cityLatLngLookup(String ip) {
-        String result = "";
-        try {
-
-            result = Joiner.on(SEPRATOR).skipNulls().join(cityLookup(ip), latLngLookup(ip));
-
-        } catch (Exception e) {
-
-            throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
-        }
-
-
-        return StringUtil.setDefaultIfEmpty(result, UNKNOW).toString();
-
+        return  Joiner.on(SEPARATOR).skipNulls().join(cityLookup(ip), latLngLookup(ip));
     }
 
     @Override
@@ -496,13 +470,11 @@ public final class IpLookup extends AbstractIpLookup{
 
     private LocationResponse getResponse(String ip) {
 
-        LocationResponse response = null;
-
         if (!IPUtil.isIP(ip) && !IPUtil.isIPv6Address(ip)) {
             throw new IllegalArgumentException("unknown ip format :" + ip );
         }
 
-        response = new Context(new PrivateReader()).executeStragey(ip);
+        LocationResponse  response = new Context(new PrivateReader()).executeStragey(ip);
 
         if (StringUtil.isEmpty(response)) {
             response =  new Context(new PublicReader()).executeStragey(ip);
@@ -572,6 +544,7 @@ public final class IpLookup extends AbstractIpLookup{
         @Override
         public LocationResponse getResponse(String ip) {
             GalaxyDataBaseReader dataBaseReader = null;
+            LocationResponse response = null;
             try {
                 InetAddress ipAddress = InetAddress.getByName(ip);
 
@@ -582,7 +555,7 @@ public final class IpLookup extends AbstractIpLookup{
                 }
 
                 if (StringUtil.isNotEmpty(dataBaseReader)) {
-                    return dataBaseReader.location(ipAddress);
+                    response = dataBaseReader.location(ipAddress);
                 }
 
             } catch(AddressNotFoundException addressNotFoundException) {
@@ -590,7 +563,7 @@ public final class IpLookup extends AbstractIpLookup{
             } catch (Exception e) {
                 throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
             }
-            return null;
+            return response;
         }
     }
     /**
@@ -600,6 +573,7 @@ public final class IpLookup extends AbstractIpLookup{
         @Override
         public LocationResponse getResponse(String ip) {
             GalaxyDataBaseReader dataBaseReader = null;
+            LocationResponse response = null;
             try {
                 InetAddress ipAddress = InetAddress.getByName(ip);
 
@@ -612,7 +586,7 @@ public final class IpLookup extends AbstractIpLookup{
                 }
 
                 if (StringUtil.isNotEmpty(dataBaseReader)) {
-                    return dataBaseReader.location(ipAddress);
+                    response =  dataBaseReader.location(ipAddress);
                 }
 
             } catch(AddressNotFoundException addressNotFoundException) {
@@ -620,7 +594,7 @@ public final class IpLookup extends AbstractIpLookup{
             } catch (Exception e) {
                 throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
             }
-            return null;
+            return response;
 
 
         }
@@ -632,10 +606,10 @@ public final class IpLookup extends AbstractIpLookup{
     class InnerReader implements  Strategy {
         @Override
         public LocationResponse getResponse(String ip) {
-            LocationResponse response = null;
-            if (IPUtil.isIP(ip) && IPUtil.internalIp(ip)) {
+            LocationResponse response = new LocationResponse();
+            if(IPUtil.isIP(ip) && IPUtil.internalIp(ip)) {
                 response = new LocationResponse();
-                response.setCountry("Private IP");
+                response.setCountry(null);
                 response.setCity(null);
                 response.setProvince(null);
                 response.setAsn(null);
@@ -643,9 +617,10 @@ public final class IpLookup extends AbstractIpLookup{
                 response.setLatitude(null);
                 response.setLongitude(null);
                 response.setAreaCode(null);
+                response.setPrivateIP(true);
                 return  response;
             } else {
-                return null;
+                return response;
             }
 
         }

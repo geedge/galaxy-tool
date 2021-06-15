@@ -19,8 +19,7 @@ import java.util.List;
 import java.util.Set;
 
 public class FormatUtilTest {
-
-    @Test
+	@Test
     public void testGetTopDomain() {
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("https://pan.baidu.com/s/1wejv5ZceAL0NQGExvPQm-Q#list/path=%2F&parentPath=%2Fsharelink3477893581-1028235543414583"), "baidu.com");
 

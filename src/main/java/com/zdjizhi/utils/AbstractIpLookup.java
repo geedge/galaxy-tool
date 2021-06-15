@@ -12,7 +12,10 @@ import org.slf4j.LoggerFactory;
  **/
 public abstract class AbstractIpLookup {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
-    protected static final String UNKNOW  =  "Unknown";
+    protected static final String UNKNOWN  =  "";
+    protected  static final String SEPARATOR = ",";
+    protected  static final String PRIVATE_IP = "Private IP";
+
     /**
      * 给定IP库文件路径，获取国家代码
      * @param ip ip地址

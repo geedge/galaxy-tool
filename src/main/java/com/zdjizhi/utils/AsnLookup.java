@@ -1,5 +1,6 @@
 package com.zdjizhi.utils;
 
+import com.google.common.base.Joiner;
 import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.zdjizhi.domain.LocationResponse;
@@ -22,12 +23,13 @@ public class AsnLookup {
     enum ServiceEnum {
         PRIVATE, PUBLIC
     }
-    protected static final String UNKNOW  =  "N/A";
+    protected static final String UNKNOWN  =  "";
+    protected  static final String SEPARATOR = ",";
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     public final static String DEFAULT_DATABASE_PATH = "dat";
     private final static String DEFAULT_DB_ASN_PUBLIC = "asn.mmdb";
-    private final static String DEFAULT_DB_ASN_PUBLIC_V4 = "asn_v4_201901.mmdb";
-    private final static String DEFAULT_DB_ASN_PUBLIC_V6 = "asn_v6_201901.mmdb";
+    private final static String DEFAULT_DB_ASN_PUBLIC_V4 = "asn_v4.mmdb";
+    private final static String DEFAULT_DB_ASN_PUBLIC_V6 = "asn_v6.mmdb";
     private final static String DEFAULT_DB_ASN_PRIVATE = "asn_private.mmdb";
     private final static String DEFAULT_DB_ASN_PRIVATE_V4 = "asn_private_v4.mmdb";
     private final static String DEFAULT_DB_ASN_PRIVATE_V6 = "asn_private_v6.mmdb";
@@ -287,46 +289,36 @@ public class AsnLookup {
 
 
     public String asnLookup(String ip) {
-        String result = UNKNOW;
+
         LocationResponse response = getResponse(ip);
 
-
-        if (StringUtil.isNotEmpty(response)) {
-            result = StringUtil.isNotBlank(response.getAsn()) ? response.getAsn() : UNKNOW;
+        if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
+            return  UNKNOWN;
         }
 
-        return result;
+        return StringUtil.setDefaultIfEmpty(response.getAsn(), UNKNOWN).toString() ;
+
 
     }
 
     public String asnLookupInfo(String ip) {
-        String result = UNKNOW;
         LocationResponse response = getResponse(ip);
-
-
-        if (StringUtil.isNotEmpty(response)) {
-            result = StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOW)
-                    +"," + StringUtil.setDefaultIfEmpty(response.getCountryCode(), UNKNOW);
+        if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
+            return  UNKNOWN;
         }
-
-        return result;
+        return Joiner.on(SEPARATOR).useForNull("").join(response.getOrganization(), response.getCountryCode());
 
     }
 
 
 
     public String asnLookupDetail(String ip) {
-        String result = UNKNOW;
         LocationResponse response = getResponse(ip);
 
-        if (StringUtil.isNotEmpty(response)) {
-            result = StringUtil.setDefaultIfEmpty(response.getAsn(), UNKNOW) + "\t"
-                    + StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOW)
-                    +"," + StringUtil.setDefaultIfEmpty(response.getCountryCode(), UNKNOW);
+        if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
+            return  UNKNOWN;
         }
-
-
-        return result;
+        return Joiner.on(SEPARATOR).useForNull("").join(response.getAsn(), response.getOrganization(), response.getCountryCode());
     }
 
 
@@ -352,6 +344,7 @@ public class AsnLookup {
 
 
     private GalaxyDataBaseReader getAsnDataBaseReaderV4(String service) {
+
         if (service.equalsIgnoreCase(ServiceEnum.PRIVATE.name())) {
             if (StringUtil.isNotEmpty(asnLocationPrivateReaderV4)) {
                 return asnLocationPrivateReaderV4;
@@ -368,6 +361,7 @@ public class AsnLookup {
     }
 
     private GalaxyDataBaseReader getAsnDataBaseReaderV6(String service) {
+
         if (service.equalsIgnoreCase(ServiceEnum.PRIVATE.name())) {
             if (StringUtil.isNotEmpty(asnLocationPrivateReaderV6)) {
                 return asnLocationPrivateReaderV6;
