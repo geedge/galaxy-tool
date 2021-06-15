@@ -174,7 +174,7 @@ public class DateUtilTest {
 
 		List<Date>lists = DateUtils.getDateRange(DateUtils.convertStringToDate("2020-06-01 01:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),
 				DateUtils.convertStringToDate("2020-06-02 00:00:00", DateUtils.YYYY_MM_DD_HH24_MM_SS),"PT3H");
-		Assert.assertEquals(lists.size(), 24);
+		Assert.assertEquals(lists.size(), 9);
 	}
 
 	@Test
