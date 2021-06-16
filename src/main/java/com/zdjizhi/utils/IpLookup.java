@@ -606,7 +606,7 @@ public final class IpLookup extends AbstractIpLookup{
     class InnerReader implements  Strategy {
         @Override
         public LocationResponse getResponse(String ip) {
-            LocationResponse response = new LocationResponse();
+            LocationResponse response = null;
             if(IPUtil.isIP(ip) && IPUtil.internalIp(ip)) {
                 response = new LocationResponse();
                 response.setCountry(null);
@@ -618,11 +618,8 @@ public final class IpLookup extends AbstractIpLookup{
                 response.setLongitude(null);
                 response.setAreaCode(null);
                 response.setPrivateIP(true);
-                return  response;
-            } else {
-                return response;
             }
-
+            return response;
         }
     }
 
