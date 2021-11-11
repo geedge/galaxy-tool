@@ -3,9 +3,7 @@ package com.zdjizhi.utils;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 
@@ -62,14 +60,14 @@ public class JsonMapper extends ObjectMapper {
 			}
         });
 		// 进行HTML解码。
-		this.registerModule(new SimpleModule().addSerializer(String.class, new JsonSerializer<String>(){
+		/*this.registerModule(new SimpleModule().addSerializer(String.class, new JsonSerializer<String>(){
 			@Override
 			public void serialize(String value, JsonGenerator jgen,
 					SerializerProvider provider) throws IOException,
 					JsonProcessingException {
 				jgen.writeString(StringEscapeUtils.unescapeHtml4(value));
 			}
-        }));
+        }));*/
 		// 设置时区
 		this.setTimeZone(TimeZone.getDefault());//getTimeZone("GMT+8:00")
 		
