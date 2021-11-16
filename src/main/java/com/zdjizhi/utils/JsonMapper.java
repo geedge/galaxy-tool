@@ -51,7 +51,7 @@ public class JsonMapper extends ObjectMapper {
 		// 设置输入时忽略在JSON字符串中存在但Java对象实际没有的属性
 		this.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
         // 空值处理为空串
-		this.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>(){
+		this.getSerializerProvider().setNullValueSerializer(new JsonSerializer<Object>() {
 			@Override
 			public void serialize(Object value, JsonGenerator jgen,
 					SerializerProvider provider) throws IOException,
@@ -59,26 +59,15 @@ public class JsonMapper extends ObjectMapper {
 				jgen.writeString("");
 			}
         });
-		// 进行HTML解码。
-		/*this.registerModule(new SimpleModule().addSerializer(String.class, new JsonSerializer<String>(){
-			@Override
-			public void serialize(String value, JsonGenerator jgen,
-					SerializerProvider provider) throws IOException,
-					JsonProcessingException {
-				jgen.writeString(StringEscapeUtils.unescapeHtml4(value));
-			}
-        }));*/
 		// 设置时区
 		this.setTimeZone(TimeZone.getDefault());//getTimeZone("GMT+8:00")
-		
 		this.registerModule(new SimpleModule().addSerializer(Date.class, new JsonSerializer<Date>(){
 			@Override
 			public void serialize(Date value, JsonGenerator jgen,
 					SerializerProvider provider) throws IOException,
 					JsonProcessingException {
-				
-				SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM yyyy HH:mm:ss", Locale.US);
-				jgen.writeString(sdf.format(value));
+					SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM yyyy HH:mm:ss", Locale.US);
+					jgen.writeString(sdf.format(value));
 			} 
         }));
 		
