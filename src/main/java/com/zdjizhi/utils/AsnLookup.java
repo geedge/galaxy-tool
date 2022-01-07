@@ -306,7 +306,7 @@ public class AsnLookup {
         if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
             return  UNKNOWN;
         }
-        return Joiner.on(SEPARATOR).useForNull("").join(response.getOrganization(), response.getCountryCode());
+        return Joiner.on(SEPARATOR).useForNull("").join(response.getCountryCode(), response.getOrganization());
 
     }
 
@@ -318,7 +318,7 @@ public class AsnLookup {
         if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
             return  UNKNOWN;
         }
-        return Joiner.on(SEPARATOR).useForNull("").join(response.getAsn(), response.getOrganization(), response.getCountryCode());
+        return Joiner.on(SEPARATOR).useForNull("").join(response.getAsn(), response.getCountryCode(), response.getOrganization());
     }
 
 

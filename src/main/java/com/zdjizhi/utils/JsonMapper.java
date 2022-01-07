@@ -5,9 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
-
-
-import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,12 +60,14 @@ public class JsonMapper extends ObjectMapper {
 		this.setTimeZone(TimeZone.getDefault());//getTimeZone("GMT+8:00")
 		this.registerModule(new SimpleModule().addSerializer(Date.class, new JsonSerializer<Date>(){
 			@Override
-			public void serialize(Date value, JsonGenerator jgen,
+			public void serialize(Date value, JsonGenerator gen,
 					SerializerProvider provider) throws IOException,
 					JsonProcessingException {
-					SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM yyyy HH:mm:ss", Locale.US);
-					jgen.writeString(sdf.format(value));
-			} 
+				SimpleDateFormat sdf = new SimpleDateFormat("EEE, MMM yyyy HH:mm:ss", Locale.US);
+				gen.writeString(sdf.format(value));
+			}
+
+
         }));
 		
 	}
@@ -229,7 +228,6 @@ public class JsonMapper extends ObjectMapper {
 	public static Object fromJsonString(String jsonString, Class<?> clazz){
 		return JsonMapper.getInstance().fromJson(jsonString, clazz);
 	}
-	
 
-	
+
 }

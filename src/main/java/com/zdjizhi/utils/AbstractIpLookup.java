@@ -13,7 +13,9 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractIpLookup {
     protected final Logger logger = LoggerFactory.getLogger(this.getClass());
     protected static final String UNKNOWN  =  "";
-    protected  static final String SEPARATOR = ",";
+    protected  static final String LOCATION_SEPARATOR = ".";
+    protected  static final String LATLNG_SEPARATOR = ",";
+    protected  static final String OBJECT_SEPARATOR = "\t";
     protected  static final String PRIVATE_IP = "Private IP";
 
     /**
@@ -98,6 +100,23 @@ public abstract class AbstractIpLookup {
      * @return asn号 组织名称
      */
     public abstract String asnLookupDetail(String ip);
+
+    /**
+     * Get A two-character ISO 3166-1 country code for the country associated with the location.
+     * @param ip ip地址
+     * @return country code
+     */
+    public abstract  String getCountryCode(String ip);
+
+    /**
+     * A string of up to three characters containing the region-portion of the ISO 3166-2 code for the first level region associated with the IP address.
+     * @param ip ip地址
+     * @return First Level Region Code
+     */
+    public abstract  String getRegionCode(String ip);
+
+
+
 
 
 

@@ -9,7 +9,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.URL;
-
 /**
  * @ClassName IpLookup
  * @Description  对IP定位查找工具类
@@ -39,6 +38,8 @@ public final class IpLookup extends AbstractIpLookup{
     private static GalaxyDataBaseReader ipLocationPrivateReader;
     private static GalaxyDataBaseReader ipLocationPrivateReaderV4;
     private static GalaxyDataBaseReader ipLocationPrivateReaderV6;
+
+
 
 
     synchronized void init(Builder builder) {
@@ -178,8 +179,8 @@ public final class IpLookup extends AbstractIpLookup{
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.warn("Unknown mmdb dat file , please check your dat path!");
+
+            logger.error("IpLookup init data error, please check your file path!");
 
         }
 
@@ -390,6 +391,7 @@ public final class IpLookup extends AbstractIpLookup{
     public String cityLookupDetail(String ip) {
 
         LocationResponse response = getResponse(ip);
+
         if (StringUtil.isEmpty(response)) {
             return  UNKNOWN;
         }
@@ -397,7 +399,7 @@ public final class IpLookup extends AbstractIpLookup{
             return PRIVATE_IP;
         }
 
-        return Joiner.on(SEPARATOR).useForNull("").join(response.getCity(), response.getProvince(), response.getCountry());
+        return Joiner.on(LOCATION_SEPARATOR).useForNull("").join(response.getCountry(), response.getProvince(), response.getCity());
 
     }
 
@@ -414,6 +416,24 @@ public final class IpLookup extends AbstractIpLookup{
 
         return StringUtil.setDefaultIfEmpty(response.getCity(), UNKNOWN).toString() ;
 
+    }
+
+    @Override
+    public String getCountryCode(String ip) {
+        LocationResponse response = getResponse(ip);
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        return StringUtil.setDefaultIfEmpty(response.getCountryCode(), UNKNOWN).toString() ;
+    }
+
+    @Override
+    public String getRegionCode(String ip) {
+        LocationResponse response = getResponse(ip);
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        return StringUtil.setDefaultIfEmpty(response.getAreaCode(), UNKNOWN).toString() ;
     }
 
     @Override
@@ -438,14 +458,14 @@ public final class IpLookup extends AbstractIpLookup{
             return  UNKNOWN;
         }
 
-        return Joiner.on(SEPARATOR).skipNulls().join(response.getLatitude(), response.getLongitude());
+        return Joiner.on(LATLNG_SEPARATOR).skipNulls().join(response.getLatitude(), response.getLongitude());
 
     }
 
 
     @Override
     public  String cityLatLngLookup(String ip) {
-        return  Joiner.on(SEPARATOR).skipNulls().join(cityLookup(ip), latLngLookup(ip));
+        return  Joiner.on(OBJECT_SEPARATOR).skipNulls().join(cityLookup(ip), latLngLookup(ip));
     }
 
     @Override
@@ -462,10 +482,7 @@ public final class IpLookup extends AbstractIpLookup{
 
     @Override
     public String asnLookupDetail(String ip) {
-
         return asnLookup.asnLookupDetail(ip);
-
-
     }
 
     private LocationResponse getResponse(String ip) {
@@ -474,14 +491,14 @@ public final class IpLookup extends AbstractIpLookup{
             throw new IllegalArgumentException("unknown ip format :" + ip );
         }
 
-        LocationResponse  response = new Context(new PrivateReader()).executeStragey(ip);
+        LocationResponse  response = new Context(new PrivateReader()).executeStrategy(ip);
 
         if (StringUtil.isEmpty(response)) {
-            response =  new Context(new PublicReader()).executeStragey(ip);
+            response =  new Context(new PublicReader()).executeStrategy(ip);
         }
 
         if (StringUtil.isEmpty(response)) {
-            response =  new Context(new InnerReader()).executeStragey(ip);
+            response =  new Context(new InnerReader()).executeStrategy(ip);
         }
 
         return response;
@@ -601,7 +618,7 @@ public final class IpLookup extends AbstractIpLookup{
     }
 
     /**
-     * 工具类自定义规则库的执行策略
+     * 私有IP执行策略
      */
     class InnerReader implements  Strategy {
         @Override
@@ -631,7 +648,7 @@ public final class IpLookup extends AbstractIpLookup{
             this.strategy = strategy;
         }
 
-        public LocationResponse executeStragey(String ip) {
+        public LocationResponse executeStrategy(String ip) {
             return strategy.getResponse(ip);
         }
 
