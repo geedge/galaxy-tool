@@ -1,6 +1,5 @@
 package com.zdjizhi.test;
 
-import com.zdjizhi.utils.ISO3166CodeUtil;
 import com.zdjizhi.utils.IpLookup;
 import org.apache.log4j.Logger;
 import org.junit.Test;
@@ -56,8 +55,6 @@ public class IpLookupTest {
                 .build();
 
         logger.info(ipLookup.cityLookup("120.221.155.123"));
-        logger.info(ISO3166CodeUtil.getSubdivisionCode(ipLookup.cityLookup("220.221.155.123")));
-        logger.info(ISO3166CodeUtil.getCountryCode(ipLookup.countryLookup("220.221.155.123")));
         logger.info(ipLookup.countryLookup("120.221.155.223"));
         logger.info(ipLookup.countryLookup("120.221.155.223"));
         logger.info(ipLookup.getCountryCode("120.221.155.223"));

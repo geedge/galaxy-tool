@@ -10,6 +10,8 @@ import com.maxmind.geoip2.exception.GeoIp2Exception;
 import com.maxmind.geoip2.model.*;
 import com.zdjizhi.domain.LocationResponse;
 import com.zdjizhi.domain.JsonInjector;
+import com.zdjizhi.domain.LocationResponseV2;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -181,6 +183,12 @@ public class GalaxyDataBaseReader  {
         return this.get(ipAddress, LocationResponse.class, "");
 
     }
+
+    public LocationResponseV2 locationV2(InetAddress ipAddress) throws IOException, GeoIp2Exception {
+        return this.get(ipAddress, LocationResponseV2.class, "");
+
+    }
+
 
 
     public void close() throws IOException {

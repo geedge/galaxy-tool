@@ -15,7 +15,11 @@ import java.net.URL;
  * @Author 中电积至有限公司 darnell
  * @Date 2020-05-8 20:01
  * @Version 1.0.2
+ * @deprecated
+ * *<p> Use {@link IpLookupV2} instead.
+ *
  **/
+@Deprecated
 public final class IpLookup extends AbstractIpLookup{
 
     enum ServiceEnum {
@@ -401,6 +405,16 @@ public final class IpLookup extends AbstractIpLookup{
 
         return Joiner.on(LOCATION_SEPARATOR).useForNull("").join(response.getCountry(), response.getProvince(), response.getCity());
 
+    }
+
+    @Override
+    public String administrativeAreaLookupDetail(String ip) {
+        throw new IllegalArgumentException("Unsupported Method administrativeAreaLookupDetail");
+    }
+
+    @Override
+    public String locationLookupDetail(String ip) {
+        throw new IllegalArgumentException("Unsupported Method locationLookupDetail");
     }
 
     @Override

@@ -27,12 +27,28 @@ public abstract class AbstractIpLookup {
 
     /**
      *
-     * 获取详细定位信息
-     *
+     * 获取到城市的3级定位信息
      * @param ip ip地址，点分十进制格式,ipv4
-     * @return String 城市代码,省代码,国家代码
+     * @return String 国家代码,省代码,城市代码
      */
     public abstract String cityLookupDetail(String ip);
+
+
+    /**
+     *
+     * 获取到区县的4级定位信息
+     * @param ip ip地址，点分十进制格式,ipv4
+     * @return String 国家代码，省，城市，区/县
+     */
+    public abstract String administrativeAreaLookupDetail(String ip);
+
+    /**
+     *
+     * 获取位置信息明细，支持7级
+     * @param ip ip地址，点分十进制格式,ipv4
+     * @return String 国家代码，省，城市，区/县，街道
+     */
+    public abstract String locationLookupDetail(String ip);
 
 
     /**
@@ -46,7 +62,7 @@ public abstract class AbstractIpLookup {
 
     /**
      *
-     *  获取所属省信息
+     *  获取所属省/州信息
      *
      * @param ip ip地址
      * @return String 州/省代码
@@ -90,7 +106,6 @@ public abstract class AbstractIpLookup {
      * @return String asn号
      */
     public abstract String asnLookupInfo(String ip);
-
 
 
     /**

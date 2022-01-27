@@ -147,15 +147,6 @@ public class IPUtil {
     }
 
 
-
-
-
-
-
-
-
-
-
     /**
      * 获得两个IP间的范围，如192.168.0.128-192.168.2.256。
      * 注意：本方法不做合法性检查！
@@ -566,20 +557,39 @@ public class IPUtil {
 
 
     /**
+     * @deprecated
+     * <p> Use {@link IPUtil#isIPv4Address(String)} instead.
+     */
+    @Deprecated
+    public static boolean isIP(String ip) {
+      return isIPv4Address(ip);
+    }
+
+    /**
+     *
+     * <p>验证字符串是否为Ip格式，包含IPv4或IPv6</p>
+     * @param ip  ip字符
+     * @return <code>true</code> ip符合验证规则, <code>false</code> ip不符合验证规则.
+     */
+    public static boolean isIPAddress(String ip) {
+        return isIPv4Address(ip) || isIPv6Address(ip);
+
+    }
+
+    /**
      *
      * <p>验证Ip是否符合规则.给定字符串,判断是否符合正则验证的ip格式.</p>
      * <pre>例子说明:</pre>
      * @param ip  ip字符
      * @return <code>true</code> ip符合验证规则, <code>false</code> ip不符合验证规则.
      */
-    public static boolean isIP(String ip) {
+    public static boolean isIPv4Address(String ip) {
         if (ip == null) {
             return false;
         }
         Matcher mat = IPV4Pattern.matcher(ip);
         return mat.matches();
     }
-
 
     public static boolean isIPv6StdAddress(final String input) {
         return IPV6_STD_PATTERN.matcher(input).matches();
@@ -589,8 +599,8 @@ public class IPUtil {
         return IPV6_HEX_COMPRESSED_PATTERN.matcher(input).matches();
     }
 
-    public static boolean isIPv6Address(final String input) {
-        return isIPv6StdAddress(input) || isIPv6HexCompressedAddress(input);
+    public static boolean isIPv6Address(final String ip) {
+        return isIPv6StdAddress(ip) || isIPv6HexCompressedAddress(ip);
     }
 
     /**

@@ -11,7 +11,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @Author dell
  * @Date 2018-10-8 18:56
  * @Version 1.0
+ * * @deprecated
+ * *<p> Use {@link LocationResponseV2} instead.
  **/
+@Deprecated
 public class LocationResponse {
 
     private String areaCode;
