@@ -69,6 +69,21 @@ public abstract class AbstractIpLookup {
      */
     public abstract String provinceLookup(String ip);
 
+    /**
+     *
+     *  获取运营商信息
+     * @param ip ip地址
+     * @return String 运营商
+     */
+    public abstract String ispLookup(String ip);
+
+    /**
+     *
+     *  获取组织信息
+     * @param ip ip地址
+     * @return String 组织
+     */
+    public abstract String organizationLookup(String ip);
 
     /**
      *

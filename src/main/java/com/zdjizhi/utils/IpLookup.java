@@ -463,6 +463,32 @@ public final class IpLookup extends AbstractIpLookup{
         return StringUtil.setDefaultIfEmpty(response.getProvince(), UNKNOWN).toString() ;
     }
 
+    @Override
+    public String ispLookup(String ip) {
+        LocationResponse response = getResponse(ip);
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        if (response.isPrivateIP()) {
+            return PRIVATE_IP;
+        }
+
+        return StringUtil.setDefaultIfEmpty(response.getIsp(), UNKNOWN).toString() ;
+    }
+
+    @Override
+    public String organizationLookup(String ip) {
+        LocationResponse response = getResponse(ip);
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        if (response.isPrivateIP()) {
+            return PRIVATE_IP;
+        }
+
+        return StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOWN).toString() ;
+    }
+
 
     @Override
     public  String latLngLookup(String ip) {

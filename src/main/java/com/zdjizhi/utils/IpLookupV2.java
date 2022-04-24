@@ -483,6 +483,29 @@ public final class IpLookupV2 extends AbstractIpLookup{
         return StringUtil.setDefaultIfEmpty(response.getSuper_administrative_area(), UNKNOWN).toString() ;
     }
 
+    @Override
+    public String ispLookup(String ip) {
+        LocationResponseV2 response = getResponse(ip);
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        if (response.isPrivateIP()) {
+            return PRIVATE_IP;
+        }
+        return StringUtil.setDefaultIfEmpty(response.getIsp(), UNKNOWN).toString() ;
+    }
+
+    @Override
+    public String organizationLookup(String ip) {
+        LocationResponseV2 response = getResponse(ip);
+        if (StringUtil.isEmpty(response)) {
+            return  UNKNOWN;
+        }
+        if (response.isPrivateIP()) {
+            return PRIVATE_IP;
+        }
+        return StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOWN).toString() ;
+    }
 
 
     @Override
@@ -496,7 +519,6 @@ public final class IpLookupV2 extends AbstractIpLookup{
 
     }
 
-
     @Override
     public  String cityLatLngLookup(String ip) {
         return  Joiner.on(OBJECT_SEPARATOR).skipNulls().join(cityLookup(ip), latLngLookup(ip));
@@ -505,7 +527,6 @@ public final class IpLookupV2 extends AbstractIpLookup{
     @Override
     public String asnLookup(String ip) {
        return asnLookup.asnLookup(ip);
-
     }
 
 
