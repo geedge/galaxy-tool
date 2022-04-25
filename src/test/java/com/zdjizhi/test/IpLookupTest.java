@@ -16,7 +16,7 @@ public class IpLookupTest {
 
        IpLookup ipLookup =  new IpLookup.Builder(false)
                .loadDataFileV4("dat/ip_v4.mmdb")
-               .loadDataFilePrivateV4("dat/all_ip_only_coun.mmdb")
+               .loadDataFilePrivateV4("dat/ip_v4_user_defined_xj.mmdb")
                .loadDataFileV6("dat/ip_v6.mmdb")
                .loadDataFilePrivateV6("dat/ip_v6.mmdb")
                .loadAsnDataFile("dat/asn_v4.mmdb")
@@ -39,6 +39,10 @@ public class IpLookupTest {
         logger.info(ipLookup.asnLookupDetail("116.128.133.102"));
         logger.info(ipLookup.asnLookup("2001:4860:4860::8888"));
         logger.info(ipLookup.cityLookupDetail("202.106.0.20"));
+        logger.info(ipLookup.ispLookup("123.139.226.221"));
+        logger.info(ipLookup.organizationLookup("123.139.226.221"));
+        logger.info(ipLookup.ispLookup("116.178.179.36"));
+        logger.info(ipLookup.organizationLookup("116.178.179.36"));
 
 
     }

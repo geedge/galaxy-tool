@@ -42,8 +42,8 @@ public class IpLookupV2Test {
         logger.info(ipLookup.cityLookupDetail("202.106.0.20"));
         logger.info(ipLookup.ispLookup("123.139.226.221"));
         logger.info(ipLookup.organizationLookup("123.139.226.221"));
-        logger.info(ipLookup.ispLookup("116.178.223.14"));
-        logger.info(ipLookup.organizationLookup("116.178.223.14"));
+        logger.info(ipLookup.ispLookup("116.178.179.36"));
+        logger.info(ipLookup.organizationLookup("116.178.179.36"));
 
 
     }
