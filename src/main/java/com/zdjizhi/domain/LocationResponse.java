@@ -37,7 +37,7 @@ public class LocationResponse {
 
     private String countryCode;
 
-    private boolean isPrivateIP;
+    private boolean privateIP;
 
 
 
@@ -147,11 +147,11 @@ public class LocationResponse {
     }
 
     public boolean isPrivateIP() {
-        return isPrivateIP;
+        return privateIP;
     }
 
     public void setPrivateIP(boolean privateIP) {
-        isPrivateIP = privateIP;
+        this.privateIP = privateIP;
     }
 }
 

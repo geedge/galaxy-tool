@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.maxmind.db.*;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.exception.GeoIp2Exception;
-import com.maxmind.geoip2.model.*;
 import com.zdjizhi.domain.LocationResponse;
 import com.zdjizhi.domain.JsonInjector;
 import com.zdjizhi.domain.LocationResponseV2;

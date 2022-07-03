@@ -3,7 +3,7 @@ package com.zdjizhi.domain;/**
  */
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.google.common.base.MoreObjects;
 
 /**
  * @ClassName CountryResponse
@@ -26,23 +26,23 @@ public class LocationResponseV2 {
 
     private String country;
 
-    private String super_administrative_area;
+    private String superAdministrativeArea;
 
-    private String administrative_area;
+    private String administrativeArea;
 
-    private String sub_administrative_area;
+    private String subAdministrativeArea;
 
     private String locality;
 
-    private String dependent_locality;
+    private String dependentLocality;
 
-    private String double_dependent_locality;
+    private String doubleDependentLocality;
 
     private String organization;
 
     private String countryCode;
 
-    private boolean isPrivateIP;
+    private boolean privateIP;
 
 
     public LocationResponseV2() {
@@ -53,9 +53,9 @@ public class LocationResponseV2 {
     public LocationResponseV2(@JsonProperty("AREA_CODE") String areaCode, @JsonProperty("ASN") String asn,
                               @JsonProperty("ISP") String isp, @JsonProperty("LATITUDE") String latitude,
                               @JsonProperty("LONGITUDE") String longitude, @JsonProperty("COUNTRY") String country,
-                              @JsonProperty("SUPER_ADMINISTRATIVE_AREA") String super_administrative_area, @JsonProperty("ADMINISTRATIVE_AREA") String administrative_area,
-                              @JsonProperty("SUB_ADMINISTRATIVE_AREA") String sub_administrative_area, @JsonProperty("LOCALITY") String locality,
-                              @JsonProperty("DEPENDENT_LOCALITY") String dependent_locality, @JsonProperty("DOUBLE_DEPENDENT_LOCALITY") String double_dependent_locality,
+                              @JsonProperty("SUPER_ADMINISTRATIVE_AREA") String superAdministrativeArea, @JsonProperty("ADMINISTRATIVE_AREA") String administrativeArea,
+                              @JsonProperty("SUB_ADMINISTRATIVE_AREA") String subAdministrativeArea, @JsonProperty("LOCALITY") String locality,
+                              @JsonProperty("DEPENDENT_LOCALITY") String dependentLocality, @JsonProperty("DOUBLE_DEPENDENT_LOCALITY") String doubleDependentLocality,
                               @JsonProperty("ORGANIZATION") String organization, @JsonProperty("COUNTRY_CODE") String countryCode) {
         this.areaCode = areaCode;
         this.asn = asn;
@@ -63,12 +63,12 @@ public class LocationResponseV2 {
         this.latitude = latitude;
         this.longitude = longitude;
         this.country = country;
-        this.super_administrative_area = super_administrative_area;
-        this.administrative_area = administrative_area;
-        this.sub_administrative_area = sub_administrative_area;
+        this.superAdministrativeArea = superAdministrativeArea;
+        this.administrativeArea = administrativeArea;
+        this.subAdministrativeArea = subAdministrativeArea;
         this.locality = locality;
-        this.dependent_locality = dependent_locality;
-        this.double_dependent_locality = double_dependent_locality;
+        this.dependentLocality = dependentLocality;
+        this.doubleDependentLocality = doubleDependentLocality;
         this.organization = organization;
         this.countryCode = countryCode;
 
@@ -88,15 +88,6 @@ public class LocationResponseV2 {
 
     public void setAsn(String asn) {
         this.asn = asn;
-    }
-
-    public String getCountry() {
-        return country;
-    }
-
-
-    public void setCountry(String country) {
-        this.country = country;
     }
 
     public String getIsp() {
@@ -123,6 +114,62 @@ public class LocationResponseV2 {
         this.longitude = longitude;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getSuperAdministrativeArea() {
+        return superAdministrativeArea;
+    }
+
+    public void setSuperAdministrativeArea(String superAdministrativeArea) {
+        this.superAdministrativeArea = superAdministrativeArea;
+    }
+
+    public String getAdministrativeArea() {
+        return administrativeArea;
+    }
+
+    public void setAdministrativeArea(String administrativeArea) {
+        this.administrativeArea = administrativeArea;
+    }
+
+    public String getSubAdministrativeArea() {
+        return subAdministrativeArea;
+    }
+
+    public void setSubAdministrativeArea(String subAdministrativeArea) {
+        this.subAdministrativeArea = subAdministrativeArea;
+    }
+
+    public String getLocality() {
+        return locality;
+    }
+
+    public void setLocality(String locality) {
+        this.locality = locality;
+    }
+
+    public String getDependentLocality() {
+        return dependentLocality;
+    }
+
+    public void setDependentLocality(String dependentLocality) {
+        this.dependentLocality = dependentLocality;
+    }
+
+    public String getDoubleDependentLocality() {
+        return doubleDependentLocality;
+    }
+
+    public void setDoubleDependentLocality(String doubleDependentLocality) {
+        this.doubleDependentLocality = doubleDependentLocality;
+    }
+
     public String getOrganization() {
         return organization;
     }
@@ -140,59 +187,26 @@ public class LocationResponseV2 {
     }
 
     public boolean isPrivateIP() {
-        return isPrivateIP;
+        return privateIP;
     }
 
     public void setPrivateIP(boolean privateIP) {
-        isPrivateIP = privateIP;
+        this.privateIP = privateIP;
     }
 
-    public String getSuper_administrative_area() {
-        return super_administrative_area;
-    }
-
-    public void setSuper_administrative_area(String super_administrative_area) {
-        this.super_administrative_area = super_administrative_area;
-    }
-
-    public String getAdministrative_area() {
-        return administrative_area;
-    }
-
-    public void setAdministrative_area(String administrative_area) {
-        this.administrative_area = administrative_area;
-    }
-
-    public String getSub_administrative_area() {
-        return sub_administrative_area;
-    }
-
-    public void setSub_administrative_area(String sub_administrative_area) {
-        this.sub_administrative_area = sub_administrative_area;
-    }
-
-    public String getLocality() {
-        return locality;
-    }
-
-    public void setLocality(String locality) {
-        this.locality = locality;
-    }
-
-    public String getDependent_locality() {
-        return dependent_locality;
-    }
-
-    public void setDependent_locality(String dependent_locality) {
-        this.dependent_locality = dependent_locality;
-    }
-
-    public String getDouble_dependent_locality() {
-        return double_dependent_locality;
-    }
-
-    public void setDouble_dependent_locality(String double_dependent_locality) {
-        this.double_dependent_locality = double_dependent_locality;
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this)
+                .add("country", getCountry())
+                .add("superAdministrativeArea", getSuperAdministrativeArea())
+                .add("administrativeArea", getAdministrativeArea())
+                .add("subAdministrativeArea", getSubAdministrativeArea())
+                .add("organization", getOrganization())
+                .add("isp", getIsp())
+                .add("asn", getAsn())
+                .add("latitude", getLatitude())
+                .add("longitude", getLongitude())
+                .toString();
     }
 }
 

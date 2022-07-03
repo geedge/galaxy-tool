@@ -3,7 +3,7 @@ package com.zdjizhi.utils;
 import com.google.common.base.Joiner;
 import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
-import com.zdjizhi.domain.LocationResponse;
+import com.zdjizhi.domain.LocationResponseV2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -134,32 +134,26 @@ public class AsnLookup {
 
 
                 if (StringUtil.isNotBlank(builder.asnDatabasePublicFile)) {
-                    asnLocationPublicReader = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePublicFile))
-                            .withCache(new CHMCache()).build();
+                    asnLocationPublicReader = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePublicFile)).withCache(new CHMCache()).build();
                 }
                 if (StringUtil.isNotBlank(builder.asnDatabasePublicFileV4)) {
-                    asnLocationPublicReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePublicFileV4))
-                            .withCache(new CHMCache()).build();
+                    asnLocationPublicReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePublicFileV4)).withCache(new CHMCache()).build();
                 }
 
                 if (StringUtil.isNotBlank(builder.asnDatabasePublicFileV6)) {
-                    asnLocationPublicReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePublicFileV6))
-                            .withCache(new CHMCache()).build();
+                    asnLocationPublicReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePublicFileV6)).withCache(new CHMCache()).build();
                 }
 
                 if (StringUtil.isNotBlank(builder.asnDatabasePrivateFile)) {
-                    asnLocationPrivateReader = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePrivateFile))
-                            .withCache(new CHMCache()).build();
+                    asnLocationPrivateReader = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePrivateFile)).withCache(new CHMCache()).build();
                 }
 
                 if (StringUtil.isNotBlank(builder.asnDatabasePrivateFileV4)) {
-                    asnLocationPrivateReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePrivateFileV4))
-                            .withCache(new CHMCache()).build();
+                    asnLocationPrivateReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePrivateFileV4)).withCache(new CHMCache()).build();
                 }
 
                 if (StringUtil.isNotBlank(builder.asnDatabasePrivateFileV6)) {
-                    asnLocationPrivateReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePrivateFileV6))
-                            .withCache(new CHMCache()).build();
+                    asnLocationPrivateReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePrivateFileV6)).withCache(new CHMCache()).build();
                 }
             }
 
@@ -290,7 +284,7 @@ public class AsnLookup {
 
     public String asnLookup(String ip) {
 
-        LocationResponse response = getResponse(ip);
+        LocationResponseV2 response = getResponse(ip);
 
         if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
             return  UNKNOWN;
@@ -302,7 +296,7 @@ public class AsnLookup {
     }
 
     public String asnLookupInfo(String ip) {
-        LocationResponse response = getResponse(ip);
+        LocationResponseV2 response = getResponse(ip);
         if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
             return  UNKNOWN;
         }
@@ -313,7 +307,7 @@ public class AsnLookup {
 
 
     public String asnLookupDetail(String ip) {
-        LocationResponse response = getResponse(ip);
+        LocationResponseV2 response = getResponse(ip);
 
         if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
             return  UNKNOWN;
@@ -324,19 +318,16 @@ public class AsnLookup {
 
 
 
-    private LocationResponse getResponse(String ip) {
-        LocationResponse response = null;
-        if (!IPUtil.isIP(ip) && !IPUtil.isIPv6Address(ip)) {
-            throw new IllegalArgumentException("unknown ip format :" + ip );
+    private LocationResponseV2 getResponse(String ip) {
+        LocationResponseV2 response = null;
+        if (IPUtil.isIPv4Address(ip) || IPUtil.isIPv6Address(ip)) {
+            response = new Context(new PrivateReader()).executeStragey(ip);
+            if (StringUtil.isEmpty(response)) {
+                response =  new Context(new PublicReader()).executeStragey(ip);
+            }
+        } else {
+            throw new IllegalArgumentException("Unknown IP format :" + ip );
         }
-
-        response = new Context(new PrivateReader()).executeStragey(ip);
-
-        if (StringUtil.isEmpty(response)) {
-            response =  new Context(new PublicReader()).executeStragey(ip);
-        }
-
-
         return response;
     }
 
@@ -380,7 +371,7 @@ public class AsnLookup {
 
 
     interface Strategy {
-        LocationResponse getResponse(String ip);
+        LocationResponseV2 getResponse(String ip);
     }
 
     /**
@@ -388,27 +379,28 @@ public class AsnLookup {
      */
     class PrivateReader implements Strategy {
         @Override
-        public LocationResponse getResponse(String ip) {
+        public LocationResponseV2 getResponse(String ip) {
             GalaxyDataBaseReader dataBaseReader = null;
+            LocationResponseV2 response = null;
             try {
                 InetAddress ipAddress = InetAddress.getByName(ip);
 
-                if (IPUtil.isIP(ip)) {
+                if (IPUtil.isIPv4Address(ip)) {
                     dataBaseReader = getAsnDataBaseReaderV4(ServiceEnum.PRIVATE.name());
                 } else if (IPUtil.isIPv6Address(ip)) {
                     dataBaseReader = getAsnDataBaseReaderV6(ServiceEnum.PRIVATE.name());
                 }
 
                 if (StringUtil.isNotEmpty(dataBaseReader)) {
-                    return dataBaseReader.location(ipAddress);
+                    response = dataBaseReader.locationV2(ipAddress);
                 }
 
             } catch(AddressNotFoundException addressNotFoundException) {
-                logger.warn("Address not found ,ip is :" + ip);
+                logger.debug("Address not found ,ip is :" + ip);
             } catch (Exception e) {
                 throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
             }
-            return null;
+            return response;
         }
     }
     /**
@@ -416,12 +408,14 @@ public class AsnLookup {
      */
     class PublicReader implements Strategy {
         @Override
-        public LocationResponse getResponse(String ip) {
+        public LocationResponseV2 getResponse(String ip) {
             GalaxyDataBaseReader dataBaseReader = null;
+            LocationResponseV2 response = null;
+
             try {
                 InetAddress ipAddress = InetAddress.getByName(ip);
 
-                if (IPUtil.isIP(ip)) {
+                if (IPUtil.isIPv4Address(ip)) {
                     dataBaseReader = getAsnDataBaseReaderV4(ServiceEnum.PUBLIC.name());
 
                 } else if (IPUtil.isIPv6Address(ip)) {
@@ -430,15 +424,15 @@ public class AsnLookup {
                 }
 
                 if (StringUtil.isNotEmpty(dataBaseReader)) {
-                    return dataBaseReader.location(ipAddress);
+                    response = dataBaseReader.locationV2(ipAddress);
                 }
 
             } catch(AddressNotFoundException addressNotFoundException) {
-                logger.warn("Address not found ,ip is :" + ip);
+                logger.debug("Address not found ,ip is :" + ip);
             } catch (Exception e) {
                 throw new IllegalArgumentException("ip address :" + ip +", parser error " + e);
             }
-            return null;
+            return response;
 
 
         }
@@ -453,7 +447,8 @@ public class AsnLookup {
             this.strategy = strategy;
         }
 
-        public LocationResponse executeStragey(String ip) {
+        public LocationResponseV2 executeStragey(String ip) {
+
             return strategy.getResponse(ip);
         }
 

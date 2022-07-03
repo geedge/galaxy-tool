@@ -136,14 +136,32 @@ public abstract class AbstractIpLookup {
      * @param ip ip地址
      * @return country code
      */
-    public abstract  String getCountryCode(String ip);
+    public abstract  String countryCodeLookup(String ip);
 
     /**
      * A string of up to three characters containing the region-portion of the ISO 3166-2 code for the first level region associated with the IP address.
      * @param ip ip地址
      * @return First Level Region Code
      */
-    public abstract  String getRegionCode(String ip);
+    public abstract  String regionCodeLookup(String ip);
+
+    /**
+     * This method to return all fields for CSV.
+     * [Location]\t[ISP]\t[Organization]\t[ASN]\t[Latitude,Longitude]
+     * -[Location]:Country.SuperAdministrativeArea[Province].AdministrativeArea[City][.SubAdministrativeArea][.Locality][.DependentLocality][.DoubleDependentLocality]
+     * -[Latitude,Longitude] : Latitude,Longitude
+     * @param ip
+     * @return
+     */
+    public abstract  String infoLookupToCSV(String ip);
+
+    /**
+     * This method to return all fields for JSON.
+     * @param ip
+     * @return
+     */
+    public abstract  String infoLookupToJson(String ip);
+
 
 
 

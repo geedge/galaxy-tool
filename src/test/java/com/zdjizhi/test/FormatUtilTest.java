@@ -22,19 +22,19 @@ public class FormatUtilTest {
 	@Test
     public void testGetTopDomain() {
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("https://pan.baidu.com/s/1wejv5ZceAL0NQGExvPQm-Q#list/path=%2F&parentPath=%2Fsharelink3477893581-1028235543414583"), "baidu.com");
-
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("www.baidu.com"), "baidu.com");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("www.baidu.com.cn"), "baidu.com.cn");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("www.baidu.cc"), "baidu.cc");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("baidu.com.hk"), "baidu.com.hk");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("baidu.com.hk:80/abc.html"), "baidu.com.hk");
-
-
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("&&&&Dddddsdd"), "");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("com.cn"), "");
+		Assert.assertNotEquals(FormatUtils.getTopPrivateDomain("playetoms-pa.googleapis.com"), "googleapis.com");
         Assert.assertNotEquals(FormatUtils.getTopPrivateDomain("com.io"), "com.io");
 
-    }
+
+
+	}
 
 
 

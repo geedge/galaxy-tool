@@ -4,6 +4,7 @@ import com.google.common.base.Joiner;
 import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.zdjizhi.domain.LocationResponse;
+import com.zdjizhi.domain.LocationResponseV2;
 
 import java.io.File;
 import java.io.IOException;
@@ -140,35 +141,28 @@ public final class IpLookup extends AbstractIpLookup{
 
 
                 if (StringUtil.isNotBlank(builder.ipDatabasePublicFile)) {
-                    ipLocationPublicReader = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePublicFile))
-                            .withCache(new CHMCache()).build();
+                    ipLocationPublicReader = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePublicFile)).withCache(new CHMCache()).build();
                 }
 
                 if (StringUtil.isNotBlank(builder.ipDatabasePublicFileV4)) {
-                    ipLocationPublicReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePublicFileV4))
-                            .withCache(new CHMCache()).build();
+                    ipLocationPublicReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePublicFileV4)).withCache(new CHMCache()).build();
                 }
 
                 if (StringUtil.isNotBlank(builder.ipDatabasePublicFileV6)) {
-                    ipLocationPublicReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePublicFileV6))
-                            .withCache(new CHMCache()).build();
+                    ipLocationPublicReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePublicFileV6)).withCache(new CHMCache()).build();
                 }
 
                 if (StringUtil.isNotBlank(builder.ipDatabasePrivateFile)) {
-                    ipLocationPrivateReader = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePrivateFile))
-                            .withCache(new CHMCache()).build();
+                    ipLocationPrivateReader = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePrivateFile)).withCache(new CHMCache()).build();
                 }
 
                 if (StringUtil.isNotBlank(builder.ipDatabasePrivateFileV4)) {
-                    ipLocationPrivateReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePrivateFileV4))
-                            .withCache(new CHMCache()).build();
+                    ipLocationPrivateReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePrivateFileV4)).withCache(new CHMCache()).build();
                 }
 
                 if (StringUtil.isNotBlank(builder.ipDatabasePrivateFileV6)) {
-                    ipLocationPrivateReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePrivateFileV6))
-                            .withCache(new CHMCache()).build();
+                    ipLocationPrivateReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePrivateFileV6)).withCache(new CHMCache()).build();
                 }
-
 
                 asnLookup =  new AsnLookup.Builder(false)
                         .loadDataFile(builder.asnDatabasePublicFile)
@@ -433,7 +427,7 @@ public final class IpLookup extends AbstractIpLookup{
     }
 
     @Override
-    public String getCountryCode(String ip) {
+    public String countryCodeLookup(String ip) {
         LocationResponse response = getResponse(ip);
         if (StringUtil.isEmpty(response)) {
             return  UNKNOWN;
@@ -442,12 +436,44 @@ public final class IpLookup extends AbstractIpLookup{
     }
 
     @Override
-    public String getRegionCode(String ip) {
+    public String regionCodeLookup(String ip) {
         LocationResponse response = getResponse(ip);
         if (StringUtil.isEmpty(response)) {
             return  UNKNOWN;
         }
         return StringUtil.setDefaultIfEmpty(response.getAreaCode(), UNKNOWN).toString() ;
+    }
+
+    @Override
+    public String infoLookupToCSV(String ip) {
+        LocationResponse response = getResponse(ip);
+        if (StringUtil.isEmpty(response)) {
+            return UNKNOWN;
+        }
+        StringBuilder ipInfo = new StringBuilder();
+        ipInfo.append(
+                    Joiner.on(LOCATION_SEPARATOR).useForNull("").join(response.getCountry(), response.getProvince(), response.getCity())
+                ).append(OBJECT_SEPARATOR).append(
+                    StringUtil.setDefaultIfEmpty(response.getIsp(), UNKNOWN).toString()
+                ).append(OBJECT_SEPARATOR).append(
+                    StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOWN).toString()
+                 ).append(OBJECT_SEPARATOR).append(
+                    asnLookup.asnLookup(ip)
+                 ).append(OBJECT_SEPARATOR).append(
+                    Joiner.on(LATLNG_SEPARATOR).skipNulls().join(response.getLatitude(), response.getLongitude())
+                 );
+
+        return ipInfo.toString();
+    }
+
+    @Override
+    public String infoLookupToJson(String ip) {
+        LocationResponse response = getResponse(ip);
+        if (StringUtil.isEmpty(response)) {
+            response = new LocationResponse();
+        }
+        response.setAsn(asnLookup(ip));
+        return JsonMapper.toJsonString(response);
     }
 
     @Override

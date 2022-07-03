@@ -121,6 +121,7 @@ public class FormatUtils {
 	/**
 	 * 获取域名的顶级私有域名
 	 * 例如：getTopPrivateDomain('www.google.com.hk') ,返回 google.com.hk
+	 * 公共后缀字典：https://publicsuffix.org/list/public_suffix_list.dat
 	 * @param domain 网站域名
 	 * @return 顶级私有域名
 	 */
@@ -133,7 +134,6 @@ public class FormatUtils {
 		}
 
 		InternetDomainName internetDomainName = InternetDomainName.from(domain);
-
 		if (internetDomainName.isUnderPublicSuffix()) {
 			return internetDomainName.topPrivateDomain().toString();
 		} else {

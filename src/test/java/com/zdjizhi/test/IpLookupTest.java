@@ -43,6 +43,10 @@ public class IpLookupTest {
         logger.info(ipLookup.organizationLookup("123.139.226.221"));
         logger.info(ipLookup.ispLookup("116.178.179.36"));
         logger.info(ipLookup.organizationLookup("116.178.179.36"));
+        logger.info(ipLookup.infoLookupToCSV("116.178.179.36"));
+        logger.info(ipLookup.infoLookupToJson("116.178.179.36"));
+
+
 
 
     }
@@ -61,8 +65,8 @@ public class IpLookupTest {
         logger.info(ipLookup.cityLookup("120.221.155.123"));
         logger.info(ipLookup.countryLookup("120.221.155.223"));
         logger.info(ipLookup.countryLookup("120.221.155.223"));
-        logger.info(ipLookup.getCountryCode("120.221.155.223"));
-        logger.info(ipLookup.getRegionCode("120.221.155.223"));
+        logger.info(ipLookup.countryCodeLookup("120.221.155.223"));
+        logger.info(ipLookup.regionCodeLookup("120.221.155.223"));
 
 
 
