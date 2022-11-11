@@ -7,6 +7,7 @@ import com.zdjizhi.domain.LocationResponseV2;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.Optional;
@@ -33,26 +34,26 @@ public final class IpLookupV2 extends AbstractIpLookup{
 
     private AsnLookup asnLookup;
 
-    private static GalaxyDataBaseReader ipLocationPublicReader;
-    private static GalaxyDataBaseReader ipLocationPublicReaderV4;
-    private static GalaxyDataBaseReader ipLocationPublicReaderV6;
+    private static GalaxyDataBaseReader publicDatabaseReader;
+    private static GalaxyDataBaseReader publicV4DatabaseReader;
+    private static GalaxyDataBaseReader publicV6DatabaseReader;
 
-    private static GalaxyDataBaseReader ipLocationPrivateReader;
-    private static GalaxyDataBaseReader ipLocationPrivateReaderV4;
-    private static GalaxyDataBaseReader ipLocationPrivateReaderV6;
+    private static GalaxyDataBaseReader privateDatabaseReader;
+    private static GalaxyDataBaseReader privateV4DatabaseReader;
+    private static GalaxyDataBaseReader privateV6DatabaseReader;
 
     synchronized void init(Builder builder) {
         try {
 
             if (builder.isDefaultDB) {
 
-                File dbPublicFile = new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
+                File publicDatabaseFile = new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
                         + DEFAULT_DB_IP_PUBLIC);
 
-                if (!dbPublicFile.exists()) {
+                if (!publicDatabaseFile.exists()) {
                     URL url = IpLookupV2.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_IP_PUBLIC);
                     if (url != null) {
-                        dbPublicFile =  new File(url.getPath());
+                        publicDatabaseFile =  new File(url.getPath());
                     }
                 }
 
@@ -105,76 +106,73 @@ public final class IpLookupV2 extends AbstractIpLookup{
                     }
                 }
 
-                if (dbPublicFile.exists()) {
-                    ipLocationPublicReader = new GalaxyDataBaseReader.Builder(dbPublicFile).withCache(new CHMCache()).build();
-                }
-                if (dbPublicV4File.exists()) {
-                    ipLocationPublicReaderV4 = new GalaxyDataBaseReader.Builder(dbPublicV4File).withCache(new CHMCache()).build();
-                }
 
-                if (dbPublicV6File.exists()) {
-                    ipLocationPublicReaderV6 = new GalaxyDataBaseReader.Builder(dbPublicV6File).withCache(new CHMCache()).build();
-                }
-
-                if (dbPrivateFile.exists()) {
-                    ipLocationPrivateReader = new GalaxyDataBaseReader.Builder(dbPrivateFile).withCache(new CHMCache()).build();
-                }
-
-                if (dbPrivateV4File.exists()) {
-                    ipLocationPrivateReaderV4 = new GalaxyDataBaseReader.Builder(dbPrivateV4File).withCache(new CHMCache()).build();
-                }
-
-                if (dbPrivateV6File.exists()) {
-                    ipLocationPrivateReaderV6 = new GalaxyDataBaseReader.Builder(dbPrivateV6File).withCache(new CHMCache()).build();
-                }
-
+                publicDatabaseReader = buildDataReader(publicDatabaseFile);
+                publicV4DatabaseReader = buildDataReader(dbPublicV4File);
+                publicV6DatabaseReader = buildDataReader(dbPublicV6File);
+                privateDatabaseReader = buildDataReader(dbPrivateFile);
+                privateV4DatabaseReader = buildDataReader(dbPrivateV4File);
+                privateV6DatabaseReader = buildDataReader(dbPrivateV6File);
 
                 asnLookup =  new AsnLookup.Builder(true).build();
 
             } else {
 
+                if (StringUtil.isNotBlank(builder.publicDatabaseFile)) {
+                    publicDatabaseReader = buildDataReader(new File(builder.publicDatabaseFile));
+                } else if (builder.publicDatabaseStream != null) {
+                    publicDatabaseReader = buildDataReader(builder.publicDatabaseStream);
+                }
 
-                if (StringUtil.isNotBlank(builder.ipDatabasePublicFile)) {
-                    ipLocationPublicReader = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePublicFile)).withCache(new CHMCache()).build();
+                if (StringUtil.isNotBlank(builder.publicV4DatabaseFile)) {
+                    publicV4DatabaseReader = buildDataReader(new File(builder.publicV4DatabaseFile));
+                } else if (builder.publicV4DatabaseStream != null) {
+                    publicV4DatabaseReader = buildDataReader(builder.publicV4DatabaseStream);
+                }
+
+                if (StringUtil.isNotBlank(builder.publicV6DatabaseFile)) {
+                    publicV6DatabaseReader = buildDataReader(new File(builder.publicV6DatabaseFile));
+                } else if (builder.publicV6DatabaseStream != null) {
+                    publicV6DatabaseReader = buildDataReader(builder.publicV6DatabaseStream);
+                }
+
+                if (StringUtil.isNotBlank(builder.privateDatabaseFile)) {
+                    privateDatabaseReader = buildDataReader(new File(builder.privateDatabaseFile));
+                } else if (builder.privateDatabaseStream != null) {
+                    privateDatabaseReader = buildDataReader(builder.privateDatabaseStream);
 
                 }
 
-                if (StringUtil.isNotBlank(builder.ipDatabasePublicFileV4)) {
-                    ipLocationPublicReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePublicFileV4)).withCache(new CHMCache()).build();
+                if (StringUtil.isNotBlank(builder.privateV4DatabaseFile)) {
+                    privateV4DatabaseReader = buildDataReader(new File(builder.privateV4DatabaseFile));
+                } else if (builder.privateV4DatabaseStream != null) {
+                    privateV4DatabaseReader = buildDataReader(builder.privateV4DatabaseStream);
                 }
 
-                if (StringUtil.isNotBlank(builder.ipDatabasePublicFileV6)) {
-                    ipLocationPublicReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePublicFileV6)).withCache(new CHMCache()).build();
-                }
-
-                if (StringUtil.isNotBlank(builder.ipDatabasePrivateFile)) {
-                    ipLocationPrivateReader = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePrivateFile)).withCache(new CHMCache()).build();
-                }
-
-                if (StringUtil.isNotBlank(builder.ipDatabasePrivateFileV4)) {
-                    ipLocationPrivateReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePrivateFileV4)).withCache(new CHMCache()).build();
-                }
-
-                if (StringUtil.isNotBlank(builder.ipDatabasePrivateFileV6)) {
-                    ipLocationPrivateReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.ipDatabasePrivateFileV6)).withCache(new CHMCache()).build();
+                if (StringUtil.isNotBlank(builder.privateV6DatabaseFile)) {
+                    privateV6DatabaseReader = buildDataReader(new File(builder.privateV6DatabaseFile));
+                } else if (builder.privateV6DatabaseStream != null) {
+                    privateV6DatabaseReader = buildDataReader(builder.privateV6DatabaseStream);
                 }
 
                 asnLookup =  new AsnLookup.Builder(false)
-                        .loadDataFile(builder.asnDatabasePublicFile)
-                        .loadDataFileV4(builder.asnDatabasePublicFileV4)
-                        .loadDataFileV6(builder.asnDatabasePublicFileV6)
-                        .loadDataFilePrivate(builder.asnDatabasePrivateFile)
-                        .loadDataFilePrivateV4(builder.asnDatabasePrivateFileV4)
-                        .loadDataFilePrivateV6(builder.asnDatabasePrivateFileV6)
+                        .loadDataFile(builder.publicAsnDatabaseFile)
+                        .loadDataFile(builder.publicAsnDatabaseStream)
+                        .loadDataFileV4(builder.publicAsnV4DatabaseFile)
+                        .loadDataFileV4(builder.publicAsnV4DatabaseStream)
+                        .loadDataFileV6(builder.publicAsnV6DatabaseFile)
+                        .loadDataFileV6(builder.publicAsnV6DatabaseStream)
+                        .loadDataFilePrivate(builder.privateAsnDatabaseFile)
+                        .loadDataFilePrivate(builder.privateAsnDatabaseStream)
+                        .loadDataFilePrivateV4(builder.privateAsnV4DatabaseFile)
+                        .loadDataFilePrivateV4(builder.privateAsnV4DatabaseStream)
+                        .loadDataFilePrivateV6(builder.privateAsnV6DatabaseFile)
+                        .loadDataFilePrivateV6(builder.privateAsnV6DatabaseStream)
                         .build();
-
-
             }
 
         } catch (Exception e) {
-
-            logger.error("IpLookup init data error, please check your file path!");
-
+            logger.error("Unsupported GeoIP2 *.mmdb database: expected either File path or Stream.");
         }
 
 
@@ -183,6 +181,22 @@ public final class IpLookupV2 extends AbstractIpLookup{
 
     private IpLookupV2(Builder builder) {
         init(builder);
+    }
+
+    private GalaxyDataBaseReader buildDataReader(File database) throws IOException {
+        if (database.exists()) {
+            return new GalaxyDataBaseReader.Builder(database).withCache(new CHMCache()).build();
+        } else {
+            return null;
+        }
+    }
+
+    private GalaxyDataBaseReader buildDataReader(InputStream stream) throws IOException {
+        if (stream != null) {
+            return new GalaxyDataBaseReader.Builder(stream).withCache(new CHMCache()).build();
+        } else {
+            return null;
+        }
     }
 
 
@@ -202,21 +216,37 @@ public final class IpLookupV2 extends AbstractIpLookup{
      * </p>
      */
     public static final class Builder {
-        String ipDatabasePublicFile;
-        String ipDatabasePublicFileV4;
-        String ipDatabasePublicFileV6;
+        String publicDatabaseFile;
+        String publicV4DatabaseFile;
+        String publicV6DatabaseFile;
 
-        String ipDatabasePrivateFile;
-        String ipDatabasePrivateFileV4;
-        String ipDatabasePrivateFileV6;
+        InputStream publicDatabaseStream;
+        InputStream publicV4DatabaseStream;
+        InputStream publicV6DatabaseStream;
 
-        String asnDatabasePublicFile;
-        String asnDatabasePublicFileV4;
-        String asnDatabasePublicFileV6;
+        String privateDatabaseFile;
+        String privateV4DatabaseFile;
+        String privateV6DatabaseFile;
 
-        String asnDatabasePrivateFile;
-        String asnDatabasePrivateFileV4;
-        String asnDatabasePrivateFileV6;
+        InputStream privateDatabaseStream;
+        InputStream privateV4DatabaseStream;
+        InputStream privateV6DatabaseStream;
+
+        String publicAsnDatabaseFile;
+        String publicAsnV4DatabaseFile;
+        String publicAsnV6DatabaseFile;
+
+        InputStream publicAsnDatabaseStream;
+        InputStream publicAsnV4DatabaseStream;
+        InputStream publicAsnV6DatabaseStream;
+
+        String privateAsnDatabaseFile;
+        String privateAsnV4DatabaseFile;
+        String privateAsnV6DatabaseFile;
+
+        InputStream privateAsnDatabaseStream;
+        InputStream privateAsnV4DatabaseStream;
+        InputStream privateAsnV6DatabaseStream;
 
         boolean isDefaultDB;
 
@@ -229,128 +259,246 @@ public final class IpLookupV2 extends AbstractIpLookup{
         }
 
         /**
-         *
-         * @param ipDatabasePublicFile 加载IPv4与IPV6 mmdb库文件
+         * @param publicDatabaseFile 加载GeoIP2 database 文件，不区分IPv4/6
          * @return
          */
-        public Builder loadDataFile(String ipDatabasePublicFile) {
-            this.ipDatabasePublicFile = ipDatabasePublicFile;
+        public Builder loadDataFile(String publicDatabaseFile) {
+            this.publicDatabaseFile = publicDatabaseFile;
+            return this;
+        }
+
+        /**
+         * @param publicDatabaseStream 加载GeoIP2流，不区分IPv4/6
+         * @return
+         */
+        public Builder loadDataFile(InputStream publicDatabaseStream) {
+            this.publicDatabaseStream = publicDatabaseStream;
             return this;
         }
 
         /**
          *
-         * @param ipDatabasePublicFileV4 加载IPv4 mmdb库文件
+         * @param publicV4DatabaseFile 加载第三方内置GeoIP2 IPv4 database 文件
          * @return
          */
-        public Builder loadDataFileV4(String ipDatabasePublicFileV4) {
-            this.ipDatabasePublicFileV4 = ipDatabasePublicFileV4;
+        public Builder loadDataFileV4(String publicV4DatabaseFile) {
+            this.publicV4DatabaseFile = publicV4DatabaseFile;
             return this;
         }
 
         /**
-         *
-         * @param ipDatabasePublicFileV6 加载IPv6 mmdb库文件
+         * @param publicV4DatabaseStream 加载第三方内置GeoIP2 IPv4流
          * @return
          */
-        public Builder loadDataFileV6(String ipDatabasePublicFileV6) {
-            this.ipDatabasePublicFileV6 = ipDatabasePublicFileV6;
-            return this;
-        }
-
-        /**
-         *
-         * @param ipDatabasePrivateFile 加载用户自定义IPv4与IPv6 mmdb库文件
-         * @return
-         */
-        public Builder loadDataFilePrivate(String ipDatabasePrivateFile) {
-            this.ipDatabasePrivateFile = ipDatabasePrivateFile;
-            return this;
-        }
-
-        /**
-         *
-         * @param ipDatabasePrivateFileV4 加载用户自定义IPv4 mmdb库文件
-         * @return
-         */
-        public Builder loadDataFilePrivateV4(String ipDatabasePrivateFileV4) {
-            this.ipDatabasePrivateFileV4 = ipDatabasePrivateFileV4;
-            return this;
-        }
-
-        /**
-         *
-         * @param ipDatabasePrivateFileV6 加载用户自定义IPv6 mmdb库文件
-         * @return
-         */
-        public Builder loadDataFilePrivateV6(String ipDatabasePrivateFileV6) {
-            this.ipDatabasePrivateFileV6 = ipDatabasePrivateFileV6;
-            return this;
-        }
-
-
-
-        /**
-         *
-         * @param asnDatabasePublicFile 加载asn IPv4与IPv6库
-         * @return
-         */
-        public Builder loadAsnDataFile(String asnDatabasePublicFile) {
-            this.asnDatabasePublicFile = asnDatabasePublicFile;
+        public Builder loadDataFileV4(InputStream publicV4DatabaseStream) {
+            this.publicV4DatabaseStream = publicV4DatabaseStream;
             return this;
         }
 
 
         /**
          *
-         * @param asnDatabasePublicFileV4 加载asn IPv4 mmdb库文件
+         * @param publicV6DatabaseFile 加载第三方内置GeoIP2 IPv6 database 文件
          * @return
          */
-        public Builder loadAsnDataFileV4(String asnDatabasePublicFileV4) {
-            this.asnDatabasePublicFileV4 = asnDatabasePublicFileV4;
+        public Builder loadDataFileV6(String publicV6DatabaseFile) {
+            this.publicV6DatabaseFile = publicV6DatabaseFile;
+            return this;
+        }
+
+        /**
+         * @param publicV6DatabaseStream 加载第三方内置GeoIP2 IPv6流
+         * @return
+         */
+        public Builder loadDataFileV6(InputStream publicV6DatabaseStream) {
+            this.publicV6DatabaseStream = publicV6DatabaseStream;
             return this;
         }
 
 
         /**
          *
-         * @param asnDatabasePublicFileV6 加载asn IPv6 mmdb库文件
+         * @param privateDatabaseFile 加载自定义GeoIP2 database 文件，不区分IPv4/6
          * @return
          */
-        public Builder loadAsnDataFileV6(String asnDatabasePublicFileV6) {
-            this.asnDatabasePublicFileV6 = asnDatabasePublicFileV6;
+        public Builder loadDataFilePrivate(String privateDatabaseFile) {
+            this.privateDatabaseFile = privateDatabaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateDatabaseStream 加载自定义GeoIP2 流，不区分IPv4/6
+         * @return
+         */
+        public Builder loadDataFilePrivate(InputStream privateDatabaseStream) {
+            this.privateDatabaseStream = privateDatabaseStream;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateV4DatabaseFile 加载自定义GeoIP2 IPv4 database 文件
+         * @return
+         */
+        public Builder loadDataFilePrivateV4(String privateV4DatabaseFile) {
+            this.privateV4DatabaseFile = privateV4DatabaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateV4DatabaseStream 加载自定义GeoIP2 IPv4 流
+         * @return
+         */
+        public Builder loadDataFilePrivateV4(InputStream privateV4DatabaseStream) {
+            this.privateV4DatabaseStream = privateV4DatabaseStream;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateV6DatabaseFile 加载自定义GeoIP2 IPv6 database 文件
+         * @return
+         */
+        public Builder loadDataFilePrivateV6(String privateV6DatabaseFile) {
+            this.privateV6DatabaseFile = privateV6DatabaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateV6DatabaseStream 加载自定义GeoIP2 IPv6流
+         * @return
+         */
+        public Builder loadDataFilePrivateV6(InputStream privateV6DatabaseStream) {
+            this.privateV6DatabaseStream = privateV6DatabaseStream;
+            return this;
+        }
+
+
+
+        /**
+         *
+         * @param publicAsnDatabaseFile 加载ASN database文件,不区分IPv4/6
+         * @return
+         */
+        public Builder loadAsnDataFile(String publicAsnDatabaseFile) {
+            this.publicAsnDatabaseFile = publicAsnDatabaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param publicAsnDatabaseStream 加载ASN database流,不区分IPv4/6
+         * @return
+         */
+        public Builder loadAsnDataFile(InputStream publicAsnDatabaseStream) {
+            this.publicAsnDatabaseStream = publicAsnDatabaseStream;
             return this;
         }
 
 
         /**
          *
-         * @param asnDatabasePrivateFile 加载asn用户自定义 IPv4与IPv6库
+         * @param publicAsnV4DatabaseFile 加载ASN IPv4 database文件
          * @return
          */
-        public Builder loadAsnDataFilePrivate(String asnDatabasePrivateFile) {
-            this.asnDatabasePrivateFile = asnDatabasePrivateFile;
+        public Builder loadAsnDataFileV4(String publicAsnV4DatabaseFile) {
+            this.publicAsnV4DatabaseFile = publicAsnV4DatabaseFile;
             return this;
         }
 
         /**
          *
-         * @param asnDatabasePrivateFileV4 加载asn用户自定义 IPv4 mmdb库文件
+         * @param publicAsnV4DatabaseStream 加载ASN IPv4 database流
          * @return
          */
-        public Builder loadAsnDataFilePrivateV4(String asnDatabasePrivateFileV4) {
-            this.asnDatabasePrivateFileV4 = asnDatabasePrivateFileV4;
+        public Builder loadAsnDataFileV4(InputStream publicAsnV4DatabaseStream) {
+            this.publicAsnV4DatabaseStream = publicAsnV4DatabaseStream;
             return this;
         }
 
 
         /**
          *
-         * @param asnDatabasePrivateFileV6 加载用户自定义asn IPv6 mmdb库文件
+         * @param publicAsnV6DatabaseFile 加载ASN IPv6 database文件
          * @return
          */
-        public Builder loadAsnDataFilePrivateV6(String asnDatabasePrivateFileV6) {
-            this.asnDatabasePrivateFileV6 = asnDatabasePrivateFileV6;
+        public Builder loadAsnDataFileV6(String publicAsnV6DatabaseFile) {
+            this.publicAsnV6DatabaseFile = publicAsnV6DatabaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param publicAsnV6DatabaseStream 加载ASN IPv6 database流
+         * @return
+         */
+        public Builder loadAsnDataFileV6(InputStream publicAsnV6DatabaseStream) {
+            this.publicAsnV6DatabaseStream = publicAsnV6DatabaseStream;
+            return this;
+        }
+
+
+        /**
+         *
+         * @param privateAsnDatabaseFile 加载ASN database文件,不区分IPv4/6
+         * @return
+         */
+        public Builder loadAsnDataFilePrivate(String privateAsnDatabaseFile) {
+            this.privateAsnDatabaseFile = privateAsnDatabaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateAsnDatabaseStream 加载ASN database流,不区分IPv4/6
+         * @return
+         */
+        public Builder loadAsnDataFilePrivate(InputStream privateAsnDatabaseStream) {
+            this.privateAsnDatabaseStream = privateAsnDatabaseStream;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateAsnV4DatabaseFile 加载ASN IPv4 database文件
+         * @return
+         */
+        public Builder loadAsnDataFilePrivateV4(String privateAsnV4DatabaseFile) {
+            this.privateAsnV4DatabaseFile = privateAsnV4DatabaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateAsnV4DatabaseStream 加载ASN IPv4 database流
+         * @return
+         */
+        public Builder loadAsnDataFilePrivateV4(InputStream privateAsnV4DatabaseStream) {
+            this.privateAsnV4DatabaseStream = privateAsnV4DatabaseStream;
+            return this;
+        }
+
+
+        /**
+         *
+         * @param privateAsnV6DatabaseFile 加载ASN IPv6 database文件
+         * @return
+         */
+        public Builder loadAsnDataFilePrivateV6(String privateAsnV6DatabaseFile) {
+            this.privateAsnV6DatabaseFile = privateAsnV6DatabaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateAsnV6DatabaseStream 加载ASN IPv6 database流
+         * @return
+         */
+        public Builder loadAsnDataFilePrivateV6(InputStream privateAsnV6DatabaseStream) {
+            this.privateAsnV6DatabaseStream = privateAsnV6DatabaseStream;
             return this;
         }
 
@@ -370,7 +518,7 @@ public final class IpLookupV2 extends AbstractIpLookup{
 
         LocationResponseV2 response = getResponse(ip);
         if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
+            return UNKNOWN;
         }
         if (response.isPrivateIP()) {
             return PRIVATE_IP;
@@ -597,16 +745,16 @@ public final class IpLookupV2 extends AbstractIpLookup{
     private GalaxyDataBaseReader getIpDataBaseReaderV4(String service) {
 
         if (service.equalsIgnoreCase(ServiceEnum.PRIVATE.name())) {
-            if (StringUtil.isNotEmpty(ipLocationPrivateReaderV4)) {
-                return ipLocationPrivateReaderV4;
+            if (StringUtil.isNotEmpty(privateV4DatabaseReader)) {
+                return privateV4DatabaseReader;
             } else {
-                return ipLocationPrivateReader;
+                return privateDatabaseReader;
             }
         } else  {
-            if (StringUtil.isNotEmpty(ipLocationPublicReaderV4)) {
-                return ipLocationPublicReaderV4;
+            if (StringUtil.isNotEmpty(publicV4DatabaseReader)) {
+                return publicV4DatabaseReader;
             } else {
-                return ipLocationPublicReader;
+                return publicDatabaseReader;
             }
         }
 
@@ -615,16 +763,16 @@ public final class IpLookupV2 extends AbstractIpLookup{
     private GalaxyDataBaseReader getIpDataBaseReaderV6(String service) {
 
         if (service.equalsIgnoreCase(ServiceEnum.PRIVATE.name())) {
-            if (StringUtil.isNotEmpty(ipLocationPrivateReaderV6)) {
-                return ipLocationPrivateReaderV6;
+            if (StringUtil.isNotEmpty(privateV6DatabaseReader)) {
+                return privateV6DatabaseReader;
             } else {
-                return ipLocationPrivateReader;
+                return privateDatabaseReader;
             }
         } else  {
-            if (StringUtil.isNotEmpty(ipLocationPublicReaderV6)) {
-                return ipLocationPublicReaderV6;
+            if (StringUtil.isNotEmpty(publicV6DatabaseReader)) {
+                return publicV6DatabaseReader;
             } else {
-                return ipLocationPublicReader;
+                return publicDatabaseReader;
             }
         }
 

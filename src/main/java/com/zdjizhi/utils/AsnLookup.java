@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
 
@@ -34,14 +35,13 @@ public class AsnLookup {
     private final static String DEFAULT_DB_ASN_PRIVATE_V4 = "asn_private_v4.mmdb";
     private final static String DEFAULT_DB_ASN_PRIVATE_V6 = "asn_private_v6.mmdb";
 
+    private static GalaxyDataBaseReader publicDatabaseReader;
+    private static GalaxyDataBaseReader publicV4DatabaseReader;
+    private static GalaxyDataBaseReader publicV6DatabaseReader;
 
-    private static GalaxyDataBaseReader asnLocationPublicReader;
-    private static GalaxyDataBaseReader asnLocationPublicReaderV4;
-    private static GalaxyDataBaseReader asnLocationPublicReaderV6;
-
-    private static GalaxyDataBaseReader asnLocationPrivateReader;
-    private static GalaxyDataBaseReader asnLocationPrivateReaderV4;
-    private static GalaxyDataBaseReader asnLocationPrivateReaderV6;
+    private static GalaxyDataBaseReader privateDatabaseReader;
+    private static GalaxyDataBaseReader privateV4DatabaseReader;
+    private static GalaxyDataBaseReader privateV6DatabaseReader;
 
 
     synchronized void init(AsnLookup.Builder builder) {
@@ -49,12 +49,12 @@ public class AsnLookup {
 
             if (builder.isDefaultDB) {
 
-                File asnDbPublicFile =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
+                File publicDatabaseFile =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
                         + DEFAULT_DB_ASN_PUBLIC);
-                if (!asnDbPublicFile.exists()) {
-                    URL url = IpLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PUBLIC);
+                if (!publicDatabaseFile.exists()) {
+                    URL url = AsnLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PUBLIC);
                     if (url != null) {
-                        asnDbPublicFile =  new File(url.getPath());
+                        publicDatabaseFile =  new File(url.getPath());
                     }
 
                 }
@@ -63,7 +63,7 @@ public class AsnLookup {
                 File asnDbPublicV4File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
                         + DEFAULT_DB_ASN_PUBLIC_V4);
                 if (!asnDbPublicV4File.exists()) {
-                    URL url = IpLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PUBLIC_V4);
+                    URL url = AsnLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PUBLIC_V4);
                     if (url != null) {
                         asnDbPublicV4File =  new File(url.getPath());
                     }
@@ -73,7 +73,7 @@ public class AsnLookup {
                 File asnDbPublicV6File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
                         + DEFAULT_DB_ASN_PUBLIC_V6);
                 if (!asnDbPublicV6File.exists()) {
-                    URL url = IpLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PUBLIC_V6);
+                    URL url = AsnLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PUBLIC_V6);
                     if (url != null) {
                         asnDbPublicV6File =  new File(url.getPath());
                     }
@@ -82,7 +82,7 @@ public class AsnLookup {
                 File asnDbPrivateFile =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
                         + DEFAULT_DB_ASN_PRIVATE);
                 if (!asnDbPrivateFile.exists()) {
-                    URL url = IpLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PRIVATE);
+                    URL url = AsnLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PRIVATE);
                     if (url != null) {
                         asnDbPrivateFile =  new File(url.getPath());
                     }
@@ -92,7 +92,7 @@ public class AsnLookup {
                 File asnDbPrivateV4File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
                         + DEFAULT_DB_ASN_PRIVATE_V4);
                 if (!asnDbPrivateV4File.exists()) {
-                    URL url = IpLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PRIVATE_V4);
+                    URL url = AsnLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PRIVATE_V4);
                     if (url != null) {
                         asnDbPrivateV4File =  new File(url.getPath());
                     }
@@ -103,64 +103,61 @@ public class AsnLookup {
                 File asnDbPrivateV6File =  new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator
                         + DEFAULT_DB_ASN_PRIVATE_V6);
                 if (!asnDbPrivateV6File.exists()) {
-                    URL url = IpLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PRIVATE_V6);
+                    URL url = AsnLookup.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + DEFAULT_DB_ASN_PRIVATE_V6);
                     if (url != null) {
                         asnDbPrivateV6File =  new File(url.getPath());
                     }
                 }
 
-                if (asnDbPublicFile.exists()) {
-                    asnLocationPublicReader = new GalaxyDataBaseReader.Builder(asnDbPublicFile).withCache(new CHMCache()).build();
-                }
-                if (asnDbPublicV4File.exists()) {
-                    asnLocationPublicReaderV4 = new GalaxyDataBaseReader.Builder(asnDbPublicV4File).withCache(new CHMCache()).build();
-                }
-
-                if (asnDbPublicV6File.exists()) {
-                    asnLocationPublicReaderV6 = new GalaxyDataBaseReader.Builder(asnDbPublicV6File).withCache(new CHMCache()).build();
-                }
-                if (asnDbPrivateFile.exists()) {
-                    asnLocationPrivateReader = new GalaxyDataBaseReader.Builder(asnDbPrivateFile).withCache(new CHMCache()).build();
-                }
-                if (asnDbPrivateV4File.exists()) {
-                    asnLocationPrivateReaderV4 = new GalaxyDataBaseReader.Builder(asnDbPrivateV4File).withCache(new CHMCache()).build();
-                }
-
-                if (asnDbPrivateV6File.exists()) {
-                    asnLocationPrivateReaderV6 = new GalaxyDataBaseReader.Builder(asnDbPrivateV6File).withCache(new CHMCache()).build();
-                }
+                publicDatabaseReader = buildDataReader(publicDatabaseFile);
+                publicV4DatabaseReader = buildDataReader(asnDbPublicV4File);
+                publicV6DatabaseReader = buildDataReader(asnDbPublicV6File);
+                privateDatabaseReader = buildDataReader(asnDbPrivateFile);
+                privateV4DatabaseReader = buildDataReader(asnDbPrivateV4File);
+                privateV6DatabaseReader = buildDataReader(asnDbPrivateV6File);
 
             } else {
 
-
-                if (StringUtil.isNotBlank(builder.asnDatabasePublicFile)) {
-                    asnLocationPublicReader = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePublicFile)).withCache(new CHMCache()).build();
-                }
-                if (StringUtil.isNotBlank(builder.asnDatabasePublicFileV4)) {
-                    asnLocationPublicReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePublicFileV4)).withCache(new CHMCache()).build();
+                if (StringUtil.isNotBlank(builder.publicAsnDatabaseFile)) {
+                    publicDatabaseReader = buildDataReader(new File(builder.publicAsnDatabaseFile));
+                 } else if (builder.publicAsnDatabaseStream != null) {
+                    publicDatabaseReader = buildDataReader(builder.publicAsnDatabaseStream);
                 }
 
-                if (StringUtil.isNotBlank(builder.asnDatabasePublicFileV6)) {
-                    asnLocationPublicReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePublicFileV6)).withCache(new CHMCache()).build();
+                if (StringUtil.isNotBlank(builder.publicAsnV4DatabaseFile)) {
+                    publicV4DatabaseReader = buildDataReader((new File(builder.publicAsnV4DatabaseFile)));
+                } else if (builder.publicAsnV4DatabaseStream != null) {
+                    publicV4DatabaseReader = buildDataReader(builder.publicAsnV4DatabaseStream);
                 }
 
-                if (StringUtil.isNotBlank(builder.asnDatabasePrivateFile)) {
-                    asnLocationPrivateReader = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePrivateFile)).withCache(new CHMCache()).build();
+                if (StringUtil.isNotBlank(builder.publicAsnV6DatabaseFile)) {
+                    publicV6DatabaseReader = buildDataReader(new File(builder.publicAsnV6DatabaseFile));
+                } else if (builder.publicAsnV6DatabaseStream != null) {
+                    publicV6DatabaseReader = buildDataReader(builder.publicAsnV6DatabaseStream);
                 }
 
-                if (StringUtil.isNotBlank(builder.asnDatabasePrivateFileV4)) {
-                    asnLocationPrivateReaderV4 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePrivateFileV4)).withCache(new CHMCache()).build();
+                if (StringUtil.isNotBlank(builder.privateAsnDatabaseFile)) {
+                    privateDatabaseReader = buildDataReader(new File(builder.privateAsnDatabaseFile));
+                } else if (builder.privateAsnDatabaseStream != null) {
+                    privateDatabaseReader = buildDataReader(builder.privateAsnDatabaseStream);
                 }
 
-                if (StringUtil.isNotBlank(builder.asnDatabasePrivateFileV6)) {
-                    asnLocationPrivateReaderV6 = new GalaxyDataBaseReader.Builder(new File(builder.asnDatabasePrivateFileV6)).withCache(new CHMCache()).build();
+                if (StringUtil.isNotBlank(builder.privateAsnV4DatabaseFile)) {
+                    privateV4DatabaseReader = buildDataReader(new File(builder.privateAsnV4DatabaseFile));
+                } else if (builder.privateAsnV4DatabaseStream != null) {
+                    privateV4DatabaseReader = buildDataReader(builder.privateAsnV4DatabaseStream);
+                }
+
+                if (StringUtil.isNotBlank(builder.privateAsnV6DatabaseFile)) {
+                    privateV6DatabaseReader = buildDataReader(new File(builder.privateAsnV6DatabaseFile));
+                } else if (builder.privateAsnV6DatabaseStream != null) {
+                    privateV6DatabaseReader = buildDataReader(builder.privateAsnV6DatabaseStream);
                 }
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            logger.warn("Unknow mmdb dat file , please check your dat path!");
-
+            logger.error("Unsupported GeoIP2 *.mmdb database: expected either File path or Stream.");
         }
 
 
@@ -171,7 +168,21 @@ public class AsnLookup {
     private AsnLookup(AsnLookup.Builder builder) {
         init(builder);
     }
+    private GalaxyDataBaseReader buildDataReader(File database) throws IOException {
+        if (database.exists()) {
+            return new GalaxyDataBaseReader.Builder(database).withCache(new CHMCache()).build();
+        } else {
+            return null;
+        }
+    }
 
+    private GalaxyDataBaseReader buildDataReader(InputStream stream) throws IOException {
+        if (stream != null) {
+            return new GalaxyDataBaseReader.Builder(stream).withCache(new CHMCache()).build();
+        } else {
+            return null;
+        }
+    }
 
     /**
      * 加载mmdb数据字典文件，内部生成mmdb动态库。
@@ -188,12 +199,21 @@ public class AsnLookup {
      * </p>
      */
     public static final class Builder {
-        String asnDatabasePublicFile;
-        String asnDatabasePublicFileV4;
-        String asnDatabasePublicFileV6;
-        String asnDatabasePrivateFile;
-        String asnDatabasePrivateFileV4;
-        String asnDatabasePrivateFileV6;
+        String publicAsnDatabaseFile;
+        String publicAsnV4DatabaseFile;
+        String publicAsnV6DatabaseFile;
+
+        InputStream publicAsnDatabaseStream;
+        InputStream publicAsnV4DatabaseStream;
+        InputStream publicAsnV6DatabaseStream;
+
+        String privateAsnDatabaseFile;
+        String privateAsnV4DatabaseFile;
+        String privateAsnV6DatabaseFile;
+
+        InputStream privateAsnDatabaseStream;
+        InputStream privateAsnV4DatabaseStream;
+        InputStream privateAsnV6DatabaseStream;
         boolean isDefaultDB;
 
 
@@ -207,64 +227,126 @@ public class AsnLookup {
 
         /**
          *
-         * @param asnDatabasePublicFile 加载IPv4与IPv6 ASN库
+         * @param publicAsnDatabaseFile  加载ASN database文件,不区分IPv4/6
          * @return
          */
-        public Builder loadDataFile(String asnDatabasePublicFile) {
-            this.asnDatabasePublicFile = asnDatabasePublicFile;
+        public Builder loadDataFile(String publicAsnDatabaseFile) {
+            this.publicAsnDatabaseFile = publicAsnDatabaseFile;
             return this;
         }
 
         /**
          *
-         * @param asnDatabasePublicFileV4 加载IPv4 ASN库
+         * @param publicAsnDatabaseStream 加载ASN database流,不区分IPv4/6
          * @return
          */
-        public Builder loadDataFileV4(String asnDatabasePublicFileV4) {
-            this.asnDatabasePublicFileV4 = asnDatabasePublicFileV4;
+        public Builder loadDataFile(InputStream publicAsnDatabaseStream) {
+            this.publicAsnDatabaseStream = publicAsnDatabaseStream;
             return this;
         }
 
         /**
          *
-         * @param asnDatabasePublicFileV6 加载IPv6 ASN库
+         * @param publicAsnV4DatabaseFile  加载ASN IPv4 database文件
          * @return
          */
-        public Builder loadDataFileV6(String asnDatabasePublicFileV6) {
-            this.asnDatabasePublicFileV6 = asnDatabasePublicFileV6;
+        public Builder loadDataFileV4(String publicAsnV4DatabaseFile) {
+            this.publicAsnV4DatabaseFile = publicAsnV4DatabaseFile;
             return this;
         }
 
         /**
          *
-         * @param asnDatabasePrivateFile 加载IPv4与IPv6 用户自定义ASN库
+         * @param publicAsnV4DatabaseStream 加载ASN IPv4 database流
          * @return
          */
-        public Builder loadDataFilePrivate(String asnDatabasePrivateFile) {
-            this.asnDatabasePrivateFile = asnDatabasePrivateFile;
+        public Builder loadDataFileV4(InputStream publicAsnV4DatabaseStream) {
+            this.publicAsnV4DatabaseStream = publicAsnV4DatabaseStream;
+            return this;
+        }
+
+
+
+        /**
+         *
+         * @param publicAsnV6DatabaseFile 加载ASN IPv6 database文件
+         * @return
+         */
+        public Builder loadDataFileV6(String publicAsnV6DatabaseFile) {
+            this.publicAsnV6DatabaseFile = publicAsnV6DatabaseFile;
             return this;
         }
 
         /**
          *
-         * @param asnDatabasePrivateFileV4 加载IPv4 用户自定义ASN库
+         * @param publicAsnV6DatabaseStream 加载ASN IPv6 database流
          * @return
          */
-        public Builder loadDataFilePrivateV4(String asnDatabasePrivateFileV4) {
-            this.asnDatabasePrivateFileV4 = asnDatabasePrivateFileV4;
+        public Builder loadDataFileV6(InputStream publicAsnV6DatabaseStream) {
+            this.publicAsnV6DatabaseStream = publicAsnV6DatabaseStream;
             return this;
         }
 
         /**
          *
-         * @param asnDatabasePrivateFileV6 加载IPv6 用户自定义ASN库
+         * @param privateAsnDatabaseFile 加载ASN database文件,不区分IPv4/6
          * @return
          */
-        public Builder loadDataFilePrivateV6(String asnDatabasePrivateFileV6) {
-            this.asnDatabasePrivateFileV6 = asnDatabasePrivateFileV6;
+        public Builder loadDataFilePrivate(String privateAsnDatabaseFile) {
+            this.privateAsnDatabaseFile = privateAsnDatabaseFile;
             return this;
         }
 
+        /**
+         *
+         * @param privateAsnDatabaseStream 加载ASN database流,不区分IPv4/6
+         * @return
+         */
+        public Builder loadDataFilePrivate(InputStream privateAsnDatabaseStream) {
+            this.privateAsnDatabaseStream = privateAsnDatabaseStream;
+            return this;
+        }
+
+
+
+        /**
+         *
+         * @param privateAsnV4DatabaseFile 加载ASN IPv4 database文件
+         * @return
+         */
+        public Builder loadDataFilePrivateV4(String privateAsnV4DatabaseFile) {
+            this.privateAsnV4DatabaseFile = privateAsnV4DatabaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateAsnV4DatabaseStream 加载ASN IPv4 database流
+         * @return
+         */
+        public Builder loadDataFilePrivateV4(InputStream privateAsnV4DatabaseStream) {
+            this.privateAsnV4DatabaseStream = privateAsnV4DatabaseStream;
+            return this;
+        }
+
+        /**
+         *
+         * @param privateAsnV6DatabaseFile 加载ASN IPv6 database文件
+         * @return
+         */
+        public Builder loadDataFilePrivateV6(String privateAsnV6DatabaseFile) {
+            this.privateAsnV6DatabaseFile = privateAsnV6DatabaseFile;
+            return this;
+        }
+        /**
+         *
+         * @param privateAsnV6DatabaseStream 加载ASN IPv6 database流
+         * @return
+         */
+        public Builder loadDataFilePrivateV6(InputStream privateAsnV6DatabaseStream) {
+            this.privateAsnV6DatabaseStream = privateAsnV6DatabaseStream;
+            return this;
+        }
 
 
         /**
@@ -279,7 +361,6 @@ public class AsnLookup {
 
 
     }
-
 
 
     public String asnLookup(String ip) {
@@ -337,16 +418,16 @@ public class AsnLookup {
     private GalaxyDataBaseReader getAsnDataBaseReaderV4(String service) {
 
         if (service.equalsIgnoreCase(ServiceEnum.PRIVATE.name())) {
-            if (StringUtil.isNotEmpty(asnLocationPrivateReaderV4)) {
-                return asnLocationPrivateReaderV4;
+            if (StringUtil.isNotEmpty(privateV4DatabaseReader)) {
+                return privateV4DatabaseReader;
             } else  {
-                return asnLocationPrivateReader;
+                return privateDatabaseReader;
             }
         } else  {
-            if (StringUtil.isNotEmpty(asnLocationPublicReaderV4)) {
-                return asnLocationPublicReaderV4;
+            if (StringUtil.isNotEmpty(publicV4DatabaseReader)) {
+                return publicV4DatabaseReader;
             } else{
-                return asnLocationPublicReader;
+                return publicDatabaseReader;
             }
         }
     }
@@ -354,16 +435,16 @@ public class AsnLookup {
     private GalaxyDataBaseReader getAsnDataBaseReaderV6(String service) {
 
         if (service.equalsIgnoreCase(ServiceEnum.PRIVATE.name())) {
-            if (StringUtil.isNotEmpty(asnLocationPrivateReaderV6)) {
-                return asnLocationPrivateReaderV6;
+            if (StringUtil.isNotEmpty(privateV6DatabaseReader)) {
+                return privateV6DatabaseReader;
             } else  {
-                return asnLocationPrivateReader;
+                return privateDatabaseReader;
             }
         } else  {
-            if (StringUtil.isNotEmpty(asnLocationPublicReaderV6)) {
-                return asnLocationPublicReaderV6;
+            if (StringUtil.isNotEmpty(publicV6DatabaseReader)) {
+                return publicV6DatabaseReader;
             } else{
-                return asnLocationPublicReader;
+                return publicDatabaseReader;
             }
         }
     }
