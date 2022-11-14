@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.zdjizhi.domain.LocationResponse;
-import com.zdjizhi.domain.LocationResponseV2;
 
 import java.io.File;
 import java.io.IOException;
@@ -538,6 +537,11 @@ public final class IpLookup extends AbstractIpLookup{
     public String asnLookup(String ip) {
        return asnLookup.asnLookup(ip);
 
+    }
+
+    @Override
+    public String asnLookupOrganization(String ip) {
+        return asnLookup.asnLookupOrganization(ip);
     }
 
 

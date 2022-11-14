@@ -376,6 +376,14 @@ public class AsnLookup {
 
     }
 
+    public String asnLookupOrganization(String ip) {
+        LocationResponseV2 response = getResponse(ip);
+        if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
+            return  UNKNOWN;
+        }
+        return response.getOrganization();
+    }
+
     public String asnLookupInfo(String ip) {
         LocationResponseV2 response = getResponse(ip);
         if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
@@ -387,6 +395,7 @@ public class AsnLookup {
 
 
 
+
     public String asnLookupDetail(String ip) {
         LocationResponseV2 response = getResponse(ip);
 
@@ -395,6 +404,8 @@ public class AsnLookup {
         }
         return Joiner.on(SEPARATOR).useForNull("").join(response.getAsn(), response.getCountryCode(), response.getOrganization());
     }
+
+
 
 
 

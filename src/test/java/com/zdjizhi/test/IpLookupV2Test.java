@@ -87,6 +87,7 @@ public class IpLookupV2Test {
   logger.info(ipLookup.asnLookupDetail("116.128.133.102"));
   logger.info(ipLookup.asnLookup("2001:4860:4860::8888"));
   logger.info(ipLookup.asnLookup("1.1.1.1"));
+  logger.info(ipLookup.asnLookupOrganization("116.128.133.102"));
 
  }
 

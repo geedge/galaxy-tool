@@ -116,11 +116,20 @@ public abstract class AbstractIpLookup {
 
     /**
      *
+     * 获取IP 所属AS的组织
+     * @param ip ip地址
+     * @return String asn号
+     */
+    public abstract String asnLookupOrganization(String ip);
+
+    /**
+     *
      * 获取IP 所属AS的组织+国家代码
      * @param ip ip地址
      * @return String asn号
      */
     public abstract String asnLookupInfo(String ip);
+
 
 
     /**

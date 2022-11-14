@@ -172,7 +172,7 @@ public final class IpLookupV2 extends AbstractIpLookup{
             }
 
         } catch (Exception e) {
-            logger.error("Unsupported GeoIP2 *.mmdb database: expected either File path or Stream.");
+            logger.error("Unsupported GeoIP2 *.mmdb database: expected either File path or Stream. " + e);
         }
 
 
@@ -708,7 +708,10 @@ public final class IpLookupV2 extends AbstractIpLookup{
        return asnLookup.asnLookup(ip);
     }
 
-
+    @Override
+    public String asnLookupOrganization(String ip) {
+        return asnLookup.asnLookupOrganization(ip);
+    }
     @Override
     public String asnLookupInfo(String ip) {
         return asnLookup.asnLookupInfo(ip);
