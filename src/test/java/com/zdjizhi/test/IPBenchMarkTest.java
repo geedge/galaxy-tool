@@ -1,7 +1,6 @@
 package com.zdjizhi.test;
 
 import com.zdjizhi.utils.AsnLookup;
-import com.zdjizhi.utils.IpLookup;
 import com.zdjizhi.utils.IpLookupV2;
 import org.apache.log4j.Logger;
 
@@ -13,7 +12,7 @@ import java.net.InetAddress;
 import java.util.Random;
 
 public class IPBenchMarkTest {
-    private final static Logger logger  = Logger.getLogger(IpLookupTest.class);
+    private final static Logger logger  = Logger.getLogger(IpLookupV2Test.class);
     private  final static boolean TRACE = false;
 
     private final static int COUNT = 1000000;

@@ -5,15 +5,15 @@
  * 
  */
 package com.zdjizhi.crypt;
-    import java.security.Key;  
-      
+    import org.apache.commons.codec.binary.Base64;
+    import org.apache.commons.codec.digest.DigestUtils;
+
+    import java.security.Key;
+
     import javax.crypto.Cipher;  
     import javax.crypto.KeyGenerator;  
     import javax.crypto.SecretKey;  
-    import javax.crypto.spec.SecretKeySpec;  
-      
-    import org.apache.commons.codec.binary.Base64;  
-    import org.apache.commons.codec.digest.DigestUtils;  
+    import javax.crypto.spec.SecretKeySpec;
    
     /**
      *  
@@ -118,9 +118,9 @@ package com.zdjizhi.crypt;
        * @return String Base64编码密钥 
        * @throws Exception 
        */  
-      public static String initKeyString() throws Exception   
-      {  
-          return new String(Base64.encodeBase64(initKey()));  
+      public static String initKeyString() throws Exception
+      {
+          return new String(Base64.encodeBase64(initKey()));
       }  
       /** 
        * <p>获取密钥</p>  
@@ -130,7 +130,7 @@ package com.zdjizhi.crypt;
        */  
       public static byte[] getKey(String key) throws Exception   
       {  
-          return Base64.decodeBase64(key.getBytes());  
+          return Base64.decodeBase64(key.getBytes());
       }  
       /** 
        * <p>摘要处理</p> 
@@ -139,7 +139,7 @@ package com.zdjizhi.crypt;
        */  
       public static String shaHex(byte[] data)  
       {  
-          return DigestUtils.md5Hex(data);  
+          return DigestUtils.md5Hex(data);
       }  
       /** 
        * <p>摘要数据验证</p> 
