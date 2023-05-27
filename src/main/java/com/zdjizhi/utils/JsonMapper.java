@@ -22,10 +22,12 @@ import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 
 /**
+ * JsonMapper 解析类已过时，使用Fastjson2进行JSON解析
  * 简单封装Jackson，实现JSON String  to Java Object的Mapper.
  * 封装不同的输出风格, 使用不同的builder函数创建实例.
  * @author darnell
  */
+@Deprecated
 public class JsonMapper extends ObjectMapper {
 
 	private static final long serialVersionUID = 1L;

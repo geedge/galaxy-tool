@@ -1,5 +1,6 @@
 package com.zdjizhi.utils;
 
+import com.alibaba.fastjson2.JSON;
 import com.google.common.base.Joiner;
 import com.maxmind.db.CHMCache;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
@@ -635,8 +636,6 @@ public final class IpLookupV2 extends AbstractIpLookup{
 
         return ipInfo.toString();
     }
-
-
     @Override
     public String infoLookupToJson(String ip) {
         LocationResponseV2 response = getResponse(ip);
@@ -644,7 +643,8 @@ public final class IpLookupV2 extends AbstractIpLookup{
             response = new LocationResponseV2();
         }
         response.setAsn(asnLookup(ip));
-        return JsonMapper.toJsonString(response);
+
+        return JSON.toJSONString(response);
     }
 
 
