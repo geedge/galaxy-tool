@@ -10,11 +10,11 @@ Galaxy Tools 是中电积至关于java的核心工具类库，主要包括文件
 
 **增加Galaxy Tools 到你的应用中**
 ***
-Galaxy 的 Maven group ID 是 `com.zdjizhi` 并且 artifactId 是 `galaxy`。增加maven依赖，如下所示：
+Galaxy 的 Maven group ID 是 `com.geedgenetworks` 并且 artifactId 是 `galaxy`。增加maven依赖，如下所示：
 
 ```
 <dependency>
-    <groupId>com.zdjizhi</groupId>
+    <groupId>com.geedgenetworks</groupId>
     <artifactId>galaxy</artifactId>
     <version>1.1.1/version>
 </dependency>
