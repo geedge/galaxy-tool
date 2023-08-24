@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.geedgenetworks.utils.AbstractIpLookup.UNKNOWN;
+import static com.geedgenetworks.utils.AbstractDatabaseReader.UNKNOWN;
 
 /**
  * @ClassName AsnLookup
@@ -29,28 +29,14 @@ import static com.geedgenetworks.utils.AbstractIpLookup.UNKNOWN;
  * @Date 2020-05-09 13:45
  * @Version 1.0.3
  **/
-public class AsnLookup {
-
-    public enum Type {
-        PRIVATE, PUBLIC
-    }
-    protected  static final String SEPARATOR = ",";
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    public final static String DEFAULT_DATABASE_PATH = "dat";
-    private final static String DEFAULT_DB_ASN_PUBLIC = "asn.mmdb";
-    private final static String DEFAULT_DB_ASN_PUBLIC_V4 = "asn_v4.mmdb";
-    private final static String DEFAULT_DB_ASN_PUBLIC_V6 = "asn_v6.mmdb";
-    private final static String DEFAULT_DB_ASN_PRIVATE = "asn_private.mmdb";
-    private final static String DEFAULT_DB_ASN_PRIVATE_V4 = "asn_private_v4.mmdb";
-    private final static String DEFAULT_DB_ASN_PRIVATE_V6 = "asn_private_v6.mmdb";
-    private final Map<String, List<GalaxyDataBaseReader>> availableDBReaders = Maps.newHashMap();
-    private static GalaxyDataBaseReader publicDatabaseReader;
-    private static GalaxyDataBaseReader publicV4DatabaseReader;
-    private static GalaxyDataBaseReader publicV6DatabaseReader;
-
-    private static GalaxyDataBaseReader privateDatabaseReader;
-    private static GalaxyDataBaseReader privateV4DatabaseReader;
-    private static GalaxyDataBaseReader privateV6DatabaseReader;
+public class AsnLookup extends AbstractDatabaseReader {
+    private Map<String, List<GalaxyDataBaseReader>> availableDBReaders = Maps.newHashMap();
+    private GalaxyDataBaseReader publicDatabaseReader;
+    private GalaxyDataBaseReader publicV4DatabaseReader;
+    private GalaxyDataBaseReader publicV6DatabaseReader;
+    private GalaxyDataBaseReader privateDatabaseReader;
+    private GalaxyDataBaseReader privateV4DatabaseReader;
+    private GalaxyDataBaseReader privateV6DatabaseReader;
 
     synchronized void init(Builder builder) {
         initializeDatabaseReaders(builder);
@@ -84,50 +70,6 @@ public class AsnLookup {
         }
     }
 
-    private File[] buildMMDBFilesUseWorkDirectory(String... files) {
-        File[] dbFiles = ObjectArrays.newArray(File.class, files.length);
-        for (int i = 0; i < files.length; i++) {
-            dbFiles[i] = new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator + files[i]);
-        }
-        return dbFiles;
-    }
-
-    private void updateFileIfNotExists(File[] files) {
-        for (File file : files) {
-            if (!file.exists()) {
-                URL url = IpLookupV2.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + file.getName());
-                if (url != null) {
-                    file = new File(url.getPath());
-                }
-            }
-        }
-
-    }
-
-
-    private GalaxyDataBaseReader constructDatabaseReader(String filePath, InputStream stream)  {
-        try {
-            if (StringUtil.isNotBlank(filePath) && new File(filePath).exists()) {
-                return constructDatabaseReader(new File(filePath));
-            } else if (stream != null) {
-                return constructDatabaseReader(stream);
-            } else {
-                return null;
-            }
-        } catch (IOException ie) {
-            logger.error("Unsupported GeoIP2 *.mmdb database: expected either File path or Stream. " + ie);
-        }
-        throw new UnsupportedOperationException("Unsupported GeoIP2 *.mmdb database: expected either File path or Stream. " );
-    }
-
-    private GalaxyDataBaseReader constructDatabaseReader(File file) throws IOException {
-        return file.exists() ? new GalaxyDataBaseReader.Builder(file).withCache(new CHMCache()).build() : null;
-    }
-
-    private GalaxyDataBaseReader constructDatabaseReader(InputStream stream) throws IOException {
-        return stream != null ? new GalaxyDataBaseReader.Builder(stream).withCache(new CHMCache()).build() : null;
-    }
-
     private void initializeAvailableDatabaseReaders() {
         List<GalaxyDataBaseReader> ipv4DbReaders = Lists.newArrayList();
         List<GalaxyDataBaseReader> ipv6DbReaders = Lists.newArrayList();
@@ -144,36 +86,14 @@ public class AsnLookup {
         addIfNotEmpty(ipv4DbReaders, publicDatabaseReader);
         addIfNotEmpty(ipv6DbReaders, publicDatabaseReader);
 
-        availableDBReaders.put(AbstractIpLookup.IpVersion.IPv4.name(), ipv4DbReaders);
-        availableDBReaders.put(AbstractIpLookup.IpVersion.IPv6.name(), ipv6DbReaders);
+        availableDBReaders.put(AbstractDatabaseReader.IpVersion.IPv4.name(), ipv4DbReaders);
+        availableDBReaders.put(AbstractDatabaseReader.IpVersion.IPv6.name(), ipv6DbReaders);
     }
-
-    private void addIfNotEmpty(List<GalaxyDataBaseReader> dbReaders, GalaxyDataBaseReader dbReader) {
-        if (StringUtil.isNotEmpty(dbReader)) {
-            dbReaders.add(dbReader);
-        }
-
-    }
-
 
     private AsnLookup(AsnLookup.Builder builder) {
         init(builder);
     }
-    private GalaxyDataBaseReader buildDataReader(File database) throws IOException {
-        if (database.exists()) {
-            return new GalaxyDataBaseReader.Builder(database).withCache(new CHMCache()).build();
-        } else {
-            return null;
-        }
-    }
 
-    private GalaxyDataBaseReader buildDataReader(InputStream stream) throws IOException {
-        if (stream != null) {
-            return new GalaxyDataBaseReader.Builder(stream).withCache(new CHMCache()).build();
-        } else {
-            return null;
-        }
-    }
 
     /**
      * 加载mmdb数据字典文件，内部生成mmdb动态库。
@@ -206,7 +126,6 @@ public class AsnLookup {
         InputStream privateAsnV4DatabaseStream;
         InputStream privateAsnV6DatabaseStream;
         boolean isDefaultDB;
-
 
         /**
          *
@@ -298,8 +217,6 @@ public class AsnLookup {
             return this;
         }
 
-
-
         /**
          *
          * @param privateAsnV4DatabaseFile 加载ASN IPv4 database文件
@@ -348,7 +265,6 @@ public class AsnLookup {
             return new AsnLookup(this);
         }
 
-
     }
 
 
@@ -361,7 +277,6 @@ public class AsnLookup {
         }
 
         return StringUtil.setDefaultIfEmpty(response.getAsn(), UNKNOWN).toString() ;
-
 
     }
 
@@ -378,7 +293,7 @@ public class AsnLookup {
         if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
             return  UNKNOWN;
         }
-        return Joiner.on(SEPARATOR).useForNull("").join(response.getCountryCode(), response.getOrganization());
+        return Joiner.on(DEFAULT_SEPARATOR).useForNull("").join(response.getCountryCode(), response.getOrganization());
 
     }
 
@@ -391,9 +306,8 @@ public class AsnLookup {
         if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
             return  UNKNOWN;
         }
-        return Joiner.on(SEPARATOR).useForNull("").join(response.getAsn(), response.getCountryCode(), response.getOrganization());
+        return Joiner.on(DEFAULT_SEPARATOR).useForNull("").join(response.getAsn(), response.getCountryCode(), response.getOrganization());
     }
-
 
     private LocationResponse getResponse(String ip) {
         try {
@@ -401,7 +315,7 @@ public class AsnLookup {
             InetAddress ipAddress = InetAddress.getByName(ip);
             if (ipAddress instanceof Inet4Address) {
                 //Iterate through each 'dbReader' and execute them in the following order: private v4 -> private -> public v4 -> public.
-                for (GalaxyDataBaseReader reader : availableDBReaders.get(AbstractIpLookup.IpVersion.IPv4.name())) {
+                for (GalaxyDataBaseReader reader : availableDBReaders.get(AbstractDatabaseReader.IpVersion.IPv4.name())) {
                     LocationResponse response = reader.locationV2(ipAddress);
                     if(StringUtil.isNotEmpty(response)) {
                         return response;
@@ -409,7 +323,7 @@ public class AsnLookup {
                 }
             } else if (ipAddress instanceof Inet6Address) {
                 //Iterate through each 'dbReader' and execute them in the following order: private v6 -> private -> public v6 -> public.
-                for(GalaxyDataBaseReader reader : availableDBReaders.get(AbstractIpLookup.IpVersion.IPv6.name())) {
+                for(GalaxyDataBaseReader reader : availableDBReaders.get(AbstractDatabaseReader.IpVersion.IPv6.name())) {
                     LocationResponse response = reader.locationV2(ipAddress);
                     if(StringUtil.isNotEmpty(response)) {
                         return  response;

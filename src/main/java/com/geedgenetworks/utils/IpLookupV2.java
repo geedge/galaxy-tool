@@ -6,38 +6,32 @@ import com.alibaba.fastjson2.JSONWriter;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.ObjectArrays;
-import com.maxmind.db.CHMCache;
 import com.geedgenetworks.domain.LocationResponse;
-
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
-import java.net.URL;
 import java.util.*;
-
 
 /**
  * @ClassName IpLookupV2
- * @Description  The IPLookupv2 class enriches information with geographic fields, given an ip address. It works with User-defined Maxmind's GeoIP binary database.
+ * @Description The IpLookupV2 class enriches information with geographic fields, given an ip address. It works with User-defined Maxmind's GeoIP binary database.
  * @Author darnell
  * @Date 2023-08-22 20:00  Geedge Networks
  * @Version 1.2
  **/
-public final class IpLookupV2 extends AbstractIpLookup {
-    private AsnLookup asnLookup;
-    private final Map<String, List<GalaxyDataBaseReader>> availableDBReaders = Maps.newHashMap();
-
+public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocator{
+    private Map<String, List<GalaxyDataBaseReader>> availableDBReaders = Maps.newHashMap();
     private GalaxyDataBaseReader publicDatabaseReader;
     private GalaxyDataBaseReader publicV4DatabaseReader;;
     private GalaxyDataBaseReader publicV6DatabaseReader;;
     private GalaxyDataBaseReader privateDatabaseReader;;
     private GalaxyDataBaseReader privateV4DatabaseReader;;
     private GalaxyDataBaseReader privateV6DatabaseReader;;
+
+    private AsnLookup asnLookup;
 
     private IpLookupV2(Builder builder) {
         init(builder);
@@ -46,8 +40,8 @@ public final class IpLookupV2 extends AbstractIpLookup {
     // Initialization of variables
     synchronized void init(Builder builder) {
         initializeDatabaseReaders(builder);
-        initializeAsnLookup(builder);
         initializeAvailableDatabaseReaders();
+        initializeAsnLookup(builder);
     }
 
     private void initializeDatabaseReaders(Builder builder) {
@@ -118,58 +112,6 @@ public final class IpLookupV2 extends AbstractIpLookup {
 
         availableDBReaders.put(IpVersion.IPv4.name(), ipv4DbReaders);
         availableDBReaders.put(IpVersion.IPv6.name(), ipv6DbReaders);
-    }
-
-
-    private void addIfNotEmpty(List<GalaxyDataBaseReader> dbReaders, GalaxyDataBaseReader dbReader) {
-        if (StringUtil.isNotEmpty(dbReader)) {
-            dbReaders.add(dbReader);
-        }
-
-    }
-
-    private File[] buildMMDBFilesUseWorkDirectory(String... files) {
-        File[] dbFiles = ObjectArrays.newArray(File.class, files.length);
-        for (int i = 0; i < files.length; i++) {
-            dbFiles[i] = new File(System.getProperty("user.dir") + File.separator + DEFAULT_DATABASE_PATH + File.separator + files[i]);
-        }
-        return dbFiles;
-    }
-
-    private void updateFileIfNotExists(File[] files) {
-        for (File file : files) {
-            if (!file.exists()) {
-                URL url = IpLookupV2.class.getResource("/"+ DEFAULT_DATABASE_PATH + "/" + file.getName());
-                if (url != null) {
-                    file = new File(url.getPath());
-                }
-            }
-        }
-
-    }
-
-
-    private GalaxyDataBaseReader constructDatabaseReader(String filePath, InputStream stream)  {
-        try {
-            if (StringUtil.isNotBlank(filePath) && new File(filePath).exists()) {
-                return constructDatabaseReader(new File(filePath));
-            } else if (stream != null) {
-                return constructDatabaseReader(stream);
-            } else {
-                return null;
-            }
-        } catch (IOException ie) {
-            logger.error("Unsupported GeoIP2 *.mmdb database: expected either File path or Stream. " + ie);
-        }
-        throw new UnsupportedOperationException("Unsupported GeoIP2 *.mmdb database: expected either File path or Stream. " );
-    }
-
-    private GalaxyDataBaseReader constructDatabaseReader(File file) throws IOException {
-        return file.exists() ? new GalaxyDataBaseReader.Builder(file).withCache(new CHMCache()).build() : null;
-    }
-
-    private GalaxyDataBaseReader constructDatabaseReader(InputStream stream) throws IOException {
-        return stream != null ? new GalaxyDataBaseReader.Builder(stream).withCache(new CHMCache()).build() : null;
     }
 
 
@@ -371,7 +313,6 @@ public final class IpLookupV2 extends AbstractIpLookup {
             this.publicAsnDatabaseStream = asnDatabaseStream;
             return this;
         }
-
 
         /**
          *
@@ -672,7 +613,6 @@ public final class IpLookupV2 extends AbstractIpLookup {
         }
         return StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOWN).toString() ;
     }
-
 
     @Override
     public  String latLngLookup(String ip) {

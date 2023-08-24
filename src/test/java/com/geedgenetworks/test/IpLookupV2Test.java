@@ -1,10 +1,12 @@
 package com.geedgenetworks.test;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.geedgenetworks.utils.AbstractIpLookup;
+import com.geedgenetworks.utils.AbstractDatabaseReader;
+import com.geedgenetworks.utils.AsnLookup;
 import com.geedgenetworks.utils.IpLookupV2;
 import com.maxmind.db.Network;
 import org.apache.log4j.Logger;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -23,8 +25,16 @@ public class IpLookupV2Test {
     @Rule
     public ExpectedException expectedEx = ExpectedException.none();
 
-    IpLookupV2 ipLookupA = getIpLookupByDatabase();
-    IpLookupV2 ipLookup = getIpLookupByStream();
+    IpLookupV2 ipLookupByDatabase;
+    IpLookupV2 ipLookupByStream;
+    AsnLookup asnLookup;
+
+    @Before
+    public void begin() {
+        ipLookupByDatabase = getIpLookupByDatabase();
+        ipLookupByStream =  getIpLookupByStream();
+        asnLookup = getAsnLookup();
+    }
 
    private IpLookupV2 getIpLookupByDatabase() {
         return new IpLookupV2.Builder(false)
@@ -40,7 +50,7 @@ public class IpLookupV2Test {
     private IpLookupV2 getIpLookupByStream() {
         IpLookupV2 ipLookupV2 = null;
         try {
-            ipLookupV2 = new IpLookupV2.Builder(true)
+            ipLookupV2 = new IpLookupV2.Builder(false)
                     .loadDataFileV4(new FileInputStream(new File("dat/ip_v4_built_in.mmdb")))
                     .loadDataFilePrivateV4(new FileInputStream(new File("dat/ip_v4_user_defined.mmdb")))
                     .loadDataFileV6(new FileInputStream(new File("dat/ip_v6_built_in.mmdb")))
@@ -54,13 +64,26 @@ public class IpLookupV2Test {
         return ipLookupV2;
     }
 
+    private AsnLookup getAsnLookup() {
+        AsnLookup asnLookup = null;
+        try {
+            asnLookup = new AsnLookup.Builder(false)
+                    .loadDataFileV4(new FileInputStream(new File("dat/asn_v4.mmdb")))
+                    .loadDataFileV6(new FileInputStream(new File("dat/asn_v6.mmdb")))
+                    .build();
+        }catch (FileNotFoundException e) {
+            logger.error(" File is not found:", e);
+        }
+        return asnLookup;
+    }
+
     @Test
     public void testLoadPrivateIPv4MMDBFiles() {
         try {
            IpLookupV2 ipLookupV4 = new IpLookupV2.Builder(false)
                    .loadDataFilePrivateV4(new FileInputStream(new File("dat/ip_v4_user_defined.mmdb")))
                    .build();
-           assertEquals(ipLookupV4.getDbReaders().get(AbstractIpLookup.IpVersion.IPv4.name()).size(), 1);
+           assertEquals(ipLookupV4.getDbReaders().get(AbstractDatabaseReader.IpVersion.IPv4.name()).size(), 1);
         }catch (FileNotFoundException e) {
             logger.error(" File is not found:", e);
         }
@@ -74,7 +97,7 @@ public class IpLookupV2Test {
                     .loadDataFilePrivateV4(new FileInputStream(new File("dat/ip_v4_user_defined.mmdb")))
                     .loadDataFileV4(new FileInputStream(new File("dat/ip_v4_built_in.mmdb")))
                     .build();
-            assertEquals(ipLookupV4.getDbReaders().get(AbstractIpLookup.IpVersion.IPv4.name()).size(), 2);
+            assertEquals(ipLookupV4.getDbReaders().get(AbstractDatabaseReader.IpVersion.IPv4.name()).size(), 2);
         } catch (FileNotFoundException e) {
             logger.error(" File is not found:", e);
         }
@@ -83,55 +106,69 @@ public class IpLookupV2Test {
 
     @Test
     public void testLoadDefaultMMDBFiles() {
-
-       IpLookupV2 tmpIpLookup = new IpLookupV2.Builder(true).build();
-       logger.info(tmpIpLookup.cityLookup("120.221.155.223"));
-
+       IpLookupV2 ipLookup = new IpLookupV2.Builder(true).build();
+        assertEquals(ipLookup.getDbReaders().values().size(), 2);
     }
 
     @Test
     public void testPrivateIP() {
-       assertEquals(ipLookupA.countryLookup("192.168.10.123"), "Private IP");
-       Object jsonObject =  ipLookupA.infoLookupToJSON("120.221.155.223");
-       logger.info(jsonObject);
+       assertEquals(ipLookupByDatabase.countryLookup("192.168.10.123"), "Private IP");
+       Object jsonObject =  ipLookupByDatabase.infoLookupToJSON("192.168.10.123");
+       assertEquals(JSONObject.from(jsonObject).get("privateIP"), true);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testIpLookupIllegalArguments(){
-        ipLookup.countryLookup("116.178.179.336");
+        ipLookupByStream.countryLookup("116.178.179.336");
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void testIPIsBlank() {
-        ipLookup.countryLookup("");
+        ipLookupByStream.countryLookup("");
     }
     @Test(expected=IllegalArgumentException.class)
     public void testIPIsNull() {
-        ipLookup.countryLookup(null);
+        ipLookupByStream.countryLookup(null);
     }
 
     @Test
-    public void testIpLookupOutput() {
-        assertEquals(ipLookup.countryLookup("120.221.155.223"), "China");
-        assertEquals(ipLookup.provinceLookup("120.221.155.223"), "Shandong");
-        assertEquals(ipLookup.cityLookup("120.221.155.223"), "Other");
-        assertEquals(ipLookup.cityLookupDetail("120.221.155.223").split("\\" + AbstractIpLookup.LOCATION_SEPARATOR).length, 3);
-        assertEquals(ipLookup.locationLookupDetail("120.221.155.223").split("\\" + AbstractIpLookup.LOCATION_SEPARATOR).length, 7);
-        assertEquals(ipLookup.administrativeAreaLookupDetail("120.221.155.223").split("\\" + AbstractIpLookup.LOCATION_SEPARATOR).length, 4);
-        assertEquals(ipLookup.latLngLookup("120.221.155.223"), "36.0986,120.3719");
-        assertEquals(ipLookup.cityLatLngLookup("120.221.155.223").split( AbstractIpLookup.OBJECT_SEPARATOR).length, 2);
-        assertEquals(ipLookup.ispLookup("120.221.155.223"), "-");
-        assertEquals(ipLookup.organizationLookup("120.221.155.223"), "");
-        assertEquals(ipLookup.infoLookupToCSV("120.221.155.223").split( AbstractIpLookup.OBJECT_SEPARATOR).length, 5);
-        assertEquals(JSONObject.from(ipLookup.infoLookupToJSON("120.221.155.223")).get("country"),"China");
+    public void testIpLookupByStream() {
+        assertEquals(ipLookupByDatabase.countryLookup("120.221.155.223"), "China");
+        assertEquals(ipLookupByStream.provinceLookup("120.221.155.223"), "Shandong");
+        assertEquals(ipLookupByStream.cityLookup("120.221.155.223"), "Other");
+        assertEquals(ipLookupByStream.cityLookupDetail("120.221.155.223").split("\\" + AbstractDatabaseReader.LOCATION_SEPARATOR).length, 3);
+        assertEquals(ipLookupByStream.locationLookupDetail("120.221.155.223").split("\\" + AbstractDatabaseReader.LOCATION_SEPARATOR).length, 7);
+        assertEquals(ipLookupByStream.administrativeAreaLookupDetail("120.221.155.223").split("\\" + AbstractDatabaseReader.LOCATION_SEPARATOR).length, 4);
+        assertEquals(ipLookupByStream.latLngLookup("120.221.155.223"), "36.0986,120.3719");
+        assertEquals(ipLookupByStream.cityLatLngLookup("120.221.155.223").split( AbstractDatabaseReader.OBJECT_SEPARATOR).length, 2);
+        assertEquals(ipLookupByStream.ispLookup("120.221.155.223"), "-");
+        assertEquals(ipLookupByStream.organizationLookup("120.221.155.223"), "");
+        assertEquals(ipLookupByStream.infoLookupToCSV("120.221.155.223").split( AbstractDatabaseReader.OBJECT_SEPARATOR).length, 5);
+        assertEquals(JSONObject.from(ipLookupByStream.infoLookupToJSON("120.221.155.223")).get("country"),"China");
+    }
+
+    @Test
+    public void testIpLookupByDatabase() {
+        assertEquals(ipLookupByDatabase.countryLookup("120.221.155.223"), "China");
+        assertEquals(ipLookupByDatabase.provinceLookup("120.221.155.223"), "Shandong");
+        assertEquals(ipLookupByDatabase.cityLookup("120.221.155.223"), "Other");
+        assertEquals(ipLookupByDatabase.cityLookupDetail("120.221.155.223").split("\\" + AbstractDatabaseReader.LOCATION_SEPARATOR).length, 3);
+        assertEquals(ipLookupByDatabase.locationLookupDetail("120.221.155.223").split("\\" + AbstractDatabaseReader.LOCATION_SEPARATOR).length, 7);
+        assertEquals(ipLookupByDatabase.administrativeAreaLookupDetail("120.221.155.223").split("\\" + AbstractDatabaseReader.LOCATION_SEPARATOR).length, 4);
+        assertEquals(ipLookupByDatabase.latLngLookup("120.221.155.223"), "36.0986,120.3719");
+        assertEquals(ipLookupByDatabase.cityLatLngLookup("120.221.155.223").split( AbstractDatabaseReader.OBJECT_SEPARATOR).length, 2);
+        assertEquals(ipLookupByDatabase.ispLookup("120.221.155.223"), "-");
+        assertEquals(ipLookupByDatabase.organizationLookup("120.221.155.223"), "");
+        assertEquals(ipLookupByDatabase.infoLookupToCSV("120.221.155.223").split( AbstractDatabaseReader.OBJECT_SEPARATOR).length, 5);
+        assertEquals(JSONObject.from(ipLookupByDatabase.infoLookupToJSON("120.221.155.223")).get("country"),"China");
     }
 
     @Test
     public void testOutputJson() {
-        logger.info(ipLookup.infoLookupToJSON("120.221.155.223"));
-        logger.info(ipLookup.infoLookupToJSON("2001:db8:3333:4444:5555:6666:7777:8888"));
-        logger.info(ipLookup.infoLookupToJSON("2001:db8::"));
-        logger.info(ipLookup.infoLookupToJSON("120.221.155.223"));
+        logger.info(ipLookupByStream.infoLookupToJSON("120.221.155.223"));
+        logger.info(ipLookupByStream.infoLookupToJSON("2001:db8:3333:4444:5555:6666:7777:8888"));
+        logger.info(ipLookupByStream.infoLookupToJSON("2001:db8::"));
+        logger.info(ipLookupByStream.infoLookupToJSON("120.221.155.223"));
 
     }
 
@@ -150,18 +187,22 @@ public class IpLookupV2Test {
 
     @Test
     public void testUnknownIP() {
-        logger.info(ipLookup.infoLookupToJSON("255.244.255.254"));
-        logger.info(ipLookup.infoLookupToJSON("8.8.8.8"));
+        logger.info(ipLookupByStream.infoLookupToJSON("255.244.255.254"));
+        logger.info(ipLookupByStream.infoLookupToJSON("8.8.8.8"));
     }
 
 
  @Test
  public void testAsnLookupOutput() {
-  logger.info(ipLookup.asnLookupOrganization("8.8.8.8"));
-  logger.info(ipLookup.asnLookupDetail("8.8.8.8"));
-  logger.info(ipLookup.asnLookupOrganization("8.8.8.8"));
+  logger.info(ipLookupByStream.asnLookupOrganization("8.8.8.8"));
+  logger.info(ipLookupByStream.asnLookupDetail("8.8.8.8"));
+  logger.info(ipLookupByStream.asnLookupInfo("8.8.8.8"));
+  logger.info(ipLookupByStream.asnLookupOrganization("8.8.8.8"));
 
-
+  logger.info(asnLookup.asnLookupOrganization("8.8.8.8"));
+  logger.info(asnLookup.asnLookupDetail("8.8.8.8"));
+  logger.info(asnLookup.asnLookupInfo("8.8.8.8"));
+  logger.info(asnLookup.asnLookupOrganization("8.8.8.8"));
 
  }
 
