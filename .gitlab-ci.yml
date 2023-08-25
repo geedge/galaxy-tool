@@ -1,4 +1,3 @@
-
 stages:
   - build
   - clean
@@ -31,7 +30,7 @@ deploy:
   script:
     - echo 'exec mvn package & docker build'
     - echo  'tag:' $CI_COMMIT_TAG
-    - mvn deploy -e -Dmaven.test.skip=true
+    - mvn deploy -e
   when: on_success
   only:
     - tags
