@@ -293,7 +293,6 @@ public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocato
         }
 
 
-
         /**
          *
          * @param asnDatabaseFile 加载ASN database文件,不区分IPv4/6

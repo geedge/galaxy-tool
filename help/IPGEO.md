@@ -88,13 +88,14 @@ Galaxy IPGEO 即数据平台下的galaxy-tool支持的IP定位功能。最终的
 ## 实现举例
 
 ```java
-IpLookup ipLookup =  new IpLookup.Builder(false)
-               .loadDataFile("dat/ip.mmdb")
-               .loadDataFilePrivateV4("dat/ip_private_v4.mmdb")
-               .loadDataFilePrivateV6("dat/ip_v6.mmdb")
-               .loadAsnDataFile("dat/asn_v4.mmdb")
-               .loadAsnDataFileV6("dat/asn_v6.mmdb")
-               .build();
+ IpLookupV2 ipLookup = new IpLookupV2.Builder(false)
+        .loadDataFileV4(new FileInputStream(new File("dat/ip_v4_built_in.mmdb")))
+        .loadDataFilePrivateV4(new FileInputStream(new File("dat/ip_v4_user_defined.mmdb")))
+        .loadDataFileV6(new FileInputStream(new File("dat/ip_v6_built_in.mmdb")))
+        .loadDataFilePrivateV6(new FileInputStream(new File("dat/ip_v6_user_defined.mmdb")))
+        .loadAsnDataFile(new FileInputStream(new File("dat/asn_v4.mmdb")))
+        .loadAsnDataFileV6(new FileInputStream(new File("dat/asn_v6.mmdb")))
+        .build();
 
         logger.info(ipLookup.countryLookup("192.168.50.21"));
         logger.info(ipLookup.cityLookupDetail("192.168.50.21"));
