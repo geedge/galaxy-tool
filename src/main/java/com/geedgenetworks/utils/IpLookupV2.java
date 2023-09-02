@@ -295,124 +295,124 @@ public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocato
 
         /**
          *
-         * @param asnDatabaseFile 加载ASN database文件,不区分IPv4/6
+         * @param databaseFile 加载ASN database文件,不区分IPv4/6
          * @return
          */
-        public Builder loadAsnDataFile(String asnDatabaseFile) {
-            this.publicAsnDatabaseFile = asnDatabaseFile;
+        public Builder loadAsnDataFile(String databaseFile) {
+            this.publicAsnDatabaseFile = databaseFile;
             return this;
         }
 
         /**
          *
-         * @param asnDatabaseStream 加载ASN database流,不区分IPv4/6
+         * @param databaseStream 加载ASN database流,不区分IPv4/6
          * @return
          */
-        public Builder loadAsnDataFile(InputStream asnDatabaseStream) {
-            this.publicAsnDatabaseStream = asnDatabaseStream;
+        public Builder loadAsnDataFile(InputStream databaseStream) {
+            this.publicAsnDatabaseStream = databaseStream;
             return this;
         }
 
         /**
          *
-         * @param asnDatabaseFile 加载ASN IPv4 database文件
+         * @param databaseFile 加载ASN IPv4 database文件
          * @return
          */
-        public Builder loadAsnDataFileV4(String asnDatabaseFile) {
-            this.publicAsnV4DatabaseFile = asnDatabaseFile;
+        public Builder loadAsnDataFileV4(String databaseFile) {
+            this.publicAsnV4DatabaseFile = databaseFile;
             return this;
         }
 
         /**
          *
-         * @param asnDatabaseStream 加载ASN IPv4 database流
+         * @param databaseStream 加载ASN IPv4 database流
          * @return
          */
-        public Builder loadAsnDataFileV4(InputStream asnDatabaseStream) {
-            this.publicAsnV4DatabaseStream = asnDatabaseStream;
-            return this;
-        }
-
-
-        /**
-         *
-         * @param asnDatabaseFile 加载ASN IPv6 database文件
-         * @return
-         */
-        public Builder loadAsnDataFileV6(String asnDatabaseFile) {
-            this.publicAsnV6DatabaseFile = asnDatabaseFile;
-            return this;
-        }
-
-        /**
-         *
-         * @param asnDatabaseStream 加载ASN IPv6 database流
-         * @return
-         */
-        public Builder loadAsnDataFileV6(InputStream asnDatabaseStream) {
-            this.publicAsnV6DatabaseStream = asnDatabaseStream;
+        public Builder loadAsnDataFileV4(InputStream databaseStream) {
+            this.publicAsnV4DatabaseStream = databaseStream;
             return this;
         }
 
 
         /**
          *
-         * @param asnDatabaseFile 加载ASN database文件,不区分IPv4/6
+         * @param databaseFile 加载ASN IPv6 database文件
          * @return
          */
-        public Builder loadAsnDataFilePrivate(String asnDatabaseFile) {
-            this.privateAsnDatabaseFile = asnDatabaseFile;
+        public Builder loadAsnDataFileV6(String databaseFile) {
+            this.publicAsnV6DatabaseFile = databaseFile;
             return this;
         }
 
         /**
          *
-         * @param asnDatabaseStream 加载ASN database流,不区分IPv4/6
+         * @param databaseStream 加载ASN IPv6 database流
          * @return
          */
-        public Builder loadAsnDataFilePrivate(InputStream asnDatabaseStream) {
-            this.privateAsnDatabaseStream = asnDatabaseStream;
-            return this;
-        }
-
-        /**
-         *
-         * @param asnDatabaseFile 加载ASN IPv4 database文件
-         * @return
-         */
-        public Builder loadAsnDataFilePrivateV4(String asnDatabaseFile) {
-            this.privateAsnV4DatabaseFile = asnDatabaseFile;
-            return this;
-        }
-
-        /**
-         *
-         * @param asnDatabaseStream 加载ASN IPv4 database流
-         * @return
-         */
-        public Builder loadAsnDataFilePrivateV4(InputStream asnDatabaseStream) {
-            this.privateAsnV4DatabaseStream = asnDatabaseStream;
+        public Builder loadAsnDataFileV6(InputStream databaseStream) {
+            this.publicAsnV6DatabaseStream = databaseStream;
             return this;
         }
 
 
         /**
          *
-         * @param asnDatabaseFile 加载ASN IPv6 database文件
+         * @param databaseFile 加载ASN database文件,不区分IPv4/6
+         * @return
+         */
+        public Builder loadAsnDataFilePrivate(String databaseFile) {
+            this.privateAsnDatabaseFile = databaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param databaseStream 加载ASN database流,不区分IPv4/6
+         * @return
+         */
+        public Builder loadAsnDataFilePrivate(InputStream databaseStream) {
+            this.privateAsnDatabaseStream = databaseStream;
+            return this;
+        }
+
+        /**
+         *
+         * @param databaseFile 加载ASN IPv4 database文件
+         * @return
+         */
+        public Builder loadAsnDataFilePrivateV4(String databaseFile) {
+            this.privateAsnV4DatabaseFile = databaseFile;
+            return this;
+        }
+
+        /**
+         *
+         * @param databaseStream 加载ASN IPv4 database流
+         * @return
+         */
+        public Builder loadAsnDataFilePrivateV4(InputStream databaseStream) {
+            this.privateAsnV4DatabaseStream = databaseStream;
+            return this;
+        }
+
+
+        /**
+         *
+         * @param databaseFile 加载ASN IPv6 database文件
          * @return Builder
          */
-        public Builder loadAsnDataFilePrivateV6(String asnDatabaseFile) {
-            this.privateAsnV6DatabaseFile = asnDatabaseFile;
+        public Builder loadAsnDataFilePrivateV6(String databaseFile) {
+            this.privateAsnV6DatabaseFile = databaseFile;
             return this;
         }
 
         /**
          *
-         * @param asnDatabaseStream 加载ASN IPv6 database流
+         * @param databaseStream 加载ASN IPv6 database流
          * @return
          */
-        public Builder loadAsnDataFilePrivateV6(InputStream asnDatabaseStream) {
-            this.privateAsnV6DatabaseStream = asnDatabaseStream;
+        public Builder loadAsnDataFilePrivateV6(InputStream databaseStream) {
+            this.privateAsnV6DatabaseStream = databaseStream;
             return this;
         }
 

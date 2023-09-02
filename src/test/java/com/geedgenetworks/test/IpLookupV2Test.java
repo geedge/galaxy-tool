@@ -80,10 +80,10 @@ public class IpLookupV2Test {
     @Test
     public void testLoadPrivateIPv4MMDBFiles() {
         try {
-           IpLookupV2 ipLookupV4 = new IpLookupV2.Builder(false)
+           IpLookupV2 ipLookup = new IpLookupV2.Builder(false)
                    .loadDataFilePrivateV4(new FileInputStream(new File("dat/ip_v4_user_defined.mmdb")))
                    .build();
-           assertEquals(ipLookupV4.getDbReaders().get(AbstractDatabaseReader.IpVersion.IPv4.name()).size(), 1);
+           assertEquals(ipLookup.getDbReaders().get(AbstractDatabaseReader.IpVersion.IPv4.name()).size(), 1);
         }catch (FileNotFoundException e) {
             logger.error(" File is not found:", e);
         }
@@ -133,7 +133,7 @@ public class IpLookupV2Test {
 
     @Test
     public void testIpLookupByStream() {
-        assertEquals(ipLookupByDatabase.countryLookup("120.221.155.223"), "China");
+        assertEquals(ipLookupByStream.countryLookup("120.221.155.223"), "China");
         assertEquals(ipLookupByStream.provinceLookup("120.221.155.223"), "Shandong");
         assertEquals(ipLookupByStream.cityLookup("120.221.155.223"), "Other");
         assertEquals(ipLookupByStream.cityLookupDetail("120.221.155.223").split("\\" + AbstractDatabaseReader.LOCATION_SEPARATOR).length, 3);
