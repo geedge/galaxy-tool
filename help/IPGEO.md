@@ -81,7 +81,7 @@ GeoIP 数据库文件默认存储在 "dat目录" 中，并且在加载工具类�
 | infoLookupToCSV(String ip)                                  | String           | 返回地理位置信息明细，支持7级,csv格式 |
 | infoLookupToJSON(String ip)                                  | String           | 返回地理位置信息明细，支持7级,json格式 |
 | infoLookup(String ip)                                  | String           | 返回地理位置信息明细，支持7级,Response 对象 |
-| latLngLookup(String ip)                                      | String           | 返回经纬度，格式：维度,经度 ；分隔符为英文句号"."  |
+| latLngLookup(String ip)                                      | String           | 返回经纬度，格式：维度,经度 ；分隔符为英文逗号","  |
 | cityLatLngLookup(String ip)                                  | String           | 返回 cityLookup+latLngLookup信息；                 |
 | asnLookup(String ip)                                         | String           | 返回ASN，调用AsnLookup工具类                     |
 | asnLookupOrganization(String ip)                                   | String           | 返回所属AS组织，调用AsnLookup工具类            |
