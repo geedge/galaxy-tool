@@ -15,6 +15,29 @@ public class FormatUtils {
 
 	protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+	private static final String HTTP_PROTOCOL_HEADER = "http://";
+	private static final String HTTPS_PROTOCOL_HEADER = "https://";
+	private static final String FTP_PROTOCOL_HEADER = "ftp://";
+
+	private FormatUtils(Builder builder) {
+		init(builder);
+	}
+
+	private synchronized void init(Builder builder) {
+		try {
+
+			if (builder.idDefault) {
+				logger.info("FormatUtils begin with default PZ.");
+			} else {
+				logger.info("FormatUtils begin with user-defined PZ.");
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+
 	/**
 	 * 将List&lt;HashMap&lt;String,Object&gt;&gt;中HashMap的key全部转化为变量形式，<br>
 	 * 如{"BRH_ID":"1234","BRH_NAME":"机构"}改为{"brhId":"1234","brhName":"机构"}
@@ -82,29 +105,13 @@ public class FormatUtils {
 		return result.toString();
 	}
 
-	private FormatUtils(Builder builder) {
-		init(builder);
-	}
 
-	private synchronized void init(Builder builder) {
-		try {
-
-			if (builder.isDefalult) {
-				logger.info("FormatUtils begin with default PZ.");
-			} else {
-				logger.info("FormatUtils begin with user-defined PZ.");
-			}
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	public static final class Builder {
-		boolean isDefalult;
+		boolean idDefault;
 
 		public Builder(boolean isDefalult) {
-			this.isDefalult = isDefalult;
+			this.idDefault = isDefalult;
 		}
 
 		public FormatUtils build() {
@@ -171,39 +178,43 @@ public class FormatUtils {
 	 * @return  返回截取后的域名地址
 	 */
 	public static String getDomain(String url) {
-
+		String domain = null;
 		if(StringUtil.isBlank(url)){
 			return StringUtil.EMPTY;
 		}
 
-		if (url.indexOf("http://") >= 0) {
-			url = url.substring("http://".length(), url.length());
-		} else if (url.indexOf("https://", 0) >= 0) {
-			url = url.substring("https://".length(), url.length());
-		} else if (url.indexOf("ftp://", 0) >= 0) {
-			url = url.substring("ftp://".length(), url.length());
-		} else {
-			url = url;
+		try {
+			if (url.startsWith(HTTP_PROTOCOL_HEADER)) {
+				domain = url.substring(HTTP_PROTOCOL_HEADER.length(), url.length());
+			} else if (url.startsWith(HTTPS_PROTOCOL_HEADER)) {
+				domain = url.substring(HTTPS_PROTOCOL_HEADER.length(), url.length());
+			} else if (url.startsWith(FTP_PROTOCOL_HEADER)) {
+				domain = url.substring(FTP_PROTOCOL_HEADER.length(), url.length());
+			} else {
+				domain = url;
+			}
+
+			if (domain.indexOf("www.") == 0) {
+				domain = domain.substring(domain.indexOf(".") + 1, url.length());
+			}
+
+			if (domain.indexOf(":") >= 0) {
+				domain = domain.substring(0, domain.indexOf(":"));
+			}
+
+			if (domain.indexOf("/", 0) >= 0 ) {
+				domain = domain.substring(0, domain.indexOf("/", 1));
+			}
+
+			if (domain.indexOf("?") >= 0) {
+				domain = domain.substring(0, domain.indexOf("?"));
+			}
+
+		} catch (RuntimeException e) {
+			throw new IllegalArgumentException("Invalid URL=["+url+"]", e);
 		}
 
-		if (url.indexOf("www.") == 0) {
-			url = url.substring(url.indexOf(".") + 1, url.length());
-		}
-
-		if (url.indexOf(":") >= 0) {
-			url = url.substring(0, url.indexOf(":"));
-		}
-
-		if (url.indexOf("/", 0) >= 0) {
-			url = url.substring(0, url.indexOf("/", 1));
-		}
-
-		if (url.indexOf("?") >= 0) {
-			url = url.substring(0, url.indexOf("?"));
-		}
-
-
-		return url;
+		return domain;
 	}
 
 	/**

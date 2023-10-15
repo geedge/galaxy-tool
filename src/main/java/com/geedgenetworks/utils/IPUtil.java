@@ -31,6 +31,10 @@ public class IPUtil {
     private static final String LOCALHOST_IPV4_ADDRESS = "127.0.0.1";
     private static final String LOCALHOST_NAME = "localhost";
     private static byte pos []= new byte []{(byte)128,64,32,16,8,4,2,1};
+
+    private IPUtil() {
+        throw new IllegalStateException("Utility Class");
+    }
     private static final Pattern IPV4Pattern = Pattern.
             compile("\\b((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\.((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\.((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\.((?!\\d\\d\\d)\\d+|1\\d\\d|2[0-4]\\d|25[0-5])\\b");
     private static final Pattern IPV6_STD_PATTERN =
@@ -56,6 +60,7 @@ public class IPUtil {
      */
     public static String getIpString(String ip10) {
         StringBuffer sb = new StringBuffer("");
+
         if (ip10.indexOf("-") > -1) {
 
             Integer intIP = Integer.parseInt(setStrEmpty(ip10));

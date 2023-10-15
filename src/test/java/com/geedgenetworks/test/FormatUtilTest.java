@@ -37,16 +37,24 @@ public class FormatUtilTest {
     @Test
     public void testGetDomain() {
         Assert.assertEquals(FormatUtils.getDomain("https://pan.baidu.com/s/1wejv5ZceAL0NQGExvPQm-Q#list/path=%2F&parentPath=%2Fsharelink3477893581-1028235543414583"), "pan.baidu.com");
-
         Assert.assertEquals(FormatUtils.getDomain("www.baidu.com"), "baidu.com");
         Assert.assertEquals(FormatUtils.getDomain("www.baidu.com.cn"), "baidu.com.cn");
         Assert.assertEquals(FormatUtils.getDomain("www.baidu.cc"),"baidu.cc");
-
-
         Assert.assertEquals(FormatUtils.getDomain("com.cn"), "com.cn");
         Assert.assertEquals(FormatUtils.getDomain("baidu.com.hk:80/abc.html"), "baidu.com.hk");
 
     }
+
+	@Test(expected=IllegalArgumentException.class)
+	public void testGetDomainExpectedException() {
+		System.out.println(FormatUtils.getDomain("http:///test"));
+		System.out.println(FormatUtils.getDomain("https:///test"));
+		System.out.println(FormatUtils.getDomain("/test"));
+		System.out.println(FormatUtils.getDomain("www./test"));
+		System.out.println(FormatUtils.getDomain("http://www./test"));
+	}
+
+
 
 
     @Test
