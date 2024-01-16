@@ -195,7 +195,7 @@ public class FormatUtils {
 			}
 
 			if (domain.indexOf("www.") == 0) {
-				domain = domain.substring(domain.indexOf(".") + 1, url.length());
+				domain = domain.substring(domain.indexOf(".") + 1, domain.length());
 			}
 
 			if (domain.indexOf(":") >= 0) {
