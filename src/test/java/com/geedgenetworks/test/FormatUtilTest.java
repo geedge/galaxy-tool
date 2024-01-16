@@ -25,8 +25,8 @@ public class FormatUtilTest {
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("baidu.com.hk:80/abc.html"), "baidu.com.hk");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("&&&&Dddddsdd"), "");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("com.cn"), "");
-		Assert.assertNotEquals(FormatUtils.getTopPrivateDomain("playetoms-pa.googleapis.com"), "googleapis.com");
-        Assert.assertNotEquals(FormatUtils.getTopPrivateDomain("com.io"), "com.io");
+		Assert.assertNotSame(FormatUtils.getTopPrivateDomain("playetoms-pa.googleapis.com"), "googleapis.com");
+        Assert.assertNotSame(FormatUtils.getTopPrivateDomain("com.io"), "com.io");
 
 
 
@@ -42,16 +42,17 @@ public class FormatUtilTest {
         Assert.assertEquals(FormatUtils.getDomain("www.baidu.cc"),"baidu.cc");
         Assert.assertEquals(FormatUtils.getDomain("com.cn"), "com.cn");
         Assert.assertEquals(FormatUtils.getDomain("baidu.com.hk:80/abc.html"), "baidu.com.hk");
+		Assert.assertEquals(FormatUtils.getDomain("http://www.abc.cc"), "abc.cc");
 
     }
 
 	@Test(expected=IllegalArgumentException.class)
 	public void testGetDomainExpectedException() {
-		System.out.println(FormatUtils.getDomain("http:///test"));
-		System.out.println(FormatUtils.getDomain("https:///test"));
-		System.out.println(FormatUtils.getDomain("/test"));
-		System.out.println(FormatUtils.getDomain("www./test"));
-		System.out.println(FormatUtils.getDomain("http://www./test"));
+		FormatUtils.getDomain("http:///test");
+		FormatUtils.getDomain("https:///test");
+		FormatUtils.getDomain("/test");
+		FormatUtils.getDomain("www./test");
+		FormatUtils.getDomain("http://www./test");
 	}
 
 
