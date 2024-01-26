@@ -1,5 +1,7 @@
 package com.geedgenetworks.test;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.geedgenetworks.model.LocationResponse;
 import com.geedgenetworks.utils.IpLookupV2;
 import org.apache.log4j.Logger;
 
@@ -73,7 +75,7 @@ public class IPBenchMark {
         for (int i = 0; i < count; i++) {
             random.nextBytes(address);
             InetAddress ip = InetAddress.getByAddress(address);
-            Object ipInfo = ipLookup.infoLookup(ip.getHostAddress());
+            LocationResponse ipInfo = ipLookup.infoLookup(ip.getHostAddress());
             if (TRACE) {
                 if (i % 50000 == 0) {
                     logger.info(i + " " + ip);

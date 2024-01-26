@@ -1,5 +1,8 @@
 package com.geedgenetworks.utils;
 
+import com.alibaba.fastjson2.JSONObject;
+import com.geedgenetworks.model.LocationResponse;
+
 public interface IPLocator {
 
     /**
@@ -125,14 +128,14 @@ public interface IPLocator {
      * @param ip
      * @return
      */
-    Object infoLookupToJSON(String ip);
+    JSONObject infoLookupToJSON(String ip);
 
     /**
-     * This method returns all fields for the MMDB Response Object..
+     * This method returns all fields for the MMDB Response Object.
      * @param ip
      * @return
      */
-    Object infoLookup(String ip);
+    LocationResponse infoLookup(String ip);
 
     /**
      *
