@@ -3,6 +3,7 @@ package com.geedgenetworks.test;
 import com.geedgenetworks.utils.Encodes;
 import com.geedgenetworks.utils.FormatUtils;
 
+import com.geedgenetworks.utils.StringUtil;
 import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,8 +28,6 @@ public class FormatUtilTest {
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("com.cn"), "");
 		Assert.assertNotSame(FormatUtils.getTopPrivateDomain("playetoms-pa.googleapis.com"), "googleapis.com");
         Assert.assertNotSame(FormatUtils.getTopPrivateDomain("com.io"), "com.io");
-
-
 
 	}
 
@@ -62,19 +61,21 @@ public class FormatUtilTest {
     public void testBase64Decode() {
         String value = Encodes.encodeBase64("我是", "GB2312");
         Assert.assertEquals(Encodes.decodeBase64String(value, "GB2312"), "我是");
-
         Assert.assertEquals(Encodes.decodeBase64String( Encodes.encodeBase64("我是UTF-8")), "我是UTF-8");
-
     }
+
+	@Test
+	public void testMD5() {
+		Assert.assertEquals(StringUtil.md5("123456"),"4QrcOUm6Wau+VuBX8g+IPg==");
+
+	}
 
 
 	@Test
 	public void testGetEmailDomain() {
-
 		Assert.assertEquals(FormatUtils.getEmailDomain("zhansan@gmail.com"), "gmail.com");
 		Assert.assertEquals(FormatUtils.getEmailDomain("zhansan"), "");
 		Assert.assertEquals(FormatUtils.getEmailDomain("@gmail.com"), "gmail.com");
-
 
 	}
 

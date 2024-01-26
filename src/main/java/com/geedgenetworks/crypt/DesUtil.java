@@ -23,7 +23,7 @@ public abstract class DesUtil {
 	 * @return 返回密钥
 	 */
 	public static SecretKey generateKey(){
-		Security.addProvider(new com.sun.crypto.provider.SunJCE());
+		Security.addProvider(java.security.Security.getProvider("SunJCE"));
 		KeyGenerator keyGenerator=null;
 		try {
 			keyGenerator = KeyGenerator.getInstance("DESede");

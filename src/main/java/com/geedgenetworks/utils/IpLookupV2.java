@@ -625,7 +625,6 @@ public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocato
     public String asnLookupDetail(String ip) {
         return asnLookup.asnLookupDetail(ip);
     }
-
     private Optional<LocationResponse> getResponse(String ip) {
         try {
             ip = Optional.ofNullable(ip).orElse("").trim();
@@ -634,10 +633,11 @@ public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocato
 
                 //Iterate through each 'dbReader' and execute them in the following order: private v4 -> private -> public v4 -> public.
                 for (GalaxyDataBaseReader reader : availableDBReaders.get(IpVersion.IPv4.name())) {
-                   LocationResponse response = reader.location(ipAddress);
-                   if(StringUtil.isNotEmpty(response)) {
-                       return Optional.of(response);
-                   }
+                   //LocationResponse response = reader.location(ipAddress);
+                    Optional<LocationResponse> response = reader.getLocation(ipAddress);
+                    if(response.isPresent()) {
+                       return response;
+                    }
                 }
                 //Is it a private IP
                 if (IPUtil.internalIp(ip)) {
@@ -649,9 +649,9 @@ public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocato
             } else if (ipAddress instanceof Inet6Address) {
                 //Iterate through each 'dbReader' and execute them in the following order: private v6 -> private -> public v6 -> public.
                 for(GalaxyDataBaseReader reader : availableDBReaders.get(IpVersion.IPv6.name())) {
-                    LocationResponse response = reader.location(ipAddress);
-                    if(StringUtil.isNotEmpty(response)) {
-                        return Optional.of(response);
+                    Optional<LocationResponse> response = reader.getLocation(ipAddress);
+                    if(response.isPresent()) {
+                        return response;
                     }
                 }
             } else {

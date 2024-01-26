@@ -30,6 +30,7 @@ public class Encodes {
 	 * Hex编码.
 	 */
 	public static String encodeHex(byte[] input) {
+
 		return new String(Hex.encodeHex(input));
 	}
 

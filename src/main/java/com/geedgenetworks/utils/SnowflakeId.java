@@ -2,7 +2,6 @@ package com.geedgenetworks.utils;
 
 import org.apache.log4j.Logger;
 
-
 public class SnowflakeId {
     private static Logger logger = Logger.getLogger(SnowflakeId.class);
 

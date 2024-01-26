@@ -2,11 +2,10 @@ package com.geedgenetworks.utils;
 
 
 import org.apache.commons.lang3.StringUtils;
-import sun.misc.BASE64Encoder;
-
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Map;
 import java.util.UUID;
@@ -316,8 +315,7 @@ public final class StringUtil extends StringUtils {
 			try {
 				MessageDigest md = MessageDigest.getInstance("MD5");
 				byte[] b = md.digest(msg.getBytes());
-				BASE64Encoder encoder = new BASE64Encoder();
-				return  encoder.encode(b);
+				return Base64.getEncoder().encodeToString(b);
 			} catch (NoSuchAlgorithmException e) {
 				e.printStackTrace();
 				 return EMPTY;	

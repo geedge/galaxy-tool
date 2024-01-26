@@ -168,16 +168,17 @@ public class IpLookupV2Test {
     @Test
     public void testCountryLookup() {
         assertEquals(ipLookupByDatabase.countryLookup("120.221.155.223"), "China");
-        assertEquals(ipLookupByDatabase.countryLookup("192.168.12.1"), "Private IP");
         assertEquals(ipLookupByDatabase.countryLookup("2001:db8:3333:4444:5555:6666:7777:8888"), "");
-        System.out.println(ipLookupByDatabase.infoLookupToCSV("120.221.155.223"));
+        assertEquals(ipLookupByDatabase.countryLookup("192.168.12.1"), "Private IP");
     }
+
 
     @Test
     public void testProvinceLookup() {
+        assertEquals(ipLookupByDatabase.provinceLookup("2001:db8:3333:4444:5555:6666:7777:8888"), "");
         assertEquals(ipLookupByDatabase.provinceLookup("120.221.155.223"), "Shandong");
         assertEquals(ipLookupByDatabase.provinceLookup("192.168.12.1"), "Private IP");
-        assertEquals(ipLookupByDatabase.provinceLookup("2001:db8:3333:4444:5555:6666:7777:8888"), "");
+
     }
 
     @Test
@@ -213,16 +214,12 @@ public class IpLookupV2Test {
         assertEquals(ipLookupByDatabase.infoLookupToJSONString("2001:db8:3333:4444:5555:6666:7777:8888"), "");
     }
 
-
-
-
     @Test
     public void testOutputJson() {
         logger.info(ipLookupByStream.infoLookupToJSON("120.221.155.223"));
         logger.info(ipLookupByStream.infoLookupToJSON("2001:db8:3333:4444:5555:6666:7777:8888"));
         logger.info(ipLookupByStream.infoLookupToJSON("2001:db8::"));
         logger.info(ipLookupByStream.infoLookupToJSON("120.221.155.223"));
-
     }
 
     @Test

@@ -13,13 +13,6 @@ import java.net.InetAddress;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-/**
- * @ClassName AsnLookup
- * @Description  IP查询AS号
- * @Author 中电积至有限公司 darnell
- * @Date 2020-05-09 13:45
- * @Version 1.0.3
- **/
 public class AsnLookup extends AbstractDatabaseReader {
     private Map<String, List<GalaxyDataBaseReader>> availableDBReaders = Maps.newHashMap();
     private GalaxyDataBaseReader publicDatabaseReader;
@@ -85,26 +78,10 @@ public class AsnLookup extends AbstractDatabaseReader {
         init(builder);
     }
 
-
-    /**
-     * 加载mmdb数据字典文件，内部生成mmdb动态库。
-     *
-     * 1.默认记载ASN库，使用方式如下:
-     * AsnLookup asnLookup = new AsnLookup.Builder(true).build();
-     * 自动加载应用dat目录下的库文件，命名为:asn_v4.asn_v6.mmdb库。
-     *
-     * 2.手动加载IP库，使用方式如下：
-     * <p>
-     *   AsnLookup asnLookup = new AsnLookup.Builder(false).loadDataFileV4("D:\\galaxy-tool\\dat\\asn_v4_201901.mmdb").
-     *   loadDataFileV6("D:\\galaxy-tool\\dat\\asn_v6_201901.mmdb").build();
-     *
-     * </p>
-     */
     public static final class Builder {
         String publicAsnDatabaseFile;
         String publicAsnV4DatabaseFile;
         String publicAsnV6DatabaseFile;
-
         InputStream publicAsnDatabaseStream;
         InputStream publicAsnV4DatabaseStream;
         InputStream publicAsnV6DatabaseStream;
@@ -289,8 +266,6 @@ public class AsnLookup extends AbstractDatabaseReader {
     }
 
 
-
-
     public String asnLookupDetail(String ip) {
         LocationResponse response = getResponse(ip);
 
@@ -307,17 +282,18 @@ public class AsnLookup extends AbstractDatabaseReader {
             if (ipAddress instanceof Inet4Address) {
                 //Iterate through each 'dbReader' and execute them in the following order: private v4 -> private -> public v4 -> public.
                 for (GalaxyDataBaseReader reader : availableDBReaders.get(AbstractDatabaseReader.IpVersion.IPv4.name())) {
-                    LocationResponse response = reader.location(ipAddress);
-                    if(StringUtil.isNotEmpty(response)) {
-                        return response;
+
+                    Optional<LocationResponse> response = reader.getLocation(ipAddress);
+                    if(response.isPresent()) {
+                        return response.get();
                     }
                 }
             } else if (ipAddress instanceof Inet6Address) {
                 //Iterate through each 'dbReader' and execute them in the following order: private v6 -> private -> public v6 -> public.
                 for(GalaxyDataBaseReader reader : availableDBReaders.get(AbstractDatabaseReader.IpVersion.IPv6.name())) {
-                    LocationResponse response = reader.location(ipAddress);
-                    if(StringUtil.isNotEmpty(response)) {
-                        return  response;
+                    Optional<LocationResponse> response = reader.getLocation(ipAddress);
+                    if(response.isPresent()) {
+                        return response.get();
                     }
                 }
             } else {
