@@ -1,14 +1,12 @@
 package com.geedgenetworks.utils;
 
 
-import com.geedgenetworks.domain.Nets;
+import com.geedgenetworks.model.Nets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.StringWriter;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;

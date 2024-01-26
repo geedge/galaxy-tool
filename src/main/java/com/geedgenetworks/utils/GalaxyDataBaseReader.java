@@ -1,7 +1,7 @@
 package com.geedgenetworks.utils;
 
 import com.maxmind.db.*;
-import com.geedgenetworks.domain.LocationResponse;
+import com.geedgenetworks.model.LocationResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import java.io.File;
@@ -114,9 +114,8 @@ public class GalaxyDataBaseReader  {
         }
     }
 
-    public LocationResponse locationV2(InetAddress ipAddress) throws IOException {
+    public LocationResponse location(InetAddress ipAddress) throws IOException {
         return reader.get(ipAddress, LocationResponse.class);
-
     }
 
     public void close() throws IOException {

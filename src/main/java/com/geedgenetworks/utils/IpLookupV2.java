@@ -3,10 +3,11 @@ package com.geedgenetworks.utils;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.JSONWriter;
+import com.geedgenetworks.model.LocationResponse;
+import com.google.common.base.Function;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.geedgenetworks.domain.LocationResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,7 +23,7 @@ import java.util.*;
  * @Date 2023-08-22 20:00  Geedge Networks
  * @Version 1.2
  **/
-public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocator{
+public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocator {
     private Map<String, List<GalaxyDataBaseReader>> availableDBReaders = Maps.newHashMap();
     private GalaxyDataBaseReader publicDatabaseReader;
     private GalaxyDataBaseReader publicV4DatabaseReader;;
@@ -432,196 +433,173 @@ public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocato
     }
 
     @Override
-    public  String countryLookup(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return UNKNOWN;
-        }
-        if (response.isPrivateIP()) {
-            return PRIVATE_IP;
-        }
-
-        return StringUtil.setDefaultIfEmpty(response.getCountry(), UNKNOWN).toString() ;
+    public String countryLookup(String ip) {
+        return getValueWithPrivateIP(getResponse(ip), LocationResponse::getCountry);
     }
 
     @Override
-    public String cityLookupDetail(String ip) {
-
-        LocationResponse response = getResponse(ip);
-
-        if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
-        }
-        if (response.isPrivateIP()) {
-            return PRIVATE_IP;
-        }
-
-        return Joiner.on(LOCATION_SEPARATOR).useForNull("").join(response.getCountry(),
-                        response.getSuperAdministrativeArea(), response.getAdministrativeArea());
-    }
-
-    @Override
-    public String administrativeAreaLookupDetail(String ip) {
-        LocationResponse response = getResponse(ip);
-
-        if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
-        }
-        if (response.isPrivateIP()) {
-            return PRIVATE_IP;
-        }
-
-        return  Joiner.on(LOCATION_SEPARATOR).useForNull("").join(response.getCountry(),
-                response.getSuperAdministrativeArea(), response.getAdministrativeArea(),
-                response.getSubAdministrativeArea());
-    }
-
-    @Override
-    public String locationLookupDetail(String ip) {
-        LocationResponse response = getResponse(ip);
-
-        if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
-        }
-        if (response.isPrivateIP()) {
-            return PRIVATE_IP;
-        }
-
-        return  Joiner.on(LOCATION_SEPARATOR).useForNull("").join(response.getCountry(),
-                response.getSuperAdministrativeArea(), response.getAdministrativeArea(),
-                response.getSubAdministrativeArea(), response.getLocality(),
-                response.getDependentLocality(), response.getDoubleDependentLocality());
+    public String provinceLookup(String ip) {
+        return getValueWithPrivateIP(getResponse(ip), LocationResponse::getSuperAdministrativeArea);
     }
 
     @Override
     public String cityLookup(String ip) {
-        LocationResponse response = getResponse(ip);
+        return getValueWithPrivateIP(getResponse(ip), LocationResponse::getAdministrativeArea);
+    }
 
-        if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
-        }
-        if (response.isPrivateIP()) {
+
+    @Override
+    public String cityLookupDetail(String ip) {
+        Optional<LocationResponse> response = getResponse(ip);
+        if (response.isPresent() && response.get().isPrivateIP()) {
             return PRIVATE_IP;
         }
+        return Joiner.on(LOCATION_SEPARATOR).useForNull("").join(
+                    getValue(response, LocationResponse::getCountry),
+                    getValue(response, LocationResponse::getSuperAdministrativeArea),
+                    getValue(response, LocationResponse::getAdministrativeArea));
+    }
 
-        return StringUtil.setDefaultIfEmpty(response.getAdministrativeArea(), UNKNOWN).toString() ;
+    @Override
+    public String administrativeAreaLookupDetail(String ip) {
+        Optional<LocationResponse> response = getResponse(ip);
+        if (response.isPresent() && response.get().isPrivateIP()) {
+            return PRIVATE_IP;
+        }
+        return  Joiner.on(LOCATION_SEPARATOR).useForNull("").join(
+                getValue(response, LocationResponse::getCountry),
+                getValue(response, LocationResponse::getSuperAdministrativeArea),
+                getValue(response, LocationResponse::getAdministrativeArea),
+                getValue(response, LocationResponse::getSubAdministrativeArea));
+    }
+
+    @Override
+    public String locationLookupDetail(String ip) {
+        Optional<LocationResponse> response = getResponse(ip);
+        if (response.isPresent() && response.get().isPrivateIP()) {
+            return PRIVATE_IP;
+        }
+        return  Joiner.on(LOCATION_SEPARATOR).useForNull("").join(
+                getValue(response, LocationResponse::getCountry),
+                getValue(response, LocationResponse::getSuperAdministrativeArea),
+                getValue(response, LocationResponse::getAdministrativeArea),
+                getValue(response, LocationResponse::getSubAdministrativeArea),
+                getValue(response, LocationResponse::getLocality),
+                getValue(response, LocationResponse::getDependentLocality),
+                getValue(response, LocationResponse::getDoubleDependentLocality));
 
     }
 
     @Override
     public String countryCodeLookup(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
-        }
-        return StringUtil.setDefaultIfEmpty(response.getCountryCode(), UNKNOWN).toString() ;
+        return getValue(getResponse(ip), LocationResponse::getCountryCode);
     }
 
     @Override
     public String regionCodeLookup(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
-        }
-        return StringUtil.setDefaultIfEmpty(response.getAreaCode(), UNKNOWN).toString() ;
+        return getValue(getResponse(ip), LocationResponse::getAreaCode);
     }
+
+    private String getValue(Optional<LocationResponse> response, Function<LocationResponse, String> valueExtractor) {
+        if (response.isPresent()) {
+            return StringUtil.setDefaultIfEmpty(valueExtractor.apply(response.get()), UNKNOWN).toString();
+        }
+        return UNKNOWN;
+    }
+
+    private String getValueWithPrivateIP(Optional<LocationResponse> response, Function<LocationResponse, String> valueExtractor) {
+        if (response.isPresent()) {
+            LocationResponse locationResponse = response.get();
+            if (locationResponse.isPrivateIP()) {
+                return PRIVATE_IP;
+            }
+            return StringUtil.setDefaultIfEmpty(valueExtractor.apply(locationResponse), UNKNOWN).toString();
+        }
+        return UNKNOWN;
+    }
+
 
     @Override
     public String infoLookupToCSV(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return UNKNOWN;
-        }
+        Optional<LocationResponse> response = getResponse(ip);
         StringBuilder ipInfo = new StringBuilder();
         ipInfo.append(
-                Joiner.on(LOCATION_SEPARATOR).useForNull("").join(response.getCountry(),
-                        response.getSuperAdministrativeArea(), response.getAdministrativeArea(),
-                        response.getSubAdministrativeArea(), response.getLocality(),
-                        response.getDependentLocality(), response.getDoubleDependentLocality()))
+                Joiner.on(LOCATION_SEPARATOR).useForNull("").join(
+                        getValue(response, LocationResponse::getCountry),
+                        getValue(response, LocationResponse::getSuperAdministrativeArea),
+                        getValue(response, LocationResponse::getAdministrativeArea),
+                        getValue(response, LocationResponse::getSubAdministrativeArea),
+                        getValue(response, LocationResponse::getLocality),
+                        getValue(response, LocationResponse::getDependentLocality),
+                        getValue(response, LocationResponse::getDoubleDependentLocality)))
                 .append(OBJECT_SEPARATOR).append(
-                        StringUtil.setDefaultIfEmpty(response.getIsp(), UNKNOWN).toString()
+                        getValue(response, LocationResponse::getIsp)
                 ).append(OBJECT_SEPARATOR).append(
-                        StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOWN).toString()
+                        getValue(response, LocationResponse::getOrganization)
                 ).append(OBJECT_SEPARATOR).append(
                         asnLookup.asnLookup(ip)
                 ).append(OBJECT_SEPARATOR).append(
-                        Joiner.on(LAT_LNG_SEPARATOR).skipNulls().join(response.getLatitude(), response.getLongitude())
+                        Joiner.on(LAT_LNG_SEPARATOR).skipNulls().join(
+                                getValue(response, LocationResponse::getLatitude),
+                                getValue(response, LocationResponse::getLongitude))
                 );
         return ipInfo.toString();
     }
 
     @Override
     public String infoLookupToJSONString(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return UNKNOWN;
+        Optional<LocationResponse> response = getResponse(ip);
+        if (response.isPresent()) {
+            return JSON.toJSONString(response.get(), JSONWriter.Feature.WriteNullStringAsEmpty);
         }
-        return JSON.toJSONString(response, JSONWriter.Feature.WriteNullStringAsEmpty);
+        return UNKNOWN;
     }
 
     @Override
-    public Object infoLookupToJSON(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return UNKNOWN;
+    public JSONObject infoLookupToJSON(String ip) {
+        Optional<LocationResponse> response = getResponse(ip);
+        if (response.isPresent()) {
+            return JSONObject.from(response.get());
         }
-        return JSONObject.from(response);
+        return null;
     }
 
     @Override
-    public Object infoLookup(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return UNKNOWN;
+    public LocationResponse infoLookup(String ip) {
+        Optional<LocationResponse> response = getResponse(ip);
+        if (response.isPresent()) {
+            return response.get();
         }
-        return response;
-    }
-
-    @Override
-    public String provinceLookup(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
-        }
-        if (response.isPrivateIP()) {
-            return PRIVATE_IP;
-        }
-        return StringUtil.setDefaultIfEmpty(response.getSuperAdministrativeArea(), UNKNOWN).toString() ;
+        return null;
     }
 
     @Override
     public String ispLookup(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
-        }
-        if (response.isPrivateIP()) {
-            return PRIVATE_IP;
-        }
-        return StringUtil.setDefaultIfEmpty(response.getIsp(), UNKNOWN).toString() ;
+        Optional<LocationResponse> response = getResponse(ip);
+        response.ifPresent(locationResponse -> {
+            if (locationResponse.isPrivateIP()) {
+                locationResponse.setIsp(PRIVATE_IP);
+            }
+        });
+        return StringUtil.setDefaultIfEmpty(response.orElseGet(()->new LocationResponse()).getIsp(), UNKNOWN).toString();
     }
 
     @Override
     public String organizationLookup(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response)) {
-            return  UNKNOWN;
-        }
-        if (response.isPrivateIP()) {
-            return PRIVATE_IP;
-        }
-        return StringUtil.setDefaultIfEmpty(response.getOrganization(), UNKNOWN).toString() ;
+        Optional<LocationResponse> response = getResponse(ip);
+        response.ifPresent(locationResponse -> {
+            if (locationResponse.isPrivateIP()) {
+                locationResponse.setOrganization(PRIVATE_IP);
+            }
+        });
+        return StringUtil.setDefaultIfEmpty(response.orElseGet(()->new LocationResponse()).getOrganization(), UNKNOWN).toString();
     }
 
     @Override
     public  String latLngLookup(String ip) {
-        LocationResponse response = getResponse(ip);
-        if (StringUtil.isEmpty(response) || response.isPrivateIP()) {
-            return  UNKNOWN;
-        }
-
-        return Joiner.on(LAT_LNG_SEPARATOR).skipNulls().join(response.getLatitude(), response.getLongitude());
-
+        Optional<LocationResponse> response = getResponse(ip);
+        LocationResponse locationResponse = response.orElseGet(()->new LocationResponse());
+        return Joiner.on(LAT_LNG_SEPARATOR).skipNulls().join(locationResponse.getLatitude(), locationResponse.getLongitude());
     }
 
     @Override
@@ -648,8 +626,7 @@ public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocato
         return asnLookup.asnLookupDetail(ip);
     }
 
-
-    private LocationResponse getResponse(String ip) {
+    private Optional<LocationResponse> getResponse(String ip) {
         try {
             ip = Optional.ofNullable(ip).orElse("").trim();
             InetAddress ipAddress = InetAddress.getByName(ip);
@@ -657,30 +634,32 @@ public final class IpLookupV2 extends AbstractDatabaseReader implements IPLocato
 
                 //Iterate through each 'dbReader' and execute them in the following order: private v4 -> private -> public v4 -> public.
                 for (GalaxyDataBaseReader reader : availableDBReaders.get(IpVersion.IPv4.name())) {
-                   LocationResponse response = reader.locationV2(ipAddress);
+                   LocationResponse response = reader.location(ipAddress);
                    if(StringUtil.isNotEmpty(response)) {
-                       return response;
+                       return Optional.of(response);
                    }
                 }
                 //Is it a private IP
                 if (IPUtil.internalIp(ip)) {
-                    return new LocationResponse(true);
+                    LocationResponse response = new LocationResponse();
+                    response.setPrivateIP(true);
+                    return Optional.of(response);
                 }
 
             } else if (ipAddress instanceof Inet6Address) {
                 //Iterate through each 'dbReader' and execute them in the following order: private v6 -> private -> public v6 -> public.
                 for(GalaxyDataBaseReader reader : availableDBReaders.get(IpVersion.IPv6.name())) {
-                    LocationResponse response = reader.locationV2(ipAddress);
+                    LocationResponse response = reader.location(ipAddress);
                     if(StringUtil.isNotEmpty(response)) {
-                        return  response;
+                        return Optional.of(response);
                     }
                 }
             } else {
-                throw new IllegalArgumentException("IP address <" + ip +">. ");
+                throw new IllegalArgumentException(String.format("IP address <%s>. ", ip));
             }
-            return null;
+            return Optional.empty();
         }  catch (Exception e) {
-            throw new IllegalArgumentException("IP address <" + ip +">. " + e);
+            throw new IllegalArgumentException(String.format("IP address <%s>. ", ip) + e);
         }
     }
 

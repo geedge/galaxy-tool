@@ -7,13 +7,13 @@
     <artifactId>galaxy</artifactId>
     <packaging>jar</packaging>
     <name>galaxy</name>
-    <version>1.2.2</version>
+    <version>1.2.3</version>
     <description>galaxy tools for common</description>
     <url>http://www.zdjizhi.com/galaxy-tool</url>
 
     <licenses>
         <license>
-            <name>The geedge networks Software License, Version 21.0</name>
+            <name>The geedgenetworks Software License, Version 21.0</name>
             <url>http://www.apache.org/licenses/LICENSE-1.0.txt</url>
             <distribution>repo</distribution>
         </license>

@@ -1,4 +1,4 @@
-package com.geedgenetworks.domain;/**
+package com.geedgenetworks.model;/**
  * Created by dell on 2018-10-8.
  */
 
@@ -43,14 +43,8 @@ public class LocationResponse implements java.io.Serializable {
     private String countryCode;
 
     private boolean isPrivateIP;
-
-
     public LocationResponse() {
         this("", "", "", "", "", "", "", "", "", "", "", "", "", "");
-    }
-
-    public LocationResponse(boolean isPrivateIP) {
-      this.setPrivateIP(isPrivateIP);
     }
     @MaxMindDbConstructor
     public LocationResponse(@MaxMindDbParameter(name="AREA_CODE") String areaCode, @MaxMindDbParameter(name= "ASN") String asn,

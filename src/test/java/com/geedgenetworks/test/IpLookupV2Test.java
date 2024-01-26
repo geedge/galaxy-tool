@@ -1,6 +1,7 @@
 package com.geedgenetworks.test;
 
 import com.alibaba.fastjson2.JSONObject;
+import com.geedgenetworks.model.LocationResponse;
 import com.geedgenetworks.utils.AbstractDatabaseReader;
 import com.geedgenetworks.utils.AsnLookup;
 import com.geedgenetworks.utils.IpLookupV2;
@@ -18,6 +19,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 
 public class IpLookupV2Test {
@@ -162,6 +164,57 @@ public class IpLookupV2Test {
         assertEquals(ipLookupByDatabase.infoLookupToCSV("120.221.155.223").split( AbstractDatabaseReader.OBJECT_SEPARATOR).length, 5);
         assertEquals(JSONObject.from(ipLookupByDatabase.infoLookupToJSON("120.221.155.223")).get("country"),"China");
     }
+
+    @Test
+    public void testCountryLookup() {
+        assertEquals(ipLookupByDatabase.countryLookup("120.221.155.223"), "China");
+        assertEquals(ipLookupByDatabase.countryLookup("192.168.12.1"), "Private IP");
+        assertEquals(ipLookupByDatabase.countryLookup("2001:db8:3333:4444:5555:6666:7777:8888"), "");
+        System.out.println(ipLookupByDatabase.infoLookupToCSV("120.221.155.223"));
+    }
+
+    @Test
+    public void testProvinceLookup() {
+        assertEquals(ipLookupByDatabase.provinceLookup("120.221.155.223"), "Shandong");
+        assertEquals(ipLookupByDatabase.provinceLookup("192.168.12.1"), "Private IP");
+        assertEquals(ipLookupByDatabase.provinceLookup("2001:db8:3333:4444:5555:6666:7777:8888"), "");
+    }
+
+    @Test
+    public void testCityLookup() {
+        assertEquals(ipLookupByDatabase.cityLookup("120.221.155.223"), "Other");
+        assertEquals(ipLookupByDatabase.cityLookup("192.168.12.1"), "Private IP");
+        assertEquals(ipLookupByDatabase.cityLookup("2001:db8:3333:4444:5555:6666:7777:8888"), "");
+    }
+
+    @Test
+    public void testCityLookupDetail() {
+        assertEquals(ipLookupByStream.cityLookupDetail("120.221.155.223").split("\\" + AbstractDatabaseReader.LOCATION_SEPARATOR).length, 3);
+        assertEquals(ipLookupByDatabase.cityLookupDetail("192.168.12.1"), "Private IP");
+        assertEquals(ipLookupByDatabase.cityLookupDetail("2001:db8:3333:4444:5555:6666:7777:8888"), "..");
+    }
+
+    @Test
+    public void testCountryCodeLookup() {
+        assertEquals(ipLookupByDatabase.countryCodeLookup("120.221.155.223"), "");
+        assertEquals(ipLookupByDatabase.countryCodeLookup("192.168.12.1"), "");
+        assertEquals(ipLookupByDatabase.countryCodeLookup("2001:db8:3333:4444:5555:6666:7777:8888"), "");
+    }
+    @Test
+    public void testRegionCodeLookup() {
+        assertEquals(ipLookupByDatabase.regionCodeLookup("120.221.155.223"), "-");
+        assertEquals(ipLookupByDatabase.regionCodeLookup("192.168.12.1"), "");
+        assertEquals(ipLookupByDatabase.regionCodeLookup("2001:db8:3333:4444:5555:6666:7777:8888"), "");
+    }
+
+    @Test
+    public void testInfoLookupJsonString() {
+        assertTrue(JSONObject.parseObject(ipLookupByDatabase.infoLookupToJSONString("120.221.155.223"), LocationResponse.class) instanceof  LocationResponse);
+        assertEquals(ipLookupByDatabase.infoLookupToJSONString("2001:db8:3333:4444:5555:6666:7777:8888"), "");
+    }
+
+
+
 
     @Test
     public void testOutputJson() {

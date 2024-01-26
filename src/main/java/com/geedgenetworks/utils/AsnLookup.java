@@ -3,7 +3,7 @@ package com.geedgenetworks.utils;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.geedgenetworks.domain.LocationResponse;
+import com.geedgenetworks.model.LocationResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -307,7 +307,7 @@ public class AsnLookup extends AbstractDatabaseReader {
             if (ipAddress instanceof Inet4Address) {
                 //Iterate through each 'dbReader' and execute them in the following order: private v4 -> private -> public v4 -> public.
                 for (GalaxyDataBaseReader reader : availableDBReaders.get(AbstractDatabaseReader.IpVersion.IPv4.name())) {
-                    LocationResponse response = reader.locationV2(ipAddress);
+                    LocationResponse response = reader.location(ipAddress);
                     if(StringUtil.isNotEmpty(response)) {
                         return response;
                     }
@@ -315,7 +315,7 @@ public class AsnLookup extends AbstractDatabaseReader {
             } else if (ipAddress instanceof Inet6Address) {
                 //Iterate through each 'dbReader' and execute them in the following order: private v6 -> private -> public v6 -> public.
                 for(GalaxyDataBaseReader reader : availableDBReaders.get(AbstractDatabaseReader.IpVersion.IPv6.name())) {
-                    LocationResponse response = reader.locationV2(ipAddress);
+                    LocationResponse response = reader.location(ipAddress);
                     if(StringUtil.isNotEmpty(response)) {
                         return  response;
                     }
