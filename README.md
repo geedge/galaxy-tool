@@ -16,7 +16,7 @@ Galaxy 的 Maven group ID 是 `com.geedgenetworks` 并且 artifactId 是 `galaxy
 <dependency>
     <groupId>com.geedgenetworks</groupId>
     <artifactId>galaxy</artifactId>
-    <version>1.2/version>
+    <version>1.2.3/version>
 </dependency>
 ```
 
