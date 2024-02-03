@@ -1,12 +1,10 @@
-**galaxy: zdjizhi Core Libraries for Java**
+**galaxy: Geedge Networks Core Libraries for Java**
 
-Galaxy Tools 是中电积至关于java的核心工具类库，主要包括文件类， 加密类，日期类，IP定位，IP工具处理类，JSON处理和字符串处理工具类等。
+Galaxy Tools 工具类库，主要包括文件， 加密，日期，IP定位，IP地址，JSON处理和字符串处理等。
 
-使用Galaxy注意如下：
-
-    * JRE环境必须使用JDK 1.8 或更高版本
-    * IP定位库，依赖GEOIP库，目前有两种GEOIP及GEOIP2
-    * 日期类库，依赖JODA-TIME库
+* JRE环境必须使用JDK 11
+* IP定位库，Maxmind DB
+* 日期类库，依赖JODA-TIME库
 
 **增加Galaxy Tools 到你的应用中**
 ***
@@ -16,21 +14,18 @@ Galaxy 的 Maven group ID 是 `com.geedgenetworks` 并且 artifactId 是 `galaxy
 <dependency>
     <groupId>com.geedgenetworks</groupId>
     <artifactId>galaxy</artifactId>
-    <version>1.2/version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
 **关于Galaxy 应用**
 ***
-
 IP映射使用向导，[IPGEO](help/IPGEO.md)
-
 格式转换Formatutils向导[FormatUtils](https://git.mesalab.cn/doufenghu/galaxy-tool/wikis/FormatUtils)
-
 
 **说明**
 ***
-目前工具类库未支持外网，maven构建时请自行添加局域网仓库URL，具体如下：
+maven构建需添加局域网仓库URL：
 ```
 <repository>
    <id>nexus</id>
