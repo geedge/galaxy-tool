@@ -18,6 +18,7 @@ import java.util.Set;
 public class FormatUtilTest {
 	@Test
     public void testGetTopDomain() {
+		Assert.assertEquals(FormatUtils.getTopPrivateDomain(" "), "");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("https://pan.baidu.com/s/1wejv5ZceAL0NQGExvPQm-Q#list/path=%2F&parentPath=%2Fsharelink3477893581-1028235543414583"), "baidu.com");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("www.baidu.com"), "baidu.com");
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("www.baidu.com.cn"), "baidu.com.cn");

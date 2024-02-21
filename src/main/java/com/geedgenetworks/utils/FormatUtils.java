@@ -110,8 +110,8 @@ public class FormatUtils {
 	public static final class Builder {
 		boolean idDefault;
 
-		public Builder(boolean isDefalult) {
-			this.idDefault = isDefalult;
+		public Builder(boolean idDefault) {
+			this.idDefault = idDefault;
 		}
 
 		public FormatUtils build() {
@@ -129,20 +129,16 @@ public class FormatUtils {
 	 */
 	public static String getTopPrivateDomain(String domain) {
 
-		domain = getDomain(domain);
-
-		if (StringUtil.isBlank(domain) || !InternetDomainName.isValid(domain)) {
-			return StringUtil.EMPTY;
+		try {
+			domain = getDomain(domain);
+			InternetDomainName internetDomainName = InternetDomainName.from(domain);
+			if (internetDomainName.isUnderPublicSuffix()) {
+				return internetDomainName.topPrivateDomain().toString();
+			}
+		} catch (IllegalArgumentException e) {
+			// Ignore Exception
 		}
-
-		InternetDomainName internetDomainName = InternetDomainName.from(domain);
-		if (internetDomainName.isUnderPublicSuffix()) {
-			return internetDomainName.topPrivateDomain().toString();
-		} else {
-			return StringUtil.EMPTY;
-
-		}
-
+		return StringUtil.EMPTY;
 	}
 
 	/**
