@@ -3,9 +3,8 @@ package com.geedgenetworks.test;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.geedgenetworks.shaded.com.google.common.collect.Iterables;
+import com.geedgenetworks.shaded.com.google.common.collect.Lists;
 import com.geedgenetworks.utils.DateUtils;
 import com.geedgenetworks.utils.TimeConstants;
 import org.apache.log4j.Logger;

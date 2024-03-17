@@ -1,6 +1,6 @@
 package com.geedgenetworks.utils;
 
-import com.google.common.collect.ObjectArrays;
+import com.geedgenetworks.shaded.com.google.common.collect.ObjectArrays;
 import com.maxmind.db.CHMCache;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -1,9 +1,10 @@
 package com.geedgenetworks.utils;
 
-import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.geedgenetworks.model.LocationResponse;
+import com.geedgenetworks.shaded.com.google.common.base.Joiner;
+import com.geedgenetworks.shaded.com.google.common.collect.Lists;
+import com.geedgenetworks.shaded.com.google.common.collect.Maps;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;

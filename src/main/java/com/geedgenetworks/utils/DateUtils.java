@@ -1,6 +1,5 @@
 package com.geedgenetworks.utils;
-
-import com.google.common.collect.Lists;
+import com.geedgenetworks.shaded.com.google.common.collect.Lists;
 import org.joda.time.*;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
