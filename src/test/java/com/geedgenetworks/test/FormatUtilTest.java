@@ -29,6 +29,7 @@ public class FormatUtilTest {
         Assert.assertEquals(FormatUtils.getTopPrivateDomain("com.cn"), "");
 		Assert.assertNotSame(FormatUtils.getTopPrivateDomain("playetoms-pa.googleapis.com"), "googleapis.com");
         Assert.assertNotSame(FormatUtils.getTopPrivateDomain("com.io"), "com.io");
+		Assert.assertNotSame(FormatUtils.getTopPrivateDomain("22.0.0.2"), "0.0.2");
 
 	}
 
@@ -43,6 +44,7 @@ public class FormatUtilTest {
         Assert.assertEquals(FormatUtils.getDomain("com.cn"), "com.cn");
         Assert.assertEquals(FormatUtils.getDomain("baidu.com.hk:80/abc.html"), "baidu.com.hk");
 		Assert.assertEquals(FormatUtils.getDomain("http://www.abc.cc"), "abc.cc");
+
 
     }
 
