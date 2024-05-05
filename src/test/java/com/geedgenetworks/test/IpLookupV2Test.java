@@ -44,8 +44,9 @@ public class IpLookupV2Test {
                 .loadDataFilePrivateV6("dat/ip_v4_user_defined.mmdb")
                 .loadDataFileV6("dat/ip_v6_built_in.mmdb")
                 .loadDataFilePrivateV6("dat/ip_v6_user_defined.mmdb")
-                .loadAsnDataFile("dat/asn_v4.mmdb")
-                .loadAsnDataFileV6("dat/asn_v6.mmdb")
+                .loadAsnDataFile("dat/asn_builtin.mmdb")
+               // .loadAsnDataFile("dat/asn_v4.mmdb")
+               // .loadAsnDataFileV6("dat/asn_v6.mmdb")
                 .build();
     }
 
@@ -57,8 +58,9 @@ public class IpLookupV2Test {
                     .loadDataFilePrivateV4(new FileInputStream(new File("dat/ip_v4_user_defined.mmdb")))
                     .loadDataFileV6(new FileInputStream(new File("dat/ip_v6_built_in.mmdb")))
                     .loadDataFilePrivateV6(new FileInputStream(new File("dat/ip_v6_user_defined.mmdb")))
-                    .loadAsnDataFile(new FileInputStream(new File("dat/asn_v4.mmdb")))
-                    .loadAsnDataFileV6(new FileInputStream(new File("dat/asn_v6.mmdb")))
+                    .loadAsnDataFile("dat/asn_builtin.mmdb")
+                    //.loadAsnDataFile(new FileInputStream(new File("dat/asn_v4.mmdb")))
+                    //.loadAsnDataFileV6(new FileInputStream(new File("dat/asn_v6.mmdb")))
                     .build();
         }catch (FileNotFoundException e) {
           logger.error(" File is not found:", e);
@@ -244,15 +246,10 @@ public class IpLookupV2Test {
 
  @Test
  public void testAsnLookupOutput() {
-  logger.info(ipLookupByStream.asnLookupOrganization("8.8.8.8"));
-  logger.info(ipLookupByStream.asnLookupDetail("8.8.8.8"));
-  logger.info(ipLookupByStream.asnLookupInfo("8.8.8.8"));
-  logger.info(ipLookupByStream.asnLookupOrganization("8.8.8.8"));
-
-  logger.info(asnLookup.asnLookupOrganization("8.8.8.8"));
-  logger.info(asnLookup.asnLookupDetail("8.8.8.8"));
-  logger.info(asnLookup.asnLookupInfo("8.8.8.8"));
-  logger.info(asnLookup.asnLookupOrganization("8.8.8.8"));
+  assertEquals("CLOUDFLARENET", ipLookupByStream.asnLookupOrganization("1.1.1.5"));
+  assertEquals("HURRICANE", ipLookupByStream.asnLookupOrganization("2001:470::"));
+  assertEquals("28563", ipLookupByStream.asnLookup("201.131.58.12"));
+  assertEquals("6939", ipLookupByStream.asnLookup("2602:fd9b::"));
 
  }
 
