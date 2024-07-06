@@ -23,7 +23,7 @@
     <repositories>
 
        <repository>
-           <id>nexus</id>
+           <id>nexus3</id>
            <name>Team Nexus Repository</name>
            <url>http://192.168.40.153:8081/repository/public</url>
        </repository>
@@ -31,7 +31,7 @@
     </repositories>
   <distributionManagement>
       <repository>
-          <id>nexus</id>
+          <id>nexus3</id>
           <name>releases</name>
           <url>http://192.168.40.153:8081/repository/releases</url>
           <uniqueVersion>true</uniqueVersion>
