@@ -8,16 +8,6 @@
     <packaging>jar</packaging>
     <name>galaxy</name>
     <version>2.0.2</version>
-    <description>galaxy tools for common</description>
-    <url>http://www.zdjizhi.com/galaxy-tool</url>
-
-    <licenses>
-        <license>
-            <name>The geedgenetworks Software License, Version 21.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-1.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
 
     <!-- 仓库地址构建 -->
     <repositories>
@@ -25,7 +15,7 @@
        <repository>
            <id>nexus3</id>
            <name>Team Nexus Repository</name>
-           <url>http://192.168.40.153:8081/repository/public</url>
+           <url>http://192.168.40.153:8081/repository/public/</url>
        </repository>
 
     </repositories>
@@ -33,7 +23,7 @@
       <repository>
           <id>nexus3</id>
           <name>releases</name>
-          <url>http://192.168.40.153:8081/repository/releases</url>
+          <url>http://192.168.40.153:8081/repository/releases/</url>
           <uniqueVersion>true</uniqueVersion>
       </repository>
     </distributionManagement>
@@ -92,7 +82,7 @@
                 </executions>
             </plugin>
 
-            <plugin>
+           <!-- <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-toolchains-plugin</artifactId>
                 <version>1.1</version>
@@ -111,7 +101,7 @@
                         </jdk>
                     </toolchains>
                 </configuration>
-            </plugin>
+            </plugin>-->
 
         </plugins>
 

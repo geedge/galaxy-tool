@@ -1,3 +1,5 @@
+image: 192.168.40.153:9080/common/maven:3.8.1-openjdk-11-slim
+
 stages:
   - build
   - clean
