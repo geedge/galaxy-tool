@@ -30,6 +30,7 @@ deploy:
   script:
     - echo 'exec mvn package & docker build'
     - echo  'tag:' $CI_COMMIT_TAG
+    - echo "$MAVEN_SETTINGS_XML" > /usr/share/maven/conf/settings.xml
     - mvn deploy -e
   when: on_success
   only:
